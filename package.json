@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "nodemon": "^3.0.2"
+  },
+  "scripts": {
+    "start": "concurrently \"npm run start:react\" \"npm run start:express\"",
+    "start:react": "cd client && npm start",
+    "start:express": "cd server && npm start"
+  }
+}
