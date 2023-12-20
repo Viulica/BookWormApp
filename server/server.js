@@ -1,5 +1,5 @@
 const express = require('express');
-const session = require('express-session');
+const jwt = require('jsonwebtoken');
 const cors = require('cors');
 const sequelize = require('./config/db');
 const data = require('./models/data');
@@ -7,11 +7,8 @@ const data = require('./models/data');
 const app = express();
 
 app.use(cors());
-app.use(session({
-  secret: 'tajna-rijec',
-  resave: false,
-  saveUninitialized: true,
-}));
+
+
 app.use(express.json());
 
 async function initDatabase() {
@@ -29,12 +26,112 @@ async function initDatabase() {
 initDatabase();
 
 app.use('/api', (req, res, next) => {
-  // Ovde možete dodati bilo kakvu dodatnu logiku ako je potrebno
   console.log('Middleware za /api');
   next();
 });
 
-app.get('/api/users', async (req, res) => {
+app.post('/api/login', async (req, res) => {
+  console.log("/api/login");
+  try {
+    const user = await data.korisnik.findOne({
+      where: {
+        korime: req.body.username,
+        lozinka: req.body.password
+      }
+    })
+
+    if (user) {
+      const token = jwt.sign({ userId: user.idkorisnik, username: user.korime }, 'tajna_lozinka', { expiresIn: '1h' });
+      res.status(200).send(token);
+    } else {
+      res.status(404).json({ error: "User not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: 'Internal Server Error', details: error.message });
+  }
+});
+
+const verifyToken = (req, res, next) => {
+  const token = req.headers.authorization;
+  console.log(token);
+  
+  if (!token) {
+    return res.status(403).json({ message: 'Token nije pružen' });
+  }
+  
+  jwt.verify(token, 'tajna_lozinka', async (err, decoded) => {
+    if (err) {
+      return res.status(401).json({ message: 'Neuspješna autentikacija tokena' });
+    }
+    req.user = decoded;
+    next();
+  });
+};
+
+app.get('/api/data/profile', verifyToken, async (req, res) => {
+  const userId = req.user.userId;
+  const user = await data.korisnik.findOne({
+      where: {
+        idkorisnik: userId
+      }
+    })
+    
+  if (user) {
+    res.json({user});
+  } else {
+    res.status(404).json({ message: 'Korisnik nije pronađen' });
+  }
+});
+
+app.get('/api/data/allBooks', async (req, res) => {
+  try {
+    const allBooks = (await data.knjiga.findAll({
+      include: [
+        {
+          model: data.korisnik,
+          as: 'idkorisnik_korisnik',
+          attributes: ['ime', 'prezime', 'datrod', 'info']
+        }
+      ]
+    }));
+
+    // const allBooks = await data.knjiga.findAll();
+    const formattedBooks = allBooks.map(book => {
+      const formattedBook = book.get({ plain: true }); // Pretvaranje Sequelize instance u običan objekt
+
+      // Zamjena asocijativnog modela s atributima
+      formattedBook.naslov = formattedBook.naslov;
+      formattedBook.zanr = formattedBook.zanr;
+      formattedBook.opis = formattedBook.opis;
+      formattedBook.datizd = formattedBook.datizd;
+      formattedBook.isbn = formattedBook.isbn;
+      formattedBook.ime = formattedBook.idkorisnik_korisnik.ime;
+      formattedBook.prezime = formattedBook.idkorisnik_korisnik.prezime;
+      formattedBook.datrod = formattedBook.idkorisnik_korisnik.datrod;
+      formattedBook.info = formattedBook.idkorisnik_korisnik.info;
+
+      // Uklanjanje originalnih atributa
+      // delete formattedBook.naslov;
+      // delete formattedBook.zanr;
+      // delete formattedBook.opis;
+      // delete formattedBook.datizd;
+      // delete formattedBook.isbn;
+      delete formattedBook.idkorisnik_korisnik; // Uklanjanje originalnog asocijativnog modela
+
+      return formattedBook;
+    })
+    console.log(formattedBooks);
+    res.status(200).json(formattedBooks);
+  }
+  catch (error) {
+    console.log('Error fetching books:', error);
+    res.status(500).json({ error: 'Internal Server Error', details: error.message });
+  }
+});
+
+
+
+app.get('/api/data/allUsers', async (req, res) => {
   try {
     const allUsers = await data.korisnik.findAll();
     res.json(allUsers);
@@ -44,49 +141,36 @@ app.get('/api/users', async (req, res) => {
   }
 });
 
-app.get('/api/books', async (req, res) => {
+
+
+app.get('/api/data/myBooks', verifyToken, async (req, res) => {
   try {
-    const allBooks = await data.knjiga.findAll();
-    res.json(allBooks);
-  }
-  catch (error) {
-    console.log('Error fetching books:', error);
-    res.status(500).json({ error: 'Internal Server Error', details: error.message });
-  }
-})
-
-app.get('/api/profile', (req, res) => {
-  console.log(req.session.user);
-  if (req.session.user) {
-    // Korisnik je prijavljen, možete koristiti req.session.user za pristup podacima
-    res.status(200).json(req.session.user);
-  } else {
-    res.status(401).json({ error: 'Not authenticated' });
-  }
-});
-
-
-app.post('/api/login', async (req, res) => {
-  console.log(req.body);
-  try {
-    const user = await data.korisnik.findOne({
+    const userId = req.user.userId;
+    const books = await data.cita.findAll({
       where: {
-        korime: req.body.username,
-        lozinka: req.body.password
-      }
+        idkorisnik: userId
+      },
+      include: [
+        {
+          model: data.knjiga,
+          as: 'idknjiga_knjiga'
+        }
+      ]
     });
 
-    if (user) {
-      req.session.user = user;
-      console.log(req.session.user);
-      res.status(200).json(user);
-    } else {
-      res.status(404).json({ error: "User not found" });
+    if (books.length === 0) {
+      return res.status(404).json({ message: 'Nema pronađenih knjiga za korisnika.' });
     }
+
+    const extractedBooks = books.map((cita) => cita.idknjiga_knjiga);
+    console.log(extractedBooks);
+    res.status(200).json({ extractedBooks });
   } catch (error) {
-    res.status(500).json({ error: 'Internal Server Error', details: error.message });
+    console.error('Greška prilikom dohvaćanja knjiga:', error);
+    res.status(500).json({ error: 'Greška prilikom dohvaćanja knjiga.' });
   }
 });
+
 
 // Server-side kod za odjavljivanje
 app.post('/api/logout', (req, res) => {

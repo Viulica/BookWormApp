@@ -12,7 +12,7 @@ const knjiga = sequelize.define('knjiga', {
     type: DataTypes.STRING(255),
     allowNull: false
   },
-  'žanr': {
+  zanr: {
     type: DataTypes.STRING(50),
     allowNull: false
   },

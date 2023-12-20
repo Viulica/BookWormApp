@@ -10,8 +10,9 @@ import NavBar from '../components/NavBar';
 import Home from '../components/Home';
 import Login from '../components/Login';
 import Profile from '../components/Profile';
-import Books from '../components/Books';
+import MyBooks from '../components/MyBooks';
 import Logout from '../components/Logout';
+import AllBooks from '../components/AllBooks';
 
 
 // Glavna aplikacija sa rutama i NavBar-om
@@ -23,10 +24,12 @@ const App: React.FC = () => {
         <div className="container">
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/home" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/profile" element={<Profile />} />
-            <Route path="/books" element={<Books />} />
+            <Route path="/myBooks" element={<MyBooks />} />
             <Route path='/logout' element={<Logout />} />
+            <Route path='/allBooks' element={<AllBooks/>} />
           </Routes>
         </div>
       </div>

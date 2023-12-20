@@ -31,8 +31,10 @@ const Login: React.FC = () => {
       // Provjeravamo status odgovora
       if (response.ok) {
         const data = await response.json();
-         console.log("Uspješan login:", data);
-         navigate('/');
+        console.log("Uspješan login:", data);
+        sessionStorage.setItem("token", data);
+        navigate('/');
+        window.location.reload();
       } else {
         console.error("Neuspješan login:", response.statusText);
       }

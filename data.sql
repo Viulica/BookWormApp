@@ -25,7 +25,7 @@ insert into korisnik(datrod, korime, lozinka, ime, prezime, info, tipkorisnika) 
 ('1980-06-26', 'user8', 'pass', 'Ana', 'Anić', 'Zovem se Ana Anić i najviše volim 
  poeziju.', 'autor');
 
-insert into knjiga(naslov, žanr, godIzd, opis, isbn, idkorisnik) values
+insert into knjiga(naslov, zanr, godIzd, opis, isbn, idkorisnik) values
 ('Miris Lavande', 'Romantična drama', 2020, 'Uzbudljiva ljubavna priča smještena 
 na slikovitu farmu lavande u Provansi, gdje neočekivana romansa cvjeta između 
 mlade umjetnice i misterioznog farmera.', '1234567890123', 4),
