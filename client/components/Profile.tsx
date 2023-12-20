@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { baseUrl } from '../src/App';
 import { useNavigate } from "react-router-dom";
 
@@ -47,22 +47,36 @@ const Profile: React.FC = () => {
     fetchProfileData();
   }, []); // Prazan niz ovisnosti znači da će se useEffect izvršiti samo pri montiranju komponente
 
+
+  const addBook = async () => {
+    navigate('/addBook');
+  }
+
   return (
     <div>
       <h1>Profil</h1>
       {loading && <p>Učitavanje profila...</p>}
       {profileData && (
-        <div>
-          <div><b>Podatci o korisniku:</b> </div>
-          <div><u>Id korisnika:</u> { profileData.idkorisnik}</div>
-          <div><u>Korisničko ime:</u> {profileData.korime}</div>
-          <div><u>Lozinka:</u> {profileData.lozinka}</div>
-          <div><u>Ime i prezime:</u> {profileData.ime } { profileData.prezime}</div>
-          <div><u>Datum rođenja:</u> {profileData.datrod}</div>
-          <div><u>Tip korisnika:</u> {profileData.tipkorisnika}</div>
-          <div><u>Info:</u> { profileData.info}</div>
-          <div></div>
-        </div>
+        <>
+          <div>
+            <div><b>Podatci o korisniku:</b> </div>
+            <div><u>Id korisnika:</u> { profileData.idkorisnik}</div>
+            <div><u>Korisničko ime:</u> {profileData.korime}</div>
+            <div><u>Lozinka:</u> {profileData.lozinka}</div>
+            <div><u>Ime i prezime:</u> {profileData.ime } { profileData.prezime}</div>
+            <div><u>Datum rođenja:</u> {profileData.datrod}</div>
+            <div><u>Tip korisnika:</u> {profileData.tipkorisnika}</div>
+            <div><u>Info:</u> { profileData.info}</div>
+            <div></div>
+          </div>
+
+          {profileData.tipkorisnika === "autor" ?
+            <>
+              <div>
+                  <button onClick={addBook}>Dodaj knjigu</button>
+              </div>
+            </>: <></>}
+        </>
       )}
     </div>
   );

@@ -1,6 +1,6 @@
 import { baseUrl } from "@/App";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import  { useNavigate, Link } from "react-router-dom";
 
 const MyBooks: React.FC = () => {
   const [myBooks, setMyBooks] = useState<any[]>([]);
@@ -50,11 +50,11 @@ const MyBooks: React.FC = () => {
           <p>My books:</p>
               {myBooks.length > 0 ? (
                   myBooks.map((book, index) => (
-                  <div key={index}>
-                     <a href="#">
+                    <div key={index}>
+                      <Link to={`/book/${book.idknjiga}`}>
                         {book.imeAutor} {book.prezAutor} : {book.naslov} (
                         {book.godizd}) - (status: {book.status})
-                     </a>
+                      </Link>
                   </div>
                   ))
               ) : (<div>Nema ništa</div>)}

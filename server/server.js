@@ -3,11 +3,13 @@ const jwt = require('jsonwebtoken');
 const cors = require('cors');
 const sequelize = require('./config/db');
 const data = require('./models/data');
+const multer = require('multer');
 
 const app = express();
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
 app.use(cors());
-
 
 app.use(express.json());
 
@@ -179,8 +181,78 @@ app.get('/api/data/reader/myBooks', verifyToken, async (req, res) => {
   }
 });
 
-app.get('/api/data/author/myBooks', verifyToken, async (req, res) => {
+app.get('/api/data/allAuthors', async (req, res) => {
+  try {
+    const allAuthors = await data.korisnik.findAll({
+      where: {
+        tipkorisnika: "autor",
+      },
+      attributes: ['idkorisnik', 'ime', 'prezime']
+    })
 
+    res.status(200).json(allAuthors);
+  }
+  catch (error) {
+    console.error('Error fetching authors:', error);
+    res.status(500).json({ error: 'Internal Server Error', details: error.message });
+  }
+});
+
+app.post('/api/data/addBook', upload.single('coverImage'), async (req, res) => {
+  try {
+    const { title, genre, published, about, isbn, userId, coverImage } = req.body;
+    // const coverImage = req.file.buffer; // binarni podaci slike
+
+    // Kreiraj novu knjigu
+    const newBook = await data.knjiga.create({
+      naslov: title,
+      zanr: genre,
+      godizd: published,
+      opis: about,
+      isbn: isbn,
+      idkorisnik: userId,
+      slika: coverImage,
+    });
+
+    return res.status(201).json(newBook);
+  } catch (error) {
+    console.error('Greška prilikom dodavanja knjige:', error);
+    return res.status(500).json({ error: 'Interna server greška' });
+  }
+});
+
+app.get('/api/data/book/:id', async (req, res) => {
+  const bookId = req.params.id;
+
+  try {
+    const book = await data.knjiga.findOne({
+      where: {
+        idknjiga: bookId
+      }
+    })
+    res.status(200).json(book);
+  }
+  catch (error) {
+    console.log("Error fetching book: ", error);
+    res.status(500).json({ error: 'Internal Server Error', details: error.message });
+  }
+});
+
+app.get('/api/data/author/myBooks', verifyToken, async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const books = await data.knjiga.findAll({
+      where: {
+        idkorisnik: userId
+      }
+    })
+
+    res.status(200).json(books);
+  }
+  catch (error) {
+    console.error('Greška prilikom dohvaćanja knjiga:', error);
+    res.status(500).json({ error: 'Greška prilikom dohvaćanja knjiga.' });
+  }
 });
 
 app.get('/api/data/allUsers', async (req, res) => {
@@ -192,23 +264,6 @@ app.get('/api/data/allUsers', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error', details: error.message });
   }
 });
-
-
-
-
-// Server-side kod za odjavljivanje
-app.post('/api/logout', (req, res) => {
-  // Obrisi podatke o korisniku iz sesije
-  req.session.destroy((err) => {
-    if (err) {
-      console.error('Greška prilikom odjavljivanja:', err);
-      res.status(500).json({ error: 'Internal Server Error' });
-    } else {
-      res.status(200).json({ success: true });
-    }
-  });
-});
-
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
