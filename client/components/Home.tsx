@@ -9,10 +9,15 @@ const Home: React.FC = () => {
       navigate('/allBooks');
       window.location.reload();
    }
+
+   const handleShowAllUsers = () => {
+      console.log("Show all users");
+   }
    return (
       <div>
          <h1>Home Page</h1>
          <button onClick={handleShowAllBooks}>Sve knjige</button>
+         <button onClick={handleShowAllUsers}>Svi korisnici</button>
       </div>
    );
 }

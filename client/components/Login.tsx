@@ -30,7 +30,7 @@ const Login: React.FC = () => {
 
       // Provjeravamo status odgovora
       if (response.ok) {
-        const data = await response.json();
+        const data = await response.text();
         console.log("Uspješan login:", data);
         sessionStorage.setItem("token", data);
         navigate('/');

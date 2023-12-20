@@ -24,8 +24,7 @@ const Profile: React.FC = () => {
           if (response.ok) {
             // Ako je odgovor uspješan, postavi podatke profila u stanje komponente
             const data = await response.json();
-            console.log(data.user);
-            setProfileData(data.user);
+            setProfileData(data);
           } else {
             // Ako odgovor nije uspješan, možete poduzeti određene korake, npr. odjaviti korisnika
             console.error("Neuspješan poziv na /api/profile");

@@ -77,7 +77,7 @@ app.get('/api/data/profile', verifyToken, async (req, res) => {
     })
     
   if (user) {
-    res.json({user});
+    res.json(user);
   } else {
     res.status(404).json({ message: 'Korisnik nije pronađen' });
   }
@@ -110,12 +110,6 @@ app.get('/api/data/allBooks', async (req, res) => {
       formattedBook.datrod = formattedBook.idkorisnik_korisnik.datrod;
       formattedBook.info = formattedBook.idkorisnik_korisnik.info;
 
-      // Uklanjanje originalnih atributa
-      // delete formattedBook.naslov;
-      // delete formattedBook.zanr;
-      // delete formattedBook.opis;
-      // delete formattedBook.datizd;
-      // delete formattedBook.isbn;
       delete formattedBook.idkorisnik_korisnik; // Uklanjanje originalnog asocijativnog modela
 
       return formattedBook;
@@ -129,7 +123,65 @@ app.get('/api/data/allBooks', async (req, res) => {
   }
 });
 
+app.get('/api/data/reader/myBooks', verifyToken, async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const books = await data.cita.findAll({
+      where: {
+        idkorisnik: userId,
+      },
+      include: [
+        {
+          model: data.korisnik,
+          as: 'idkorisnik_korisnik',
+        },
+        {
+          model: data.knjiga,
+          as: 'idknjiga_knjiga',
+          include: [
+            {
+              model: data.korisnik,
+              as: 'idkorisnik_korisnik'
+            }
+          ]
+        }
+      ]
+    })
 
+    if (books.length === 0) {
+      return res.status(404).json(books);
+    }
+
+    const formattedBooks = books.map(book => {
+      const formattedBook = book.get({ plain: true });
+
+      formattedBook.idkorisnikCitatelj = formattedBook.idkorisnik_korisnik.idkorisnik;
+      formattedBook.idkorisnikAutor = formattedBook.idknjiga_knjiga.idkorisnik;
+      formattedBook.status = formattedBook.status;
+      formattedBook.naslov = formattedBook.idknjiga_knjiga.naslov;
+      formattedBook.godizd = formattedBook.idknjiga_knjiga.godizd;
+      formattedBook.imeAutor = formattedBook.idknjiga_knjiga.idkorisnik_korisnik.ime;
+      formattedBook.prezAutor = formattedBook.idknjiga_knjiga.idkorisnik_korisnik.prezime;
+      
+      delete formattedBook.idkorisnik;
+      delete formattedBook.idkorisnik_korisnik;
+      delete formattedBook.idknjiga_knjiga;
+
+      console.log(formattedBook);
+      return formattedBook;
+    });
+
+
+    res.status(200).json(formattedBooks);
+  } catch (error) {
+    console.error('Greška prilikom dohvaćanja knjiga:', error);
+    res.status(500).json({ error: 'Greška prilikom dohvaćanja knjiga.' });
+  }
+});
+
+app.get('/api/data/author/myBooks', verifyToken, async (req, res) => {
+
+});
 
 app.get('/api/data/allUsers', async (req, res) => {
   try {
@@ -142,34 +194,6 @@ app.get('/api/data/allUsers', async (req, res) => {
 });
 
 
-
-app.get('/api/data/myBooks', verifyToken, async (req, res) => {
-  try {
-    const userId = req.user.userId;
-    const books = await data.cita.findAll({
-      where: {
-        idkorisnik: userId
-      },
-      include: [
-        {
-          model: data.knjiga,
-          as: 'idknjiga_knjiga'
-        }
-      ]
-    });
-
-    if (books.length === 0) {
-      return res.status(404).json({ message: 'Nema pronađenih knjiga za korisnika.' });
-    }
-
-    const extractedBooks = books.map((cita) => cita.idknjiga_knjiga);
-    console.log(extractedBooks);
-    res.status(200).json({ extractedBooks });
-  } catch (error) {
-    console.error('Greška prilikom dohvaćanja knjiga:', error);
-    res.status(500).json({ error: 'Greška prilikom dohvaćanja knjiga.' });
-  }
-});
 
 
 // Server-side kod za odjavljivanje
