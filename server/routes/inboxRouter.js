@@ -8,25 +8,70 @@ const { Op } = require('sequelize');
 router.get('/', verifyToken, async (req, res) => {
    try {
       const userId = req.user.userId;
-      const message = await data.poruka.findAll({
+      const messages = await data.poruka.findAll({
+         attributes: [
+            'idporuka',
+            'txtporuka',
+            'vremozn',
+            'idposiljatelj',
+            'idprimatelj',
+          ],
          where: {
             idposiljatelj: userId
-         }
+         },
+         include: [
+            {
+               model: data.korisnik,
+               as: 'idposiljatelj_korisnik',
+               attributes: [['ime', 'imePosiljatelj'], ['prezime', 'prezimePosiljatelj']],
+               foreignKey: 'idposiljatelj'
+            },
+            {
+               model: data.korisnik,
+               as: 'idprimatelj_korisnik',
+               attributes: [['ime', 'imePrimatelj'], ['prezime', 'prezimePrimatelj']],
+               foreignKey: 'idprimatelj'
+            }
+         ]
       });
 
-      res.status(200).json(message);
+      const formattedMessages = messages.map(message => {
+         const formattedMessage = message.get({ plain: true });
+
+         formattedMessage.imePosiljatelj = formattedMessage.idposiljatelj_korisnik.imePosiljatelj;
+         formattedMessage.prezimePosiljatelj = formattedMessage.idposiljatelj_korisnik.prezimePosiljatelj;
+         formattedMessage.imePrimatelj = formattedMessage.idprimatelj_korisnik.imePrimatelj;
+         formattedMessage.prezimePrimatelj = formattedMessage.idprimatelj_korisnik.prezimePrimatelj;
+
+         delete formattedMessage.idposiljatelj_korisnik;
+         delete formattedMessage.idprimatelj_korisnik;
+
+         return formattedMessage;
+      });
+      
+      console.log(formattedMessages);
+
+      res.status(200).json(formattedMessages);
    }
    catch (error) {
       res.status(404).json({ message: 'Nema nikakvih poruka' });
    }
 });
 
-router.get('/:idReciever', verifyToken, async (req, res) => {
+router.get('/messages/:idReciever', verifyToken, async (req, res) => {
    const idSender = req.user.userId;
    const idReciever = req.params.idReciever;
 
+   console.log(idSender + " " + idReciever);
    try {
       const messagesSender = await data.poruka.findAll({
+         attributes: [
+            'idporuka',
+            'txtporuka',
+            'vremozn',
+            'idposiljatelj',
+            'idprimatelj',
+         ],
          where: {
             [Op.or]: [
                {
@@ -43,10 +88,40 @@ router.get('/:idReciever', verifyToken, async (req, res) => {
                }
             ]
          },
+         include: [
+            {
+               model: data.korisnik,
+               as: 'idposiljatelj_korisnik',
+               attributes: [['ime', 'imePosiljatelj'], ['prezime', 'prezimePosiljatelj']],
+               foreignKey: 'idposiljatelj'
+            },
+            {
+               model: data.korisnik,
+               as: 'idprimatelj_korisnik',
+               attributes: [['ime', 'imePrimatelj'], ['prezime', 'prezimePrimatelj']],
+               foreignKey: 'idprimatelj'
+            }
+         ],
          order: [['vremozn', 'ASC']]
       });
 
-      res.status(200).json(messagesSender);
+      const formattedMessages = messagesSender.map(message => {
+         const formattedMessage = message.get({ plain: true });
+
+         formattedMessage.imePosiljatelj = formattedMessage.idposiljatelj_korisnik.imePosiljatelj;
+         formattedMessage.prezimePosiljatelj = formattedMessage.idposiljatelj_korisnik.prezimePosiljatelj;
+         formattedMessage.imePrimatelj = formattedMessage.idprimatelj_korisnik.imePrimatelj;
+         formattedMessage.prezimePrimatelj = formattedMessage.idprimatelj_korisnik.prezimePrimatelj;
+
+         delete formattedMessage.idposiljatelj_korisnik;
+         delete formattedMessage.idprimatelj_korisnik;
+
+         return formattedMessage;
+      });
+      
+      console.log(formattedMessages);
+
+      res.status(200).json(formattedMessages);
 
    }
    catch (error) {
@@ -54,7 +129,7 @@ router.get('/:idReciever', verifyToken, async (req, res) => {
    }
 });
 
-router.post('/send/:idReciever', verifyToken, async (req, res) => {
+router.post('/messages/send/:idReciever', verifyToken, async (req, res) => {
    // console.log(req.user.userId);
    try {
       const idposiljatelj = req.user.userId;

@@ -24,6 +24,26 @@ router.get('/allAuthors', async (req, res) => {
    }
 });
 
+router.get('/getUserId', verifyToken, async (req, res) => {
+   try {
+      const userId = req.user.userId;
+      const user = await data.korisnik.findOne({
+         where: {
+            idkorisnik: userId
+         }
+      })
+
+      if (user) {
+         res.status(200).json(userId);
+      }
+      else {
+         res.status(404).json({ message: "Nemoguće pronaći korisnika" });
+      }
+   } catch (error) {
+      console.log("Greška prilikom dohvaćanja id: ", error);
+      res.status(500).json({ message: "Internal Server Error" });
+   }
+});
 
 router.get('/book/:id', async (req, res) => {
    const bookId = req.params.id;

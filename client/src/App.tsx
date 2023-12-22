@@ -18,6 +18,7 @@ import AllBooks from '../components/AllBooks';
 import AddBook from '../components/AddBook';
 import ShowBook from '../components/ShowBook';
 import Inbox from '../components/Inbox';
+import Messages from '../components/Messages';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 
@@ -40,7 +41,8 @@ const App: React.FC = () => {
             <Route path='/allBooks' element={<AllBooks />} />
             <Route path='/addBook' element={<AddBook />} />
             <Route path='/book/:id' element={<ShowBook />} />
-            <Route path='/inbox' element={<Inbox/>} />
+            <Route path='/inbox' element={<Inbox />} />
+            <Route path='/messages/:id' element={<Messages />} />
           </Routes>
         </div>
       </div>
