@@ -46,24 +46,30 @@ const Login: React.FC = () => {
   return (
     <div>
       <form onSubmit={handleSubmit} method="post">
-        <label htmlFor="username">Korisničko ime:</label>
-        <input
-          type="text"
-          value={formData.username}
-          onChange={(e) =>
-            setFormData({ ...formData, username: e.target.value })
-          }
-        />
+        <div className="mb-3">
+          <label htmlFor="username" className="form-label">Korisničko ime:</label>
+          <input
+            type="text"
+            className="form-control"
+            value={formData.username}
+            onChange={(e) =>
+              setFormData({ ...formData, username: e.target.value })
+            }
+          />
+        </div>
 
-        <label htmlFor="password">Lozinka:</label>
-        <input
-          type="password" // Koristite type="password" za unos lozinke
-          value={formData.password}
-          onChange={(e) =>
-            setFormData({ ...formData, password: e.target.value })
-          }
-        />
-        <button type="submit">Prijava</button>
+        <div className="mb-3">
+          <label htmlFor="password" className="form-label">Lozinka:</label>
+          <input
+            type="password"
+            className="form-control"
+            value={formData.password}
+            onChange={(e) =>
+              setFormData({ ...formData, password: e.target.value })
+            }
+          />
+        </div>
+        <button className="btn btn-primary">Prijava</button>
       </form>
     </div>
   );

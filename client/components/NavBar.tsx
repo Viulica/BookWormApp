@@ -1,18 +1,24 @@
 // NavBar.tsx
 import React from 'react';
-import '../styles/NavBar.css';
 
 const NavBar: React.FC = () => {
 
   const token = sessionStorage.getItem("token");
 
   return (
-    <nav className="navbar">
-      <div className='navbar-option'><a href="/">Home</a></div>
-      <div className='navbar-option'><a href="/profile">Profile</a></div>
-      <div className='navbar-option'><a href="/myBooks">Books</a></div>
-      {!token && <div className='navbar-option'><a href="/login">Login</a></div>}
-      {token && <div className='navbar-option'><a href="/logout">Logout</a></div>}
+    <nav className="navbar navbar-expand-lg navbar-light bg-light">
+      <div className='container'>
+
+        <ul className='navbar-nav'>
+          <li className='nav-item'><a href="/" className='nav-link'>Home</a></li>
+          <li className='nav-item'><a href="/profile" className='nav-link'>Profile</a></li>
+          <li className='nav-item'><a href="/myBooks/" className='nav-link'>My Books</a></li>
+          <li className='nav-item'><a href="/inbox" className='nav-link'>Inbox</a></li>
+          {!token && <li className='nav-item'><a href="/login" className='nav-link'>Login</a></li>}
+          {token && <li className='nav-item'><a href="/logout" className='nav-link'>Logout</a></li>}
+        </ul>
+      </div>
+      
     </nav>
     
   );

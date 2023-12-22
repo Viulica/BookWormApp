@@ -4,31 +4,11 @@ const data = require('../models/data');
 const verifyToken = require('./tokenVerification');
 
 const multer = require('multer');
+const Sequelize = require('sequelize');
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-
-router.get('/', verifyToken, async (req, res) => {
-   try {
-      const userId = req.user.userId;
-      const user = await data.korisnik.findOne({
-         where: {
-            idkorisnik: userId
-         }
-      })
-
-      if (user) {
-         res.status(200).json(user);
-      } else {
-         res.status(404).json({ message: 'Korisnik nije pronađen' });
-      }
-   }
-   catch (error) {
-      console.error('Greška prilikom dohvaćanja profila:', error);
-      res.status(500).json({ error: 'Greška prilikom dohvaćanja knjiga.' });
-   }
-});
 
 router.get('/reader/myBooks', verifyToken, async (req, res) => {
    try {
@@ -217,4 +197,87 @@ router.post('/change', verifyToken,async (req, res) => {
       res.status(500).json({ error: 'Internal Server Error' });
    }
 });
+
+router.get('/', verifyToken, async (req, res) => {
+   res.redirect(`/api/data/profile/${req.user.userId}`);
+});
+
+router.get('/:id', verifyToken, async (req, res) => {
+   console.log(req.params.id);
+   try {
+      const userId = req.params.id;
+      var user;
+
+      if (req.user.typeOfUser == "čitatelj") {
+         user = await data.korisnik.findOne({
+            attributes: [
+               'ime',
+               'prezime',
+               'korime',
+               'lozinka',
+               'info',
+               'datrod',
+               [
+                 Sequelize.literal('(SELECT COUNT(*) FROM prati WHERE prati.idkorisnik1 = korisnik.idkorisnik)'),
+                 'pratim'
+               ],
+               [
+                 Sequelize.literal('(SELECT COUNT(*) FROM prati WHERE prati.idkorisnik2 = korisnik.idkorisnik)'),
+                 'pratitelji'
+               ],
+               [
+                  Sequelize.literal('(SELECT COUNT(*) FROM cita WHERE cita.idkorisnik = korisnik.idkorisnik)'),
+                  'spremljeneKnjige'
+               ]
+             ],
+             where: {
+               idkorisnik: userId,
+             },
+         })
+      }
+      else if (req.user.typeOfUser == "autor") {
+         user = await data.korisnik.findOne({
+            attributes: [
+               'ime',
+               'prezime',
+               'korime',
+               'lozinka',
+               'info',
+               'datrod',
+               [
+                 Sequelize.literal('(SELECT COUNT(*) FROM prati WHERE prati.idkorisnik1 = korisnik.idkorisnik)'),
+                 'pratim'
+               ],
+               [
+                 Sequelize.literal('(SELECT COUNT(*) FROM prati WHERE prati.idkorisnik2 = korisnik.idkorisnik)'),
+                 'pratitelji'
+               ],
+               [
+                  Sequelize.literal('(SELECT COUNT(*) FROM cita WHERE cita.idkorisnik = korisnik.idkorisnik)'),
+                  'spremljeneKnjige'
+               ],
+               [
+                  Sequelize.literal('(SELECT COUNT(*) FROM knjiga WHERE knjiga.idkorisnik = korisnik.idkorisnik)'),
+                  'napisaoKnjiga'
+               ]
+             ],
+             where: {
+               idkorisnik: userId,
+             },
+         })
+      }
+
+
+      if (user) {
+         res.status(200).json(user);
+      } else {
+         res.status(404).json({ message: 'Korisnik nije pronađen' });
+      }
+   }
+   catch (error) {
+      console.error('Greška prilikom dohvaćanja profila:', error);
+      res.status(500).json({ error: 'Greška prilikom dohvaćanja korisnika.' });
+   }
+});
+
 module.exports = router;

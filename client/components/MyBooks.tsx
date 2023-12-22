@@ -43,23 +43,37 @@ const MyBooks: React.FC = () => {
 
   return (
     <div>
-      <h1>Books</h1>
-      {loading && <p>Učitavanje popisa mojih knjiga...</p>}
-      {myBooks.length > 0 && (
-        <div>
-          <p>My books:</p>
-              {myBooks.length > 0 ? (
-                  myBooks.map((book, index) => (
-                    <div key={index}>
-                      <Link to={`/book/${book.idknjiga}`}>
-                        {book.imeAutor} {book.prezAutor} : {book.naslov} (
-                        {book.godizd}) - (status: {book.status})
-                      </Link>
-                  </div>
-                  ))
-              ) : (<div>Nema ništa</div>)}
-        </div>
-      )}
+      {
+        loading ?
+          <p className="p-4">Učitavanje popisa mojih knjiga...</p> :
+          <>
+            <div className="container">
+              <h1 className="display-6">My Books</h1>
+              
+              <div className="container">
+                <hr className="my-4" />
+
+                {myBooks.length > 0 ?
+                  
+                  (myBooks.map((book, index) => (
+                    <div key={index} className="container">
+                      <div>
+                        <a href={"/book/" + book.idknjiga}
+                          className="text-primary text-decoration-underline">
+                          {JSON.stringify(book)}
+                        </a>
+                      </div>
+                      <hr className="my-4" />
+                    </div>
+                  ))) :
+                  
+                  <>Ništa</>
+                }
+              </div>
+            </div>
+          
+          </>
+      }
     </div>
   );
 };
