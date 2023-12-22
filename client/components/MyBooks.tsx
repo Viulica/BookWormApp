@@ -12,7 +12,7 @@ const MyBooks: React.FC = () => {
       const storedToken = sessionStorage.getItem("token");
       if (storedToken) {
         try {
-          const response = await fetch(`${baseUrl}/api/data/reader/myBooks`, {
+          const response = await fetch(`${baseUrl}/api/data/profile/reader/myBooks`, {
             headers: {
               Authorization: `${storedToken}`,
             },

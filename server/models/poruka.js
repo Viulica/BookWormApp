@@ -13,7 +13,7 @@ const poruka = sequelize.define('poruka', {
     allowNull: false
   },
   vremozn: {
-    type: DataTypes.DATEONLY,
+    type: DataTypes.DATE,
     allowNull: false
   },
   idposiljatelj: {
