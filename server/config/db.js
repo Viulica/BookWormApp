@@ -1,6 +1,6 @@
 const { Sequelize } = require('sequelize');
 
-const sequelize = new Sequelize('BookWormAppDB', 'postgres', 'baze', {
+const sequelize = new Sequelize('BookWormAppDB', 'bookwormadmin', 'pass', {
   host: 'localhost',
   dialect: 'postgres',
 });

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { baseUrl } from "../src/App";
+import { baseUrl } from "../App";
 import { useNavigate } from "react-router-dom";
 import "../styles/Profile.css";
 
@@ -37,11 +37,14 @@ const Profile: React.FC = () => {
       if (storedToken) {
         try {
           // Ako postoji token, izvrši poziv na /api/profile
-          const response = await fetch(`${baseUrl}/api/data/profile/${userId}`, {
-            headers: {
-              Authorization: `${storedToken}`,
-            },
-          });
+          const response = await fetch(
+            `${baseUrl}/api/data/profile/${userId}`,
+            {
+              headers: {
+                Authorization: `${storedToken}`,
+              },
+            }
+          );
 
           if (response.ok) {
             // Ako je odgovor uspješan, postavi podatke profila u stanje komponente
@@ -60,10 +63,9 @@ const Profile: React.FC = () => {
           setLoading(false);
         }
       } else {
-        setTimeout(() => {
-          navigate("/login");
-          window.location.reload();
-        }, 1500);
+        console.log("Navigating...");
+        navigate("/login");
+        window.location.reload();
       }
     };
 

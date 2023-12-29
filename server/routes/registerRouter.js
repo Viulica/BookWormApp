@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const data = require('../models/data');
+const bcrypt = require('bcrypt');
 
 router.post('/', async (req, res) => {
 
@@ -19,9 +20,16 @@ router.post('/', async (req, res) => {
          return res.status(409).json({ message: "Korisnik već postoji" });
       }
 
-      const newUser = await data.korisnik.create({
-         datrod, korime, lozinka, ime, prezime, info, tipkorisnika
-      });
+      bcrypt.hash(lozinka, 10, async (err, hash) => {
+         if (err) {
+            console.log("[ERROR] Error hashing password");
+            throw new Error("Hashing error");
+         } else {
+            const newUser = await data.korisnik.create({
+               datrod, korime, hash, ime, prezime, info, tipkorisnika
+            });
+         }
+      })
 
       res.status(201).json({ message: "Korisnik uspješno stvoren", user: newUser });
    }

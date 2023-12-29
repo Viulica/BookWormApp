@@ -1,4 +1,3 @@
-
 select setval('knjiga_idknjiga_seq', 1, false);
 delete from knjiga;
 
@@ -12,17 +11,17 @@ select setval('recenzija_idrecenzija_seq', 1, false);
 delete from recenzija;
 
 insert into korisnik(datrod, korime, lozinka, ime, prezime, info, tipkorisnika) values
-('1985-05-15', 'user1', 'pass', 'Ana', 'Horvat', NULL, 'čitatelj'),
-('1999-01-01', 'user2', 'pass', 'Marko', 'Kovač', NULL, 'čitatelj'),
-('1998-08-10', 'user3', 'pass', 'Petra', 'Novak', NULL, 'čitatelj'),
-('1995-05-05', 'user4', 'pass', 'Ivan', 'Tomić', 'Zovem se Ivan Tomić, 
+('1985-05-15', 'user1', '$2a$10$0fUw5wFVAoRA.8GjDaGXpu5f8B4WNFRJ.epGq85gAuThKf.famNV6', 'Ana', 'Horvat', NULL, 'čitatelj'),
+('1999-01-01', 'user2', '$2a$10$0fUw5wFVAoRA.8GjDaGXpu5f8B4WNFRJ.epGq85gAuThKf.famNV6', 'Marko', 'Kovač', NULL, 'čitatelj'),
+('1998-08-10', 'user3', '$2a$10$0fUw5wFVAoRA.8GjDaGXpu5f8B4WNFRJ.epGq85gAuThKf.famNV6', 'Petra', 'Novak', NULL, 'čitatelj'),
+('1995-05-05', 'user4', '$2a$10$0fUw5wFVAoRA.8GjDaGXpu5f8B4WNFRJ.epGq85gAuThKf.famNV6', 'Ivan', 'Tomić', 'Zovem se Ivan Tomić, 
  do sada sam napisao 20 knjiga, a najviše volim klasike.', 'autor'),
- ('2000-01-04', 'user5', 'pass', 'Luka', 'Jurić', NULL, 'čitatelj'),
- ('2002-05-03', 'user6', 'pass', 'Marta', 'Šimić', NULL, 'čitatelj'),
- (NULL, 'admin', 'pass', NULL, NULL, NULL, 'admin'),
- ('2002-04-04', 'user7', 'pass', 'Ivana', 'Radić', 'Ja sam Ivana Radić
+ ('2000-01-04', 'user5', '$2a$10$0fUw5wFVAoRA.8GjDaGXpu5f8B4WNFRJ.epGq85gAuThKf.famNV6', 'Luka', 'Jurić', NULL, 'čitatelj'),
+ ('2002-05-03', 'user6', '$2a$10$0fUw5wFVAoRA.8GjDaGXpu5f8B4WNFRJ.epGq85gAuThKf.famNV6', 'Marta', 'Šimić', NULL, 'čitatelj'),
+ (NULL, 'admin', '$2a$10$0fUw5wFVAoRA.8GjDaGXpu5f8B4WNFRJ.epGq85gAuThKf.famNV6', NULL, NULL, NULL, 'admin'),
+ ('2002-04-04', 'user7', '$2a$10$0fUw5wFVAoRA.8GjDaGXpu5f8B4WNFRJ.epGq85gAuThKf.famNV6', 'Ivana', 'Radić', 'Ja sam Ivana Radić
  i volim čitati i pisati knjige.', 'autor'),
-('1980-06-26', 'user8', 'pass', 'Ana', 'Anić', 'Zovem se Ana Anić i najviše volim 
+('1980-06-26', 'user8', '$2a$10$0fUw5wFVAoRA.8GjDaGXpu5f8B4WNFRJ.epGq85gAuThKf.famNV6', 'Ana', 'Anić', 'Zovem se Ana Anić i najviše volim 
  poeziju.', 'autor');
 
 insert into knjiga(naslov, zanr, godIzd, opis, isbn, idkorisnik) values

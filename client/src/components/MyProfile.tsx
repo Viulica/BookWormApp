@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { baseUrl } from '../src/App';
+import { baseUrl } from "../App";
 import { useNavigate } from "react-router-dom";
-import '../styles/Profile.css';
+import "../styles/Profile.css";
 
-interface Profile{
-   ime: string,
-   prezime: string,
-   korime: string,
-   lozinka: string,
-   info: string,
-   datrod: string
- }
+interface Profile {
+  ime: string;
+  prezime: string;
+  korime: string;
+  lozinka: string;
+  info: string;
+  datrod: string;
+}
 
 const MyProfile: React.FC = () => {
   const [profileData, setProfileData] = useState<Profile>({
@@ -66,21 +66,23 @@ const MyProfile: React.FC = () => {
     fetchProfileData();
   }, []); // Prazan niz ovisnosti znači da će se useEffect izvršiti samo pri montiranju komponente
 
-   return (
-      <div>
-         {
-            loading ?
-               <p className="p-4">Loading...</p> :
-               <>
-                  <div className="container">
-                     <h1 className="display-6">My Profile</h1>
-                     <p className="p-4">{JSON.stringify(profileData, null, 3)}</p>
-                     <a href="/changeProfile" className="btn btn-primary">Promijeni</a>
-                  </div>
-               </>
-         }
-      </div>
-   );
+  return (
+    <div>
+      {loading ? (
+        <p className="p-4">Loading...</p>
+      ) : (
+        <>
+          <div className="container">
+            <h1 className="display-6">My Profile</h1>
+            <p className="p-4">{JSON.stringify(profileData, null, 3)}</p>
+            <a href="/changeProfile" className="btn btn-primary">
+              Promijeni
+            </a>
+          </div>
+        </>
+      )}
+    </div>
+  );
 };
 
 export default MyProfile;

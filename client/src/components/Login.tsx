@@ -1,7 +1,7 @@
 // Login.tsx
 import React, { useState } from "react";
-import { useNavigate } from 'react-router-dom';
-import { baseUrl } from '../src/App';
+import { useNavigate } from "react-router-dom";
+import { baseUrl } from "../App";
 
 interface LoginForm {
   username: string;
@@ -13,7 +13,7 @@ const Login: React.FC = () => {
     username: "",
     password: "",
   });
-   const navigate = useNavigate();
+  const navigate = useNavigate();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -33,7 +33,7 @@ const Login: React.FC = () => {
         const data = await response.text();
         console.log("Uspješan login:", data);
         sessionStorage.setItem("token", data);
-        navigate('/');
+        navigate("/");
         window.location.reload();
       } else {
         console.error("Neuspješan login:", response.statusText);
@@ -47,7 +47,9 @@ const Login: React.FC = () => {
     <div>
       <form onSubmit={handleSubmit} method="post">
         <div className="mb-3">
-          <label htmlFor="username" className="form-label">Korisničko ime:</label>
+          <label htmlFor="username" className="form-label">
+            Korisničko ime:
+          </label>
           <input
             type="text"
             className="form-control"
@@ -59,7 +61,9 @@ const Login: React.FC = () => {
         </div>
 
         <div className="mb-3">
-          <label htmlFor="password" className="form-label">Lozinka:</label>
+          <label htmlFor="password" className="form-label">
+            Lozinka:
+          </label>
           <input
             type="password"
             className="form-control"
@@ -69,7 +73,7 @@ const Login: React.FC = () => {
             }
           />
         </div>
-        <button className="btn btn-primary">Prijava</button>
+        <button className="bg-orange-200">Prijava</button>
       </form>
     </div>
   );
