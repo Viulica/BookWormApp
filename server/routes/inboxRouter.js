@@ -15,7 +15,7 @@ router.get('/', verifyToken, async (req, res) => {
             'vremozn',
             'idposiljatelj',
             'idprimatelj',
-          ],
+         ],
          where: {
             idposiljatelj: userId
          },
@@ -34,6 +34,7 @@ router.get('/', verifyToken, async (req, res) => {
             }
          ]
       });
+       
 
       const formattedMessages = messages.map(message => {
          const formattedMessage = message.get({ plain: true });
@@ -48,13 +49,49 @@ router.get('/', verifyToken, async (req, res) => {
 
          return formattedMessage;
       });
-      
+
       console.log(formattedMessages);
 
       res.status(200).json(formattedMessages);
    }
    catch (error) {
       res.status(404).json({ message: 'Nema nikakvih poruka' });
+   }
+});
+
+router.post('/findUsers', verifyToken, async (req, res) => {
+   const { searchTerm } = req.body;
+   try {
+      const rezultati = await data.korisnik.findAll({
+         where: {
+            [Op.or]: [
+               { korime: { [Op.iLike]: `${searchTerm}%` } },
+               { ime: { [Op.iLike]: `${searchTerm}%` } },
+               { prezime: { [Op.iLike]: `${searchTerm}%` } },
+            ],
+            korime: {
+               [Op.ne]: "admin"
+            }
+         },
+      });
+
+      if (rezultati.length > 0) {
+         const formattedUsers = rezultati.map(user => {
+            const formattedUser = user.get({ plain: true });
+
+            delete formattedUser.datrod;
+            delete formattedUser.lozinka;
+            delete formattedUser.info;
+            delete formattedUser.tipkorisnika;
+            return formattedUser;
+         })
+         
+         res.json(formattedUsers);
+         console.log(formattedUsers);
+      }
+   } catch (error) {
+      console.error('Greška prilikom pretraživanja korisnika:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
    }
 });
 
@@ -118,7 +155,7 @@ router.get('/messages/:idReciever', verifyToken, async (req, res) => {
 
          return formattedMessage;
       });
-      
+
       console.log(formattedMessages);
 
       res.status(200).json(formattedMessages);
@@ -131,19 +168,20 @@ router.get('/messages/:idReciever', verifyToken, async (req, res) => {
 
 router.post('/messages/send/:idReciever', verifyToken, async (req, res) => {
    // console.log(req.user.userId);
+
    try {
       const idposiljatelj = req.user.userId;
       const idprimatelj = req.params.idReciever;
-      const txtporuka = req.body.text;
+      const { txtporuka } = req.body;
 
       const trenutnoVrijeme = new Date();
       // console.log(trenutnoVrijeme);
 
       const sendMessage = await data.poruka.create({
-         txtporuka,
+         txtporuka: txtporuka,
          vremozn: trenutnoVrijeme, // Koristi objekt tipa Date
-         idposiljatelj,
-         idprimatelj
+         idposiljatelj: idposiljatelj,
+         idprimatelj: idprimatelj
       });
 
       res.status(200).json({ message: "Poruka uspješno poslana", message: sendMessage });

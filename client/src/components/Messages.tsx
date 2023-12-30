@@ -1,11 +1,13 @@
 import { baseUrl } from '@/App';
 import React, { useEffect, useState } from 'react';
+import '../styles/Messages.css';
 
 const Messages: React.FC = () => {
 
    const [messagesData, setMessagesData] = useState<any[]>([]);
    const [loading, setLoading] = useState<boolean>(true);
    const [userId, setUserId] = useState<number>(0);
+   const [txtporuka, setTxtPoruka] = useState('');
 
    useEffect(() => {
       const fetchUserId = async () => {
@@ -63,6 +65,34 @@ const Messages: React.FC = () => {
       fetchInbox();
    }, []);
 
+   const handleSendMessage = async () => {
+      const storedToken = sessionStorage.getItem('token');
+      const data = {
+         txtporuka,
+      };
+
+      console.log(data);
+
+      if (storedToken) {
+         const idReciever = window.location.href.split('/').at(window.location.href.split('/').length - 1);
+         console.log(idReciever);
+         try {
+            const response = await fetch(`${baseUrl}/api/inbox/messages/send/${idReciever}`, {
+               method: 'POST',
+               headers: {
+                  'Content-Type': 'application/json',
+                  Authorization: `${storedToken}`,
+               },
+               body: JSON.stringify(data),
+            })
+
+            console.log(await response.json());
+         }
+         catch (error) {
+            console.log("Greška prilikom slanja poruke:", error);
+         }
+      }
+   }
    
 
    return (
@@ -90,6 +120,14 @@ const Messages: React.FC = () => {
                         </div>
                      
                      ))}
+                  </div>
+                  <div className='form'>
+                     <div className="form-group">
+                        <input className="form-control" id="message-textarea" value={txtporuka} onChange={(e) => {setTxtPoruka(e.target.value)}}></input>
+                     </div>
+                     <div className='form-group'>
+                        <button className='btn' onClick={handleSendMessage}>Send</button>
+                     </div>
                   </div>
                </>
          }

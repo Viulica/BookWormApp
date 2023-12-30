@@ -3,67 +3,133 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const Inbox: React.FC = () => {
-   const [inboxData, setInboxData] = useState<any[]>([]);
-   const [loading, setLoading] = useState<boolean>(true);
-   const navigate = useNavigate();
+  const [inboxData, setInboxData] = useState<any[]>([]);
+  const [filteredData, setFilteredData] = useState<any[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const navigate = useNavigate();
 
-   useEffect(() => {
-      const fetchInbox = async () => {
-         const storedToken = sessionStorage.getItem("token");
-         if (storedToken) {
-         try {
-            const response = await fetch(`${baseUrl}/api/inbox`, {
-               headers: {
-                  Authorization: `${storedToken}`,
-               },
-            });
+  useEffect(() => {
+    const fetchInbox = async () => {
+      const storedToken = sessionStorage.getItem("token");
+      if (storedToken) {
+        try {
+          const response = await fetch(`${baseUrl}/api/inbox`, {
+            headers: {
+              Authorization: `${storedToken}`,
+            },
+          });
 
-            if (response.ok) {
-               const data = await response.json();
-               setInboxData(data);
-            } else {
-               console.log(await response.json());
-            }
-         } catch (error) {
-            console.error("Greška prilikom dohvaćanja poruka:", error);
-         } finally {
+          if (response.ok) {
+            const data = await response.json();
+            setInboxData(data);
             setLoading(false);
-         }
-         } else {
-         setTimeout(() => {
-            navigate("/login");
-            window.location.reload();
-         }, 1500);
-         }
-      };
+          } else {
+            console.log(await response.json());
+          }
+        } catch (error) {
+          console.error("Greška prilikom dohvaćanja poruka:", error);
+        }
+      } else {
+        setTimeout(() => {
+          navigate("/login");
+          window.location.reload();
+        }, 1500);
+      }
+    };
 
-      fetchInbox();
-   }, []);
+    fetchInbox();
+  }, [navigate]);
 
-   return (
-      <>
-         {
-            loading ?
-               <p className="p-4">Loading...</p> :
-               <>
-                  <div className="container">
-                     <h1 className="display-6">Inbox</h1>
-                     <div className="container">
-                        {inboxData.length > 0 ? 
-                           (inboxData.map((message, index) => (
-                              <a href={"/messages/" + message.idprimatelj} className="text-primary" key={index}>
-                                 <div className="container">{ message.imePrimatelj + " " + message.prezimePrimatelj }</div>
-                              </a>
-                           ))):
-                              <>Ništa</>
-                        }
-                     </div>
-                  </div>
-               </>
-         }
+  const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    //  console.log(searchTerm);
+    const searchTermValue = e.target.value;
+    try {
+      const storedToken = sessionStorage.getItem("token");
+      const response = await fetch(`${baseUrl}/api/inbox/findUsers`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `${storedToken}`,
+        },
+        body: JSON.stringify({ searchTerm: searchTermValue }),
+      });
 
-      </>
-   );
+      if (response.ok) {
+        const data = await response.json();
+        setFilteredData(data);
+      } else {
+        console.log(await response.json());
+      }
+    } catch (error) {
+      console.error("Greška prilikom pretraživanja korisnika:", error);
+    }
+  };
+
+  return (
+    <>
+      {loading ? (
+        <p className="p-4">Loading...</p>
+      ) : (
+        <>
+          <div className="container">
+            <div className="container-title-and-searchbar">
+              <h1 className="display-6">Inbox</h1>
+              <input
+                type="text"
+                placeholder="Pretraži korisnike..."
+                value={searchTerm}
+                onChange={(e) => {
+                  console.log(e.target.value);
+                  setSearchTerm(e.target.value);
+                  handleChange(e);
+                }}
+              />
+              {searchTerm !== "" ? (
+                <>
+                  {filteredData.map((message, index) => (
+                    <a
+                      href={"/messages/" + message.idkorisnik}
+                      className="text-primary"
+                      key={index}
+                    >
+                      <div className="container-searchedUsers">
+                        {message.korime +
+                          " (" +
+                          message.ime +
+                          " " +
+                          message.prezime +
+                          ")"}
+                      </div>
+                    </a>
+                  ))}
+                </>
+              ) : (
+                <></>
+              )}
+            </div>
+            <div className="container-messages">
+              {inboxData.length > 0 ? (
+                inboxData.map((message, index) => (
+                  <a
+                    href={"/messages/" + message.idprimatelj}
+                    className="text-primary"
+                    key={index}
+                  >
+                    <div className="container">
+                      {message.imePrimatelj + " " + message.prezimePrimatelj}
+                    </div>
+                  </a>
+                ))
+              ) : (
+                <>Ništa</>
+              )}
+            </div>
+          </div>
+        </>
+      )}
+    </>
+  );
 };
 
 export default Inbox;
