@@ -7,6 +7,7 @@ const Inbox: React.FC = () => {
   const [filteredData, setFilteredData] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [searchTerm, setSearchTerm] = useState<string>("");
+  const [userId, setUserId] = useState<number>(0);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -38,7 +39,32 @@ const Inbox: React.FC = () => {
       }
     };
 
+    const fetchUserId = async () => {
+      const storedToken = sessionStorage.getItem("token");
+      if (storedToken) {
+         try {
+            const response = await fetch(`${baseUrl}/api/data/getUserId`, {
+               headers: {
+                  Authorization: `${storedToken}`
+               }
+            });
+
+            if (response.ok) {
+               const data = await response.json();
+               setUserId(data);
+            }
+            else {
+               console.log(await response.json());
+            }
+         }
+         catch (error) {
+            console.log("Greška prilikom dohvaćanja userId:", error);
+         }
+      }
+   };
+
     fetchInbox();
+    fetchUserId();
   }, [navigate]);
 
   const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -112,12 +138,12 @@ const Inbox: React.FC = () => {
               {inboxData.length > 0 ? (
                 inboxData.map((message, index) => (
                   <a
-                    href={"/messages/" + message.idprimatelj}
+                    href={message.idprimatelj === userId ? "/messages/" + message.idposiljatelj : "/messages/" + message.idprimatelj}
                     className="text-primary"
                     key={index}
                   >
                     <div className="container">
-                      {message.imePrimatelj + " " + message.prezimePrimatelj}
+                      {message.idprimatelj === userId ? message.imePosiljatelj + " " + message.prezimePosiljatelj : message.imePrimatelj + " " + message.prezimePrimatelj}
                     </div>
                   </a>
                 ))

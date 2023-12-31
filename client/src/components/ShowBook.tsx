@@ -39,7 +39,8 @@ const ShowBook: React.FC = () => {
             <a href={"/profile/" + bookData.autorKnjiga.idkorisnik} className="text-primary text-decoration-underline">{bookData.autorKnjiga.ime + " " + bookData.autorKnjiga.prezime}</a></p>
             <p className="p-1">Genre: { bookData.zanr}</p>
             <p className="p-1">Published: {bookData.godizd}</p>
-            <p className="p-1">Description: { bookData.opis}</p>
+            <p className="p-1">Description: {bookData.opis}</p>
+            <p className="p-1"><a href={"/messages/" + bookData.autorKnjiga.idkorisnik} className="btn btn-primary">Send message</a></p>
           </div>
 
           <hr  className="my-4"/>

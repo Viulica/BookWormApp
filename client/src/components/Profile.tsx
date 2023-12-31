@@ -24,12 +24,34 @@ const Profile: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const navigate = useNavigate();
   const [username, setUsername] = useState<string>("");
+  const [myUserId, setMyUserId] = useState<number>(0);
 
   const userId = window.location.href
     .split("/")
     .at(window.location.href.split("/").length - 1);
 
   useEffect(() => {
+    const fetchMyUserId = async () => {
+      const storedToken = sessionStorage.getItem("token");
+      if (storedToken) {
+        try {
+          const response = await fetch(`${baseUrl}/api/data/getUserId`, {
+            headers: {
+              Authorization: `${storedToken}`,
+            },
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            setMyUserId(data);
+          } else {
+            console.log(await response.json());
+          }
+        } catch (error) {
+          console.log("Greška prilikom dohvaćanja userId:", error);
+        }
+      }
+    };
     const fetchProfileData = async () => {
       // Provjeri postoji li token u sessionStorage
       const storedToken = sessionStorage.getItem("token");
@@ -69,6 +91,7 @@ const Profile: React.FC = () => {
       }
     };
 
+    fetchMyUserId();
     fetchProfileData();
   }, []); // Prazan niz ovisnosti znači da će se useEffect izvršiti samo pri montiranju komponente
 
@@ -79,7 +102,9 @@ const Profile: React.FC = () => {
       ) : (
         <>
           <div className="container">
-            <p className="p-4">{JSON.stringify(profileData, null, 3)}</p>
+              <p className="p-4">{JSON.stringify(profileData, null, 3)}</p>
+              {/* Za slanje poruke korisniku, ako to nije korisnikov id koji je trenutno prijavljen u sustav! */}
+              {userId !== myUserId.toString() ? <p className="p-4"><a href={"/messages/"+userId} className="btn btn-primary">Send message</a></p> : <></>}
           </div>
         </>
       )}

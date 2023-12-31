@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const data = require('../models/data');
 const verifyToken = require('./tokenVerification');
-const { Op } = require('sequelize');
+const { Op, UnknownConstraintError } = require('sequelize');
 
 
 router.get('/', verifyToken, async (req, res) => {
@@ -11,30 +11,30 @@ router.get('/', verifyToken, async (req, res) => {
       const messages = await data.poruka.findAll({
          attributes: [
             'idporuka',
-            'txtporuka',
-            'vremozn',
             'idposiljatelj',
-            'idprimatelj',
+            'idprimatelj'
          ],
          where: {
-            idposiljatelj: userId
+            [Op.or]: [
+               { idposiljatelj: userId },
+               { idprimatelj: userId },
+            ],
          },
          include: [
             {
                model: data.korisnik,
                as: 'idposiljatelj_korisnik',
                attributes: [['ime', 'imePosiljatelj'], ['prezime', 'prezimePosiljatelj']],
-               foreignKey: 'idposiljatelj'
+               foreignKey: 'idposiljatelj',
             },
             {
                model: data.korisnik,
                as: 'idprimatelj_korisnik',
                attributes: [['ime', 'imePrimatelj'], ['prezime', 'prezimePrimatelj']],
-               foreignKey: 'idprimatelj'
-            }
-         ]
+               foreignKey: 'idprimatelj',
+            },
+         ],
       });
-       
 
       const formattedMessages = messages.map(message => {
          const formattedMessage = message.get({ plain: true });
@@ -50,9 +50,27 @@ router.get('/', verifyToken, async (req, res) => {
          return formattedMessage;
       });
 
-      console.log(formattedMessages);
 
-      res.status(200).json(formattedMessages);
+      // Rješavanje duplikata! - Ne smijem imati iste parove npr. (1,4) i (4,1) nego se samo jedan od njih zapisuje!
+      var uniqueMessages = [];
+      formattedMessages.forEach(message => {
+         if (message.idprimatelj !== userId) {
+            console.log("Poslao: ", message);
+            if (!uniqueMessages.some(obj => obj.idprimatelj === message.idprimatelj) && !uniqueMessages.some(obj => obj.idposiljatelj === message.idprimatelj)) {
+               console.log("ubačeno");
+               uniqueMessages.push(message);
+            }
+         }
+         else {
+            console.log("Primio: ", message);
+            if (!uniqueMessages.some(obj => obj.idposiljatelj === message.idposiljatelj) && !uniqueMessages.some(obj => obj.idprimatelj === message.idposiljatelj)) {
+               console.log("ubačeno");
+               uniqueMessages.push(message);
+            }
+         }
+      })
+
+      res.status(200).json(uniqueMessages);
    }
    catch (error) {
       res.status(404).json({ message: 'Nema nikakvih poruka' });
@@ -85,7 +103,7 @@ router.post('/findUsers', verifyToken, async (req, res) => {
             delete formattedUser.tipkorisnika;
             return formattedUser;
          })
-         
+
          res.json(formattedUsers);
          console.log(formattedUsers);
       }
@@ -156,8 +174,6 @@ router.get('/messages/:idReciever', verifyToken, async (req, res) => {
          return formattedMessage;
       });
 
-      console.log(formattedMessages);
-
       res.status(200).json(formattedMessages);
 
    }
@@ -175,11 +191,12 @@ router.post('/messages/send/:idReciever', verifyToken, async (req, res) => {
       const { txtporuka } = req.body;
 
       const trenutnoVrijeme = new Date();
-      // console.log(trenutnoVrijeme);
+      trenutnoVrijeme.setUTCHours(trenutnoVrijeme.getUTCHours() + 1);
+      console.log(trenutnoVrijeme);
 
       const sendMessage = await data.poruka.create({
          txtporuka: txtporuka,
-         vremozn: trenutnoVrijeme, // Koristi objekt tipa Date
+         vremozn: trenutnoVrijeme,
          idposiljatelj: idposiljatelj,
          idprimatelj: idprimatelj
       });

@@ -8,6 +8,8 @@ const inboxRouter = require('./routes/inboxRouter.js');
 const registerRouter = require('./routes/registerRouter.js');
 
 const app = express();
+
+
 app.use(cors());
 app.use(express.json());
 
