@@ -26,7 +26,6 @@ const App: React.FC = () => {
     <Router>
       <div className="app">
         <NavBar />
-        <div className="container">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/home" element={<Home />} />
@@ -40,9 +39,8 @@ const App: React.FC = () => {
             <Route path="/addBook" element={<AddBook />} />
             <Route path="/book/:id" element={<ShowBook />} />
             <Route path="/inbox" element={<Inbox />} />
-            <Route path="/messages/:id" element={<Messages />} />
+            <Route path="/messages/:id" element={<Messages param=""/>} />
           </Routes>
-        </div>
       </div>
     </Router>
   );

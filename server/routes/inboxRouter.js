@@ -54,6 +54,7 @@ router.get('/', verifyToken, async (req, res) => {
       // Rješavanje duplikata! - Ne smijem imati iste parove npr. (1,4) i (4,1) nego se samo jedan od njih zapisuje!
       var uniqueMessages = [];
       formattedMessages.forEach(message => {
+         console.log(message);
          if (message.idprimatelj !== userId) {
             console.log("Poslao: ", message);
             if (!uniqueMessages.some(obj => obj.idprimatelj === message.idprimatelj) && !uniqueMessages.some(obj => obj.idposiljatelj === message.idprimatelj)) {
@@ -65,6 +66,9 @@ router.get('/', verifyToken, async (req, res) => {
             console.log("Primio: ", message);
             if (!uniqueMessages.some(obj => obj.idposiljatelj === message.idposiljatelj) && !uniqueMessages.some(obj => obj.idprimatelj === message.idposiljatelj)) {
                console.log("ubačeno");
+               uniqueMessages.push(message);
+            }
+            else if (!uniqueMessages.some(obj => obj.idposiljatelj === userId && obj.idprimatelj === userId)) {
                uniqueMessages.push(message);
             }
          }
@@ -210,7 +214,7 @@ router.post('/messages/send/:idReciever', verifyToken, async (req, res) => {
 });
 
 
-router.delete('/delete/:idSender/:idReciever', (req, res) => {
+router.delete('/delete/:idMessage', (req, res) => {
 
 });
 
