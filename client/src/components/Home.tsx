@@ -16,7 +16,7 @@ const Home: React.FC = () => {
 
   return (
     <div>
-      <h1 className="display-4">Welcome to BookWormApp</h1>
+      
       {/* <button className="btn btn-primary" onClick={handleShowAllBooks}>Sve knjige</button>
          <button className="btn btn-primary" onClick={handleShowAllUsers}>Svi korisnici</button> */}
 

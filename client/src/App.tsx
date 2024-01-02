@@ -19,6 +19,7 @@ import ShowBook from "../src/components/ShowBook";
 import Inbox from "../src/components/Inbox";
 import Messages from "../src/components/Messages";
 import "bootstrap/dist/css/bootstrap.min.css";
+import "./App.css"
 
 // Glavna aplikacija sa rutama i NavBar-om
 const App: React.FC = () => {
