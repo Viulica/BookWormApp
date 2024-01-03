@@ -10,8 +10,6 @@ const Messages: React.FC = () => {
   const [txtporuka, setTxtPoruka] = useState("");
   const [lastRefreshed, setLastRefreshed] = useState<string>("");
 
-  const [refreshState, setRefreshState] = useState(true);
-
   const formatDate = (date: any) => {
     const vremenskiFormat = new Date(date).toLocaleTimeString("hr-HR", {
       hour: "2-digit",
@@ -119,7 +117,7 @@ const Messages: React.FC = () => {
         //window.location.reload();
         let newMessageData = messagesData;
         newMessageData.push((await response.json()).message)
-        setMessagesData([...newMessageData])
+        setMessagesData(newMessageData)
       } catch (error) {
         console.log("Greška prilikom slanja poruke:", error);
       }
