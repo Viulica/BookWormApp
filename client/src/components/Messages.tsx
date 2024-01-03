@@ -2,7 +2,11 @@ import { baseUrl } from "@/App";
 import React, { useEffect, useState } from "react";
 import "../styles/Messages.css";
 
-const Messages: React.FC = () => {
+interface MessagesProps {
+  param: string;
+}
+
+const Messages: React.FC<MessagesProps> = (props) => {
   const [messagesData, setMessagesData] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [userId, setUserId] = useState<number>(0);
@@ -51,9 +55,10 @@ const Messages: React.FC = () => {
     const fetchInbox = async () => {
       const storedToken = sessionStorage.getItem("token");
       if (storedToken) {
-        const idReciever = window.location.href
+        var idReciever = props.param || window.location.href
           .split("/")
           .at(window.location.href.split("/").length - 1);
+
         console.log(idReciever);
         try {
           const response = await fetch(
@@ -87,6 +92,11 @@ const Messages: React.FC = () => {
   }, []);
 
   const handleSendMessage = async () => {
+
+    if (txtporuka === "") {
+      return;
+    }
+
     const storedToken = sessionStorage.getItem("token");
     const data = {
       txtporuka,
@@ -95,9 +105,9 @@ const Messages: React.FC = () => {
     console.log(data);
 
     if (storedToken) {
-      const idReciever = window.location.href
-        .split("/")
-        .at(window.location.href.split("/").length - 1);
+      var idReciever = props.param || window.location.href
+          .split("/")
+          .at(window.location.href.split("/").length - 1);
       console.log(idReciever);
       try {
         const response = await fetch(
@@ -125,44 +135,45 @@ const Messages: React.FC = () => {
       {loading ? (
         <p className="p-4">Loading...</p>
       ) : (
-        <>
-          <div className="container">
-            {messagesData.map((message, index) => (
-              <div
-                className={`container ${
-                  message.idposiljatelj === userId ? "bg-info" : "bg-light"
-                }`}
-                key={index}
-              >
-                {message.idposiljatelj === userId ? (
-                  <div className="container">
-                    <p>
-                      <a
-                        href={"/profile/" + message.idposiljatelj}
-                        className="text-primary text-decoration-underline"
-                      >
-                        Me
-                      </a>
-                    </p>
-                    <p>{message.txtporuka}</p>
-                    <p>{formatDate(message.vremozn)}</p>
-                  </div>
-                ) : (
-                  <div className="container">
-                    <p>
-                      <a
-                        href={"/profile/" + message.idposiljatelj}
-                        className="text-primary text-decoration-underline"
-                      >
-                        {message.imePosiljatelj +
-                          " " +
-                          message.prezimePosiljatelj}
-                      </a>
-                    </p>
-                    <p>{message.txtporuka}</p>
-                    <p>{formatDate(message.vremozn)}</p>
-                  </div>
-                )}
+        <div className="container">
+          <div className="messages">
+              {messagesData.map((message, index) => (
+                <div className={`${message.idposiljatelj === userId ? "d-flex justify-content-end" : "d-flex justify-content-start"}`} key={index}>
+                <div
+                  className={`message ${
+                    message.idposiljatelj === userId ? "bg-info" : "bg-light"
+                  }`}
+                >
+                  {message.idposiljatelj === userId ? (
+                    <div className="container">
+                      <p>
+                        <a
+                          href={"/profile/" + message.idposiljatelj}
+                          className="text-primary text-decoration-underline"
+                        >
+                          Me
+                        </a>
+                      </p>
+                      <p>{message.txtporuka}</p>
+                      <p>{formatDate(message.vremozn)}</p>
+                    </div>
+                  ) : (
+                    <div className="container">
+                      <p>
+                        <a
+                          href={"/profile/" + message.idposiljatelj}
+                          className="text-primary text-decoration-underline"
+                        >
+                          {message.imePosiljatelj +
+                            " " +
+                            message.prezimePosiljatelj}
+                        </a>
+                      </p>
+                      <p>{message.txtporuka}</p>
+                      <p>{formatDate(message.vremozn)}</p>
+                    </div>
+                  )}
+                </div>
               </div>
             ))}
           </div>
@@ -183,31 +194,20 @@ const Messages: React.FC = () => {
                 className="form-control"
                 id="message-textarea"
                 value={txtporuka}
-                onChange={(e) => {
-                  setTxtPoruka(e.target.value);
-                  const sendButton = document.getElementById(
-                    "sendButton"
-                  ) as HTMLButtonElement;
-                  if (e.target.value === "") {
-                    sendButton.disabled = true;
-                  } else {
-                    sendButton.disabled = false;
-                  }
-                }}
+                placeholder="Write a message"
+                onChange={(e) => {setTxtPoruka(e.target.value)}}
               ></input>
             </div>
             <div className="form-group">
               <button
                 className="btn"
                 onClick={handleSendMessage}
-                id="sendButton"
-                disabled
-              >
+                id="sendButton">
                 Send
               </button>
             </div>
           </div>
-        </>
+        </div>
       )}
     </>
   );

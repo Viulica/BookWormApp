@@ -1,3 +1,16 @@
+.messages{
+   height: 300px;
+   overflow: scroll;
+   display: flex;
+   flex-direction: column;
+   gap: 10px;
+   padding: 10px;
+}
+
+.message{
+   width: 40%;
+}
+
 #message-textarea{
    resize: none;
    width: 30%;

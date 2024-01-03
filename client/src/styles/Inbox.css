@@ -1,0 +1,61 @@
+.inbox{
+   height: 90vh;
+}
+
+.container-title-and-searchbar{
+   display: flex;
+   flex-direction: column;
+   gap: 10px;
+   position: relative;
+}
+
+.container-searchbar>input{
+   border-bottom: 1px solid;
+   outline: none;
+}
+
+.container-searchedUsers{
+   position: absolute;
+   top: 100%;
+   background-color: white;
+   box-shadow: 2px 2px 8px;
+   padding: 10px;
+   z-index: 10;
+}
+
+.user:hover{
+   background-color: lightgrey;
+}
+
+.container-messages{
+   overflow-y: auto;
+   margin-top: 30px;
+   height: 70%;
+   display: flex;
+}
+
+.choose-user{
+   width: 30%;
+}
+
+.write-message{
+   width: 70%;
+   border: 1px solid;
+}
+
+.hide-on-big-screens{
+   display: none;
+}
+
+@media (max-width: 768px) {
+   .hide-on-small-screens{
+      display: none;
+   }
+   .hide-on-big-screens{
+      display: block;
+   }
+
+   .write-message{
+      border: none;
+   }
+}
