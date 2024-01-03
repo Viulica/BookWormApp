@@ -2,11 +2,8 @@ import { baseUrl } from "@/App";
 import React, { useEffect, useState } from "react";
 import "../styles/Messages.css";
 
-interface MessagesProps {
-  param: string;
-}
 
-const Messages: React.FC<MessagesProps> = (props) => {
+const Messages: React.FC = () => {
   const [messagesData, setMessagesData] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [userId, setUserId] = useState<number>(0);
@@ -55,10 +52,7 @@ const Messages: React.FC<MessagesProps> = (props) => {
     const fetchInbox = async () => {
       const storedToken = sessionStorage.getItem("token");
       if (storedToken) {
-        var idReciever = props.param || window.location.href
-          .split("/")
-          .at(window.location.href.split("/").length - 1);
-
+        const idReciever = window.location.search.split("=")[1];
         console.log(idReciever);
         try {
           const response = await fetch(
@@ -105,9 +99,7 @@ const Messages: React.FC<MessagesProps> = (props) => {
     console.log(data);
 
     if (storedToken) {
-      var idReciever = props.param || window.location.href
-          .split("/")
-          .at(window.location.href.split("/").length - 1);
+      const idReciever = window.location.search.split("=")[1];
       console.log(idReciever);
       try {
         const response = await fetch(

@@ -45,7 +45,7 @@ const MyBooks: React.FC = () => {
     <div>
       {
         loading ?
-          <p className="p-4">Učitavanje popisa mojih knjiga...</p> :
+          <p className="p-4">Loading...</p> :
           <>
             <div className="container">
               <h1 className="display-6">My Books</h1>
@@ -67,7 +67,7 @@ const MyBooks: React.FC = () => {
                     </div>
                   ))) :
                   
-                  <>Ništa</>
+                  <>Search for books</>
                 }
               </div>
             </div>

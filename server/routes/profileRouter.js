@@ -206,70 +206,44 @@ router.get('/:id', verifyToken, async (req, res) => {
    console.log(req.params.id);
    try {
       const userId = req.params.id;
-      var user;
+      var user = await data.korisnik.findOne({
+         attributes: [
+            'ime',
+            'prezime',
+            'korime',
+            // 'lozinka',
+            'info',
+            'datrod',
+            'tipkorisnika',
+            [
+              Sequelize.literal('(SELECT COUNT(*) FROM prati WHERE prati.idkorisnik1 = korisnik.idkorisnik)'),
+              'pratim'
+            ],
+            [
+              Sequelize.literal('(SELECT COUNT(*) FROM prati WHERE prati.idkorisnik2 = korisnik.idkorisnik)'),
+              'pratitelji'
+            ],
+            [
+               Sequelize.literal('(SELECT COUNT(*) FROM cita WHERE cita.idkorisnik = korisnik.idkorisnik)'),
+               'spremljeneKnjige'
+            ],
+            [
+               Sequelize.literal('(SELECT COUNT(*) FROM knjiga WHERE knjiga.idkorisnik = korisnik.idkorisnik)'),
+               'napisaoKnjiga'
+            ]
+          ],
+          where: {
+            idkorisnik: userId,
+          },
+      });
+      console.log(user.dataValues);
 
-      if (req.user.typeOfUser == "čitatelj") {
-         user = await data.korisnik.findOne({
-            attributes: [
-               'ime',
-               'prezime',
-               'korime',
-               'lozinka',
-               'info',
-               'datrod',
-               [
-                 Sequelize.literal('(SELECT COUNT(*) FROM prati WHERE prati.idkorisnik1 = korisnik.idkorisnik)'),
-                 'pratim'
-               ],
-               [
-                 Sequelize.literal('(SELECT COUNT(*) FROM prati WHERE prati.idkorisnik2 = korisnik.idkorisnik)'),
-                 'pratitelji'
-               ],
-               [
-                  Sequelize.literal('(SELECT COUNT(*) FROM cita WHERE cita.idkorisnik = korisnik.idkorisnik)'),
-                  'spremljeneKnjige'
-               ]
-             ],
-             where: {
-               idkorisnik: userId,
-             },
-         })
-      }
-      else if (req.user.typeOfUser == "autor") {
-         user = await data.korisnik.findOne({
-            attributes: [
-               'ime',
-               'prezime',
-               'korime',
-               'lozinka',
-               'info',
-               'datrod',
-               [
-                 Sequelize.literal('(SELECT COUNT(*) FROM prati WHERE prati.idkorisnik1 = korisnik.idkorisnik)'),
-                 'pratim'
-               ],
-               [
-                 Sequelize.literal('(SELECT COUNT(*) FROM prati WHERE prati.idkorisnik2 = korisnik.idkorisnik)'),
-                 'pratitelji'
-               ],
-               [
-                  Sequelize.literal('(SELECT COUNT(*) FROM cita WHERE cita.idkorisnik = korisnik.idkorisnik)'),
-                  'spremljeneKnjige'
-               ],
-               [
-                  Sequelize.literal('(SELECT COUNT(*) FROM knjiga WHERE knjiga.idkorisnik = korisnik.idkorisnik)'),
-                  'napisaoKnjiga'
-               ]
-             ],
-             where: {
-               idkorisnik: userId,
-             },
-         })
-      }
-
-
+      
       if (user) {
-         res.status(200).json(user);
+         if (user.dataValues.tipkorisnika === "čitatelj") {
+            delete user.dataValues.napisaoKnjiga;
+         }
+         res.status(200).json(user.dataValues);
       } else {
          res.status(404).json({ message: 'Korisnik nije pronađen' });
       }

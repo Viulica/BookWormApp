@@ -10,6 +10,9 @@ interface Profile {
   lozinka: string;
   info: string;
   datrod: string;
+  pratim: string;
+  pratitelji: string;
+  spremljeneKnjige: string;
 }
 
 const MyProfile: React.FC = () => {
@@ -20,6 +23,9 @@ const MyProfile: React.FC = () => {
     lozinka: "",
     info: "",
     datrod: "",
+    pratim: "",
+    pratitelji: "",
+    spremljeneKnjige: ""
   });
   const [loading, setLoading] = useState<boolean>(true);
   const navigate = useNavigate();
@@ -67,18 +73,44 @@ const MyProfile: React.FC = () => {
   }, []); // Prazan niz ovisnosti znači da će se useEffect izvršiti samo pri montiranju komponente
 
   return (
-    <div>
+    <div className="container profile">
       {loading ? (
         <p className="p-4">Loading...</p>
       ) : (
         <>
-          <div className="container">
+          <div className="container-title">
             <h1 className="display-6">My Profile</h1>
-            <p className="p-4">{JSON.stringify(profileData, null, 3)}</p>
-            <a href="/changeProfile" className="btn btn-primary">
-              Promijeni
-            </a>
           </div>
+            
+            <div className="container-profileData">
+              <div className="container-profileData-image-and-username">
+                <div className="container-profileData-image"><img src="https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg" alt="" /></div>
+                <div className="container-profileData-username">{profileData.korime }</div>
+              </div>
+              <div className="container-profileData-info">
+                <div className="container-profileData-info-books">
+                  <div>{ profileData.spremljeneKnjige}</div>
+                  <div>Books</div>
+                </div>
+
+                <div className="vertical-line" />
+                
+                <div className="container-profileData-info-followers">
+                  <div>{ profileData.pratitelji}</div>
+                  <div>Followers</div>
+                </div>
+
+                <div className="vertical-line" />
+                
+                <div className="container-profileData-info-following">
+                  <div>{ profileData.pratim}</div>
+                  <div>Following</div>
+                </div>
+              </div>
+            </div>
+            <a href="/changeProfile" className="btn btn-primary">
+              Change
+            </a>
         </>
       )}
     </div>

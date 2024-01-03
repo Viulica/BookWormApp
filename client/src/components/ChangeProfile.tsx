@@ -7,7 +7,6 @@ interface Profile {
   ime: string;
   prezime: string;
   korime: string;
-  lozinka: string;
   info: string;
   datrod: string;
 }
@@ -17,7 +16,6 @@ const ChangeProfile: React.FC = () => {
     ime: "",
     prezime: "",
     korime: "",
-    lozinka: "",
     info: "",
     datrod: "",
   });
@@ -73,7 +71,7 @@ const ChangeProfile: React.FC = () => {
   const handleChangeProfileData = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    navigate("/login");
+    // navigate("/login");
   };
 
   const allowChange = () => {
@@ -96,11 +94,11 @@ const ChangeProfile: React.FC = () => {
     <div>
       {loading ? (
         <>
-          <p className="p-4">Učitavanje...</p>
+          <p className="p-4">Loading...</p>
         </>
       ) : (
         <>
-          <h1 className="display-6">Bok, {username}!</h1>
+          <h1 className="display-6">Hello, {username}!</h1>
 
           <form
             method="post"
@@ -109,7 +107,7 @@ const ChangeProfile: React.FC = () => {
           >
             <div className="mb-3">
               <label htmlFor="name" className="form-label">
-                Ime:
+                Name:
               </label>
               <input
                 type="text"
@@ -124,7 +122,7 @@ const ChangeProfile: React.FC = () => {
             </div>
             <div className="mb-3">
               <label htmlFor="surname" className="form-label">
-                Prezime:
+                Surname:
               </label>
               <input
                 type="text"
@@ -139,7 +137,7 @@ const ChangeProfile: React.FC = () => {
             </div>
             <div className="mb-3">
               <label htmlFor="dateOfBirth" className="form-label">
-                Datum rođenja:
+                Date of birth:
               </label>
               <input
                 type="date"
@@ -153,7 +151,9 @@ const ChangeProfile: React.FC = () => {
               />
             </div>
             <div className="mb-3">
-              <label htmlFor="username">Korisničko ime:</label>
+              <label htmlFor="username">
+                Username:
+              </label>
               <input
                 type="text"
                 name="username"
@@ -166,24 +166,11 @@ const ChangeProfile: React.FC = () => {
               />
             </div>
             <div className="mb-3">
-              <label htmlFor="password">Lozinka: </label>
-              <input
-                type="password"
-                name="password"
-                id="password"
-                className="form-control"
-                value={profileData.lozinka}
-                onChange={(e) => {
-                  setProfileData({ ...profileData, lozinka: e.target.value });
-                }}
-              />
-            </div>
-            <div className="mb-3">
               <button className="btn btn-primary" id="buttonSave">
-                Spremi
+                Save
               </button>
               <a href="/profile" className="btn btn-primary text-end">
-                Natrag
+                Back
               </a>
             </div>
           </form>

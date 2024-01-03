@@ -2,79 +2,53 @@ const express = require('express');
 const router = express.Router();
 const data = require('../models/data');
 const verifyToken = require('./tokenVerification');
-const { Op, UnknownConstraintError } = require('sequelize');
-
+const { Op, literal, Sequelize } = require('sequelize');
 
 router.get('/', verifyToken, async (req, res) => {
    try {
       const userId = req.user.userId;
-      const messages = await data.poruka.findAll({
+      const conversation = await data.poruka.findAll({
          attributes: [
-            'idporuka',
-            'idposiljatelj',
-            'idprimatelj'
-         ],
-         where: {
+            [Sequelize.fn('DISTINCT', Sequelize.col('idposiljatelj')), 'idposiljatelj'],
+            'idprimatelj',
+            [literal('idposiljatelj_korisnik.ime'), 'imePosiljatelj'],
+            [literal('idposiljatelj_korisnik.prezime'), 'prezimePosiljatelj'],
+            [literal('idprimatelj_korisnik.ime'), 'imePrimatelj'],
+            [literal('idprimatelj_korisnik.prezime'), 'prezimePrimatelj'],
+          ],
+          include: [
+            {
+              model: data.korisnik,
+              as: 'idposiljatelj_korisnik',
+              attributes: [],
+            },
+            {
+              model: data.korisnik,
+              as: 'idprimatelj_korisnik',
+              attributes: [],
+            },
+          ],
+          where: {
             [Op.or]: [
-               { idposiljatelj: userId },
-               { idprimatelj: userId },
+              { idposiljatelj: userId },
+              { idprimatelj: userId },
             ],
-         },
-         include: [
-            {
-               model: data.korisnik,
-               as: 'idposiljatelj_korisnik',
-               attributes: [['ime', 'imePosiljatelj'], ['prezime', 'prezimePosiljatelj']],
-               foreignKey: 'idposiljatelj',
-            },
-            {
-               model: data.korisnik,
-               as: 'idprimatelj_korisnik',
-               attributes: [['ime', 'imePrimatelj'], ['prezime', 'prezimePrimatelj']],
-               foreignKey: 'idprimatelj',
-            },
-         ],
-      });
-
-      const formattedMessages = messages.map(message => {
-         const formattedMessage = message.get({ plain: true });
-
-         formattedMessage.imePosiljatelj = formattedMessage.idposiljatelj_korisnik.imePosiljatelj;
-         formattedMessage.prezimePosiljatelj = formattedMessage.idposiljatelj_korisnik.prezimePosiljatelj;
-         formattedMessage.imePrimatelj = formattedMessage.idprimatelj_korisnik.imePrimatelj;
-         formattedMessage.prezimePrimatelj = formattedMessage.idprimatelj_korisnik.prezimePrimatelj;
-
-         delete formattedMessage.idposiljatelj_korisnik;
-         delete formattedMessage.idprimatelj_korisnik;
-
-         return formattedMessage;
-      });
-
-
-      // Rješavanje duplikata! - Ne smijem imati iste parove npr. (1,4) i (4,1) nego se samo jedan od njih zapisuje!
-      var uniqueMessages = [];
-      formattedMessages.forEach(message => {
-         console.log(message);
-         if (message.idprimatelj !== userId) {
-            console.log("Poslao: ", message);
-            if (!uniqueMessages.some(obj => obj.idprimatelj === message.idprimatelj) && !uniqueMessages.some(obj => obj.idposiljatelj === message.idprimatelj)) {
-               console.log("ubačeno");
-               uniqueMessages.push(message);
-            }
-         }
-         else {
-            console.log("Primio: ", message);
-            if (!uniqueMessages.some(obj => obj.idposiljatelj === message.idposiljatelj) && !uniqueMessages.some(obj => obj.idprimatelj === message.idposiljatelj)) {
-               console.log("ubačeno");
-               uniqueMessages.push(message);
-            }
-            else if (!uniqueMessages.some(obj => obj.idposiljatelj === userId && obj.idprimatelj === userId)) {
-               uniqueMessages.push(message);
-            }
-         }
+          },
+          raw: true,
       })
 
-      res.status(200).json(uniqueMessages);
+      
+      var filteredConversation = [];
+
+      conversation.forEach(conv => {
+         if (!filteredConversation.find(obj => obj.idposiljatelj === conv.idposiljatelj && obj.idprimatelj === conv.idprimatelj ||
+                                                obj.idprimatelj === conv.idposiljatelj && obj.idposiljatelj === conv.idprimatelj)) {
+            filteredConversation.push(conv);
+         }
+      });
+      
+
+      res.status(200).json(filteredConversation);
    }
    catch (error) {
       res.status(404).json({ message: 'Nema nikakvih poruka' });
@@ -85,6 +59,12 @@ router.post('/findUsers', verifyToken, async (req, res) => {
    const { searchTerm } = req.body;
    try {
       const rezultati = await data.korisnik.findAll({
+         attributes: [
+            'idkorisnik',
+            'korime',
+            'ime',
+            'prezime'
+         ],
          where: {
             [Op.or]: [
                { korime: { [Op.iLike]: `${searchTerm}%` } },
@@ -95,21 +75,12 @@ router.post('/findUsers', verifyToken, async (req, res) => {
                [Op.ne]: "admin"
             }
          },
+         raw: true,
       });
 
       if (rezultati.length > 0) {
-         const formattedUsers = rezultati.map(user => {
-            const formattedUser = user.get({ plain: true });
-
-            delete formattedUser.datrod;
-            delete formattedUser.lozinka;
-            delete formattedUser.info;
-            delete formattedUser.tipkorisnika;
-            return formattedUser;
-         })
-
-         res.json(formattedUsers);
-         console.log(formattedUsers);
+         console.log(rezultati);
+         res.status(200).json(rezultati);
       }
    } catch (error) {
       console.error('Greška prilikom pretraživanja korisnika:', error);
@@ -130,6 +101,10 @@ router.get('/messages/:idReciever', verifyToken, async (req, res) => {
             'vremozn',
             'idposiljatelj',
             'idprimatelj',
+            [literal('idposiljatelj_korisnik.ime'), 'imePosiljatelj'],
+            [literal('idposiljatelj_korisnik.prezime'), 'prezimePosiljatelj'],
+            [literal('idprimatelj_korisnik.ime'), 'imePrimatelj'],
+            [literal('idprimatelj_korisnik.prezime'), 'prezimePrimatelj'],
          ],
          where: {
             [Op.or]: [
@@ -151,34 +126,23 @@ router.get('/messages/:idReciever', verifyToken, async (req, res) => {
             {
                model: data.korisnik,
                as: 'idposiljatelj_korisnik',
-               attributes: [['ime', 'imePosiljatelj'], ['prezime', 'prezimePosiljatelj']],
+               attributes: [],
                foreignKey: 'idposiljatelj'
             },
             {
                model: data.korisnik,
                as: 'idprimatelj_korisnik',
-               attributes: [['ime', 'imePrimatelj'], ['prezime', 'prezimePrimatelj']],
+               attributes: [],
                foreignKey: 'idprimatelj'
             }
          ],
-         order: [['vremozn', 'ASC']]
+         order: [['vremozn', 'ASC']],
+         raw: true,
       });
 
-      const formattedMessages = messagesSender.map(message => {
-         const formattedMessage = message.get({ plain: true });
+      console.log(messagesSender);
 
-         formattedMessage.imePosiljatelj = formattedMessage.idposiljatelj_korisnik.imePosiljatelj;
-         formattedMessage.prezimePosiljatelj = formattedMessage.idposiljatelj_korisnik.prezimePosiljatelj;
-         formattedMessage.imePrimatelj = formattedMessage.idprimatelj_korisnik.imePrimatelj;
-         formattedMessage.prezimePrimatelj = formattedMessage.idprimatelj_korisnik.prezimePrimatelj;
-
-         delete formattedMessage.idposiljatelj_korisnik;
-         delete formattedMessage.idprimatelj_korisnik;
-
-         return formattedMessage;
-      });
-
-      res.status(200).json(formattedMessages);
+      res.status(200).json(messagesSender);
 
    }
    catch (error) {
@@ -214,7 +178,7 @@ router.post('/messages/send/:idReciever', verifyToken, async (req, res) => {
 });
 
 
-router.delete('/delete/:idMessage', (req, res) => {
+router.delete('/delete/:idMessage', verifyToken, async (req, res) => {
 
 });
 

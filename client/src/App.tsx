@@ -40,7 +40,7 @@ const App: React.FC = () => {
             <Route path="/addBook" element={<AddBook />} />
             <Route path="/book/:id" element={<ShowBook />} />
             <Route path="/inbox" element={<Inbox />} />
-            <Route path="/messages/:id" element={<Messages param=""/>} />
+            <Route path="/inbox?idReciever=:id" element={<Messages/>} />
           </Routes>
       </div>
     </Router>
