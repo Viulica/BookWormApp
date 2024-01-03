@@ -5,7 +5,7 @@
    list-style: none; /* Remove default list styling */
    padding: 10px; /* Remove default padding */
    margin: 5px;
-   background-color: #f8f8f8; /* Add background color */
+   background-color: var(--bg-main); /* Add background color */
    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add subtle shadow */
  }
 

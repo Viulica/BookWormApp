@@ -24,26 +24,20 @@ insert into korisnik(datrod, korime, lozinka, ime, prezime, info, tipkorisnika) 
 ('1980-06-26', 'user8', '$2a$10$0fUw5wFVAoRA.8GjDaGXpu5f8B4WNFRJ.epGq85gAuThKf.famNV6', 'Ana', 'Anić', 'Zovem se Ana Anić i najviše volim 
  poeziju.', 'autor');
 
-insert into knjiga(naslov, zanr, godIzd, opis, isbn, idkorisnik) values
-('Miris Lavande', 'Romantična drama', 2020, 'Uzbudljiva ljubavna priča smještena 
-na slikovitu farmu lavande u Provansi, gdje neočekivana romansa cvjeta između 
-mlade umjetnice i misterioznog farmera.', '1234567890123', 4),
+insert into knjiga(naslov, zanr, godIzd, opis, isbn, idkorisnik, idautor) values
+('1984', 'distopija', 1949, 'A dystopian novel that presents a chilling portrayal of a totalitarian regime that exercises extreme control over all aspects of life. The story follows Winston Smith, who begins to question the oppressive system led by the Party and its leader, Big Brother.', '9780451524935', 4),
 
-('Sjena nebeskih anđela', 'Fantazija', 2019, 'Fantastična saga koja prati mladog 
-junaka kroz magični svijet gdje se bori protiv zlih sila, otkriva svoje vlastite moći i 
-susreće nevjerojatna stvorenja.', '9876543210987', 8),
+('Ubiti sojku rugalicu', 'bildungsroman', 1960, 'This novel is set in the Deep South and deals with serious issues like racial injustice and moral growth. It narrates the story of a young girl, Scout Finch, her brother, Jem, and their father, Atticus Finch, an attorney who defends a black man accused of raping a white woman.', '9780060935467', 8),
 
-('Izgubljeno vrijeme', 'Znanstvena fikcija', 2018, 'Znanstvena fikcija koja istražuje 
-koncept vremenskih petlji, gdje glavni lik pokušava promijeniti prošlost kako bi spasio 
-voljenu osobu, suočavajući se s neočekivanim posljedicama.', '1234987654561', 4),
+('Ponos i predrasude', 'romansa, fikcija', 1813, 'A classic novel in English literature, focusing on the emotional development of the protagonist, Elizabeth Bennet, who learns about the repercussions of hasty judgments and comes to appreciate the difference between superficial goodness and actual goodness.', '1234987654561', 4),
 
-('Šapat noći', 'poezija', 2022, 'Poezija "Šapat Noći" otkriva ljepotu i čaroliju noći. 
- Sjene, mjesečina i zvijezde postaju tihi plesači u tajanstvenom spektaklu pri zalasku sunca. 
- Sanjarimo o svjetlima neba, a srce odjekuje u melodiji noći. Noćne rijeke snova teku niz 
- kamenje sna, ostavljajući iza sebe tragove nezaboravnih putovanja u svijetu mašte. Ljubav, 
- poput nevidljive niti, plete se kroz prostor i vrijeme, spajajući nas s nebeskim pričama. 
- U tišini cvjetova, povjetarac donosi šapat noći, a sjećanja mirišu na prolaznost trenutka u 
- toj večernjoj idili.', '9781234567890', 9);
+('Veliki Gatsby', 'tragedija', 1925, 'This novel is set in the Jazz Age on Long Island and provides a critical social history of America in the 1920s. The story is centered around the young and mysterious millionaire Jay Gatsby and his quixotic passion for the beautiful Daisy Buchanan.', '9780743273565', 9);
+
+insert into autor(imeautor, prezimeautor, datrod) values 
+("George", "Orwell", "1984-6-25"),
+("Harper", "Lee", "1926-4-26"),
+("Jane", "Austen", "1775-12-16")
+("Scott", "Fitzgerald", "1896-9-24")
 
 
 insert into poruka(txtPoruka, vremOzn, idPosiljatelj, idPrimatelj) values

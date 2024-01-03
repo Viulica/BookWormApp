@@ -19,6 +19,8 @@
     "react-anchor-link-smooth-scroll": "^1.0.12",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.21.0",
+    "react-slick": "^0.29.0",
+    "slick-carousel": "^1.8.1",
     "websocket": "^1.0.34"
   },
   "devDependencies": {

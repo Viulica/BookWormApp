@@ -39,6 +39,14 @@ const knjiga = sequelize.define('knjiga', {
   slika: {
     type: DataTypes.BLOB,
     allowNull: true
+  },
+  idautor: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: 'autor',
+      key: "idautor"
+    }
   }
 }, {
   sequelize,

@@ -2,9 +2,9 @@
 import React from "react";
 import NavItem from "./NavItem";
 import SearchBar from "./SearchBar";
-import "../styles/NavItem.css"
-import "../styles/SearchBar.css"
-import "../styles/NavBar.css"
+import "../../styles/NavItem.css"
+import "../../styles/SearchBar.css"
+import "../../styles/NavBar.css"
 
 
 const NavBar: React.FC = () => {

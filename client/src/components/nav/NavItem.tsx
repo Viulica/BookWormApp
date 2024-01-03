@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import "../styles/NavItem.css"
+import "../../styles/NavItem.css"
 
 function NavItem({ href, children }: NavItemProps) {
   return (
