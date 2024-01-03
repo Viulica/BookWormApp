@@ -1,0 +1,15 @@
+.carousel {
+    display: flex;
+    align-items: center;
+}
+
+.slide {
+    width: 600px;
+    height: 400px;
+    overflow: hidden;
+}
+
+.slide img {
+    width: 100%;
+    height: auto;
+}

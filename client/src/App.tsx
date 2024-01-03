@@ -3,7 +3,7 @@ import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
 // Uvezite NavBar
-import NavBar from "../src/components/NavBar";
+import NavBar from "./components/NavBar";
 
 // Komponente za rute
 import Home from "../src/components/Home";
