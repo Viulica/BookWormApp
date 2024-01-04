@@ -202,7 +202,7 @@ router.get('/', verifyToken, async (req, res) => {
    res.redirect(`/api/data/profile/${req.user.userId}`);
 });
 
-router.get('/:id', verifyToken, async (req, res) => {
+router.get('/:id', async (req, res) => {
    console.log(req.params.id);
    try {
       const userId = req.params.id;

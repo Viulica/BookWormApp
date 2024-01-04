@@ -54,15 +54,14 @@ const Profile: React.FC = () => {
     };
     const fetchProfileData = async () => {
       // Provjeri postoji li token u sessionStorage
-
-      if (storedToken) {
         try {
           // Ako postoji token, izvrši poziv na /api/profile
           const response = await fetch(
             `${baseUrl}/api/data/profile/${userId}`,
             {
+              method: 'GET',
               headers: {
-                Authorization: `${storedToken}`,
+                'Content-Type': 'application/json'
               },
             }
           );
@@ -73,11 +72,9 @@ const Profile: React.FC = () => {
             console.log(data);
             setProfileData(data);
             setUsername(data.korime);
-          }
-          else if (response.status === 401) {
-            navigate('/login');
-          }
-          else {
+          } else if (response.status === 401) {
+            navigate("/login");
+          } else {
             // Ako odgovor nije uspješan, možete poduzeti određene korake, npr. odjaviti korisnika
             console.error("Neuspješan poziv na /api/profile");
           }
@@ -87,11 +84,7 @@ const Profile: React.FC = () => {
           // Postavi loading stanje na false kako bi se prikazao profil nakon dohvaćanja podataka
           setLoading(false);
         }
-      } else {
-        console.log("Navigating...");
-        navigate("/login");
-        window.location.reload();
-      }
+      
     };
 
     fetchMyUserId();
@@ -105,9 +98,17 @@ const Profile: React.FC = () => {
       ) : (
         <>
           <div className="container">
-              <p className="p-4">{JSON.stringify(profileData, null, 3)}</p>
-              {/* Za slanje poruke korisniku, ako to nije korisnikov id koji je trenutno prijavljen u sustav! */}
-              {userId !== myUserId.toString() ? <p className="p-4"><a href={"/messages/"+userId} className="btn btn-primary">Send message</a></p> : <></>}
+            <p className="p-4">{JSON.stringify(profileData, null, 3)}</p>
+            {/* Za slanje poruke korisniku, ako to nije korisnikov id koji je trenutno prijavljen u sustav! */}
+            {userId !== myUserId.toString() ? (
+              <p className="p-4">
+                <a href={"/inbox?idReciever=" + userId} className="btn btn-primary">
+                  Send message
+                </a>
+              </p>
+            ) : (
+              <></>
+            )}
           </div>
         </>
       )}

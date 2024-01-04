@@ -84,9 +84,6 @@ const ShowBook: React.FC = () => {
           console.error("Greška prilikom dohvaćanja recenzije:", error);
         }
       }
-      else {
-        navigate('/login');
-      }
     };
 
     const fetchMyRating = async () => {
@@ -113,9 +110,6 @@ const ShowBook: React.FC = () => {
           console.error("Greška prilikom dohvaćanja moje recenzije:", error);
         }
       }
-      else {
-        navigate('/login');
-      }
     }
 
     fetchBookData();
@@ -129,6 +123,9 @@ const ShowBook: React.FC = () => {
     const data = {
       ocjena, txtrecenzija
     };
+
+    console.log(data);
+    
     if (storedToken) {
       try {
         const response = await fetch(`${baseUrl}/api/data/rate/${bookId}`, {

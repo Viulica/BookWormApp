@@ -11,19 +11,73 @@ router.use('/profile', profileRouter);
 router.get('/allAuthors', async (req, res) => {
    try {
       const allAuthors = await data.korisnik.findAll({
+         attributes: [
+            'idkorisnik',
+            'ime',
+            'prezime',
+            'korime'
+         ],
          where: {
             tipkorisnika: "autor",
          },
-         attributes: ['idkorisnik', 'ime', 'prezime']
+         raw: true,
       })
 
-      res.status(200).json(allAuthors);
+      console.log(allAuthors);
+
+      if (allAuthors) {
+         res.status(200).json(allAuthors);
+      }
+      else {
+         res.status(404).json("Nema autora!");
+      }
+      
    }
    catch (error) {
       console.error('Error fetching authors:', error);
       res.status(500).json({ error: 'Internal Server Error', details: error.message });
    }
 });
+
+router.get('/allBooks', async (req, res) => {
+   try {
+      const allBooks = await data.knjiga.findAll({
+         attributes: [
+            'idknjiga',
+            'naslov',
+            'zanr',
+            'godizd',
+            'opis',
+            'isbn',
+            [literal('idkorisnik_korisnik.idkorisnik'), 'idkorisnikAutor'],
+            [literal('idkorisnik_korisnik.ime'), 'imeAutor'],
+            [literal('idkorisnik_korisnik.prezime'), 'prezAutor'],
+            [literal('idkorisnik_korisnik.datrod'), 'datrod'],
+            [literal('idkorisnik_korisnik.info'), 'info']
+
+         ],
+         include: [
+            {
+               model: data.korisnik,
+               as: 'idkorisnik_korisnik',
+               attributes: []
+            }
+         ],
+         raw: true
+      })
+
+      if (allBooks.length > 0) {
+         res.status(200).json(allBooks);
+      }
+      else {
+         res.status(404).json("Nema knjiga!");
+      }
+   } 
+   catch (error) {
+      console.error('Error fetching authors:', error);
+      res.status(500).json({ error: 'Internal Server Error', details: error.message });
+   }
+})
 
 router.get('/getUserId', verifyToken, async (req, res) => {
    try {
@@ -46,9 +100,9 @@ router.get('/getUserId', verifyToken, async (req, res) => {
    }
 });
 
-router.get('/getUserData/:idReciever', verifyToken, async (req, res) => {
+router.get('/getUserData/:id  ', verifyToken, async (req, res) => {
    try {
-      const userId = req.params.idReciever;
+      const userId = req.params.id;
       const user = await data.korisnik.findOne({
          attributes: [
             'idkorisnik',

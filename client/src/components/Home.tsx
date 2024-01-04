@@ -1,6 +1,6 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
 import Carousel from "./MyCarousel";
+import { storedToken } from "@/App";
 
 
   const Home: React.FC = () => {
@@ -12,8 +12,14 @@ import Carousel from "./MyCarousel";
            <button className="btn btn-primary" onClick={handleShowAllUsers}>Svi korisnici</button> */}
   
         {/* Prikaz popularnih knjiga! */}
+<<<<<<< Updated upstream
         <Carousel title="Najbolje ocijenjene"/>
 
+=======
+
+        <a href="/allBooks" className="btn btn-primary">All books</a>
+        <a href="/allAuthors" className="btn btn-primary">All authors</a>
+>>>>>>> Stashed changes
       </div>
     );
   }

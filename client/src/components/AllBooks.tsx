@@ -1,41 +1,26 @@
-import { baseUrl } from "@/App";
+import { baseUrl, storedToken } from "@/App";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 
-interface Book {
-   idknjiga: number;
-   naslov: string;
-   zanr: string;
-   godizd: number;
-   opis: string;
-   isbn: string;
-   idkorisnik: number,
-   ime: string,
-   prezime: string,
-   datrod: number,
-   info: string
- }
- 
 
 const AllBooks: React.FC = () => {
    const navigate = useNavigate();
-
-   const [allBooks, setAllBooks] = useState<Book[]>([]);
-
-
-   const handleReturnBack = () => {
-      navigate('/home');
-      window.location.reload();
-   }
+   const [allBooks, setAllBooks] = useState<any>([]);
 
    useEffect(() => {
       const fetchAllBooks = async () => {
          try {
-            const promise = await fetch(`${baseUrl}/api/data/allBooks`);
+            const promise = await fetch(`${baseUrl}/api/data/allBooks`, {
+               method: 'GET',
+               headers: {
+                  'Contenty-type': 'application/json'
+               }
+            });
 
             if (promise.ok) {
                const data = await promise.json();
+               console.log(data);
                setAllBooks(data);
             }
             else {
@@ -50,23 +35,22 @@ const AllBooks: React.FC = () => {
       fetchAllBooks();
    }, []);
 
-   const printAllBooks = () => {
-      console.log(allBooks);
-   }
 
    return (
-      <div>
-         <h1>All books</h1>
-         <button onClick={handleReturnBack}>Natrag</button>
-         {
-            allBooks.map((book, index) => (
-               <div key={index}>
-                  <a href="#">{book.ime} {book.prezime} : {book.naslov} ({ book.godizd })</a>
+      allBooks && (
+         <div className="container allBooks">
+            {allBooks.map((book: any, index: any) => (
+               <div className="book" key={index}>
+                  <div className="book-title">
+                     <a href={"/book/" + book.idknjiga} className="text-primary text-decoration-underline">{book.naslov + " (" + book.godizd + ")"}</a>
+                  </div>
+                  <div className="book-author">
+                     <a href={"/profile/" + book.idkorisnikAutor}>{ book.imeAutor + " " + book.prezAutor}</a>
+                  </div>
                </div>
-            ))
-         }
-         <button onClick={printAllBooks}>Print (pogledaj console)</button>
-      </div>
+            ))}
+         </div>
+      )
    );
 }
 
