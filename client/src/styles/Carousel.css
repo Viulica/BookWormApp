@@ -1,9 +1,18 @@
 .slick-list {
-    margin-top: 90px;
+    margin-top: 15px;
 }
 
 .slick-slide > div {
     margin: 0 5px;
     border: 1px solid black;
     background-color: var(--bg-main);
+}
+
+.carousel-container {
+    margin-top: 50px;
+}
+
+.carousel-title {
+    margin: 0 5px;
+    font-family: "playfair";
 }

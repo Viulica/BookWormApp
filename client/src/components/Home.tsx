@@ -7,11 +7,13 @@ import Carousel from "./MyCarousel";
 
     return (
       <div>
-        <Carousel />
+        <Carousel title="Najpopularnije knjige"/>
         {/* <button className="btn btn-primary" onClick={handleShowAllBooks}>Sve knjige</button>
            <button className="btn btn-primary" onClick={handleShowAllUsers}>Svi korisnici</button> */}
   
         {/* Prikaz popularnih knjiga! */}
+        <Carousel title="Najbolje ocijenjene"/>
+
       </div>
     );
   }

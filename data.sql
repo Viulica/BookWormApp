@@ -23,21 +23,22 @@ insert into korisnik(datrod, korime, lozinka, ime, prezime, info, tipkorisnika) 
  i volim čitati i pisati knjige.', 'autor'),
 ('1980-06-26', 'user8', '$2a$10$0fUw5wFVAoRA.8GjDaGXpu5f8B4WNFRJ.epGq85gAuThKf.famNV6', 'Ana', 'Anić', 'Zovem se Ana Anić i najviše volim 
  poeziju.', 'autor');
+insert into korisnik(ime, prezime, datrod, tipkorisnika, korime, lozinka) values 
+ ('George', 'Orwell', '1984-6-25', 'autor', 'gorwell', '$2a$10$0fUw5wFVAoRA.8GjDaGXpu5f8B4WNFRJ.epGq85gAuThKf.famNV6'),
+('Harper', 'Lee', '1926-4-26', 'autor', 'lharper', '$2a$10$0fUw5wFVAoRA.8GjDaGXpu5f8B4WNFRJ.epGq85gAuThKf.famNV6'),
+('Jane', 'Austen', '1775-12-16', 'autor', 'jausten', '$2a$10$0fUw5wFVAoRA.8GjDaGXpu5f8B4WNFRJ.epGq85gAuThKf.famNV6'),
+('Scott', 'Fitzgerald', '1896-9-24', 'autor', 'sfitz', '$2a$10$0fUw5wFVAoRA.8GjDaGXpu5f8B4WNFRJ.epGq85gAuThKf.famNV6');
 
-insert into knjiga(naslov, zanr, godIzd, opis, isbn, idkorisnik, idautor) values
-('1984', 'distopija', 1949, 'A dystopian novel that presents a chilling portrayal of a totalitarian regime that exercises extreme control over all aspects of life. The story follows Winston Smith, who begins to question the oppressive system led by the Party and its leader, Big Brother.', '9780451524935', 4),
+insert into knjiga(naslov, zanr, godIzd, opis, isbn, idkorisnik, slika) values
+('1984', 'distopija', 1949, 'A dystopian novel that presents a chilling portrayal of a totalitarian regime that exercises extreme control over all aspects of life. The story follows Winston Smith, who begins to question the oppressive system led by the Party and its leader, Big Brother.', '9780451524935', 10, 'https://znanje.hr/product-images/6882dddc-6a4f-436d-8059-5dee2951de26.jpg'),
 
-('Ubiti sojku rugalicu', 'bildungsroman', 1960, 'This novel is set in the Deep South and deals with serious issues like racial injustice and moral growth. It narrates the story of a young girl, Scout Finch, her brother, Jem, and their father, Atticus Finch, an attorney who defends a black man accused of raping a white woman.', '9780060935467', 8),
+('Ubiti sojku rugalicu', 'bildungsroman', 1960, 'This novel is set in the Deep South and deals with serious issues like racial injustice and moral growth. It narrates the story of a young girl, Scout Finch, her brother, Jem, and their father, Atticus Finch, an attorney who defends a black man accused of raping a white woman.', '9780060935467', 11, 'https://epqkkxb65h3.exactdn.com/wp-content/uploads/2023/02/m-2908.jpg?strip=all&lossy=1&ssl=1'),
 
-('Ponos i predrasude', 'romansa, fikcija', 1813, 'A classic novel in English literature, focusing on the emotional development of the protagonist, Elizabeth Bennet, who learns about the repercussions of hasty judgments and comes to appreciate the difference between superficial goodness and actual goodness.', '1234987654561', 4),
+('Ponos i predrasude', 'romansa, fikcija', 1813, 'A classic novel in English literature, focusing on the emotional development of the protagonist, Elizabeth Bennet, who learns about the repercussions of hasty judgments and comes to appreciate the difference between superficial goodness and actual goodness.', '1234987654561', 12, 'https://images.penguinrandomhouse.com/cover/9780593622452'),
 
-('Veliki Gatsby', 'tragedija', 1925, 'This novel is set in the Jazz Age on Long Island and provides a critical social history of America in the 1920s. The story is centered around the young and mysterious millionaire Jay Gatsby and his quixotic passion for the beautiful Daisy Buchanan.', '9780743273565', 9);
+('Veliki Gatsby', 'tragedija', 1925, 'This novel is set in the Jazz Age on Long Island and provides a critical social history of America in the 1920s. The story is centered around the young and mysterious millionaire Jay Gatsby and his quixotic passion for the beautiful Daisy Buchanan.', '9780743273565', 13, 'https://d28hgpri8am2if.cloudfront.net/book_images/onix/cvr9781982146702/the-great-gatsby-9781982146702_hr.jpg');
 
-insert into autor(imeautor, prezimeautor, datrod) values 
-("George", "Orwell", "1984-6-25"),
-("Harper", "Lee", "1926-4-26"),
-("Jane", "Austen", "1775-12-16")
-("Scott", "Fitzgerald", "1896-9-24")
+
 
 
 insert into poruka(txtPoruka, vremOzn, idPosiljatelj, idPrimatelj) values

@@ -8,9 +8,24 @@ import img2 from "../images/gatsby.jpeg"
 import img3 from "../images/pride.jpeg"
 import img4 from "../images/mockingbird.jpg"
 import "../styles/Carousel.css";
+import { baseUrl } from "@/App";
+import { useEffect, useState } from 'react';
+
+interface BookType {
+  naslov: string,
+  autor: string,
+  src: string,
+  rating: number
+}
+
+interface CarouselProps {
+  title: string
+}
 
 
-const MySlider = () => {
+const MyCarousel = (props: CarouselProps) => {
+
+  const [data, setData] = useState<BookType[]>([]);
   const settings = {
     dots: true,
     infinite: true,
@@ -21,22 +36,38 @@ const MySlider = () => {
     pauseOnHover: true,
   };
 
+  async function fetchData() {
+    try {
+      const response = await fetch(`${baseUrl}/api/data/allBooks`);
+      console.log(response)
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const resdata = await response.json();
+      //@ts-ignore
+      setData([...resdata]);
+    } catch (error) {
+      console.error('There has been a problem with your fetch operation:', error);
+    }
+  }
+
+  useEffect(() => {
+    fetchData();
+  }, [])
+
+  
   return (
-    <Slider  {...settings}>
-      <div>
-        <Book src={img1} autor="George Orwell" naslov='1984' rating={4}/>
-      </div>
-      <div>
-      <Book src={img2} autor="F.Scott Fitzgerlad" naslov='Veliki Gatsby' rating={4}/>
-      </div>
-      <div>
-      <Book src={img3} autor="Jane Austen" naslov='Ponos i predrasude' rating={5}/>
-      </div>
-      <div>
-      <Book src={img4} autor="Harper Lee" naslov='Ubiti sojku rugalicu' rating={3}/>
-      </div>
-    </Slider>
+    <div className='carousel-container'>
+      <h3 className='carousel-title'>{props.title}</h3>
+      <Slider  {...settings}>
+            {data.map(book => (
+                <div key={book.naslov}>
+                    <Book naslov={book.naslov} autor={book.autor} src={book.src} rating={book.rating} />
+                </div>
+            ))}
+      </Slider>
+    </div>
   );
 }
 
-export default MySlider;
+export default MyCarousel;
