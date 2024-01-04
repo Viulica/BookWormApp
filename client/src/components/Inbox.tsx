@@ -1,4 +1,4 @@
-import { baseUrl } from "@/App";
+import { baseUrl, storedToken } from "@/App";
 import React, { useEffect, useState } from "react";
 import { useNavigate} from "react-router-dom";
 import "../styles/Inbox.css";
@@ -22,7 +22,6 @@ const Inbox: React.FC = () => {
     }
 
     const fetchInbox = async () => {
-      const storedToken = sessionStorage.getItem("token");
       if (storedToken) {
         try {
           const response = await fetch(`${baseUrl}/api/inbox`, {
@@ -35,7 +34,11 @@ const Inbox: React.FC = () => {
             const data = await response.json();
             setInboxData(data);
             setLoading(false);
-          } else {
+          }
+          else if (response.status === 401) {
+            navigate('/login');
+          }
+          else {
             console.log(await response.json());
           }
         } catch (error) {
@@ -50,7 +53,6 @@ const Inbox: React.FC = () => {
     };
 
     const fetchUserId = async () => {
-      const storedToken = sessionStorage.getItem("token");
       if (storedToken) {
         try {
           const response = await fetch(`${baseUrl}/api/data/getUserId`, {
@@ -62,7 +64,11 @@ const Inbox: React.FC = () => {
           if (response.ok) {
             const data = await response.json();
             setUserId(data);
-          } else {
+          }
+          else if (response.status === 401) {
+            navigate('/login');
+          }
+          else {
             console.log(await response.json());
           }
         } catch (error) {
@@ -79,7 +85,6 @@ const Inbox: React.FC = () => {
     //  console.log(searchTerm);
     const searchTermValue = e.target.value;
     try {
-      const storedToken = sessionStorage.getItem("token");
       const response = await fetch(`${baseUrl}/api/inbox/findUsers`, {
         method: "POST",
         headers: {
@@ -92,7 +97,11 @@ const Inbox: React.FC = () => {
       if (response.ok) {
         const data = await response.json();
         setFilteredData(data);
-      } else {
+      }
+      else if (response.status === 401) {
+        navigate('/login');
+      }
+      else {
         console.log(await response.json());
       }
     } catch (error) {
@@ -169,7 +178,7 @@ const Inbox: React.FC = () => {
                 )}
               </div>
               {showMessages && 
-                <Messages/>
+                <Messages />
                 }
           </div>
         </>

@@ -4,7 +4,7 @@ const data = require('../models/data');
 const verifyToken = require('./tokenVerification');
 
 const multer = require('multer');
-const Sequelize = require('sequelize');
+const {Sequelize, literal} = require('sequelize');
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });

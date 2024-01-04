@@ -14,7 +14,7 @@ const NavBar: React.FC = () => {
     <nav className="my-container">
         <ul className="my-navbar">
         <NavItem href="/">Home</NavItem>
-        <NavItem href="/profile">Profile</NavItem>
+        <NavItem href="/my-profile">Profile</NavItem>
         <NavItem href="/myBooks/">My Books</NavItem>
         <NavItem href="/inbox">Inbox</NavItem>
       {!token && <NavItem href="/login">Login</NavItem>}

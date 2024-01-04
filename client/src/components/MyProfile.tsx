@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { baseUrl } from "../App";
+import { baseUrl, storedToken } from "../App";
 import { useNavigate } from "react-router-dom";
 import "../styles/Profile.css";
 
@@ -34,7 +34,6 @@ const MyProfile: React.FC = () => {
   useEffect(() => {
     const fetchProfileData = async () => {
       // Provjeri postoji li token u sessionStorage
-      const storedToken = sessionStorage.getItem("token");
 
       if (storedToken) {
         try {
@@ -51,7 +50,11 @@ const MyProfile: React.FC = () => {
             console.log(data);
             setProfileData(data);
             setUsername(data.korime);
-          } else {
+          }
+          else if (response.status === 401) {
+            navigate('/login');
+          }
+          else {
             // Ako odgovor nije uspješan, možete poduzeti određene korake, npr. odjaviti korisnika
             console.error("Neuspješan poziv na /api/profile");
           }

@@ -1,4 +1,4 @@
-import { baseUrl } from "@/App";
+import { baseUrl, storedToken } from "@/App";
 import { useEffect, useState } from "react";
 import  { useNavigate } from "react-router-dom";
 
@@ -9,7 +9,6 @@ const MyBooks: React.FC = () => {
 
   useEffect(() => {
     const fetchBooksData = async () => {
-      const storedToken = sessionStorage.getItem("token");
       if (storedToken) {
         try {
           const response = await fetch(`${baseUrl}/api/data/profile/reader/myBooks`, {
@@ -20,8 +19,13 @@ const MyBooks: React.FC = () => {
 
           if (response.ok) {
             const data = await response.json();
+            console.log(data);
             setMyBooks(data);
-          } else {
+          }
+          else if (response.status === 401) {
+            navigate('/login');
+          }
+          else {
              // Treba prikazati na zaslon da nema nikakvih knjiga!
              console.log(await response.json());
           }
