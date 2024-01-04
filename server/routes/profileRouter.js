@@ -254,4 +254,42 @@ router.get('/:id', async (req, res) => {
    }
 });
 
+router.post('/follow/:profileId', verifyToken, async (req, res) => {
+   const profileId = req.params.profileId;
+   const userId = req.user.userId;
+   try {
+      const follow = await data.prati.findOne({
+         where: {
+            idkorisnik1: userId,
+            idkorisnik2: profileId
+         },
+         raw: true,
+      })
+
+      console.log(follow);
+
+      if (follow) {
+         await data.prati.destroy({
+            where: {
+               idkorisnik1: userId,
+               idkorisnik2: profileId
+            },
+         });
+         res.status(204).send("Follow");
+      }
+      else {
+         await data.prati.create({ idkorisnik1: userId, idkorisnik2: profileId });
+         res.status(200).send("Unfollow");
+      }
+   }
+   catch (error) {
+      console.error('Error fetching authors:', error);
+      res.status(500).json({ error: 'Internal Server Error', details: error.message });
+   }
+})
+
+router.get('/following/:profileId', verifyToken, async (req, res) => {
+
+})
+
 module.exports = router;

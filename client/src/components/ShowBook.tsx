@@ -3,8 +3,9 @@ import React, { useEffect, useState } from "react";
 import StarRating from "./StarRating";
 import "../styles/ShowBook.css";
 import { useNavigate } from "react-router-dom";
-import EditIcon from "./EditIcon";
-import DeleteIcon from "./DeleteIcon";
+import {EditIcon} from "./EditIcon";
+import {DeleteIcon} from "./DeleteIcon";
+import { InfoIcon } from "./InfoIcon";
 
 const ShowBook: React.FC = () => {
   const bookId = window.location.href
@@ -22,6 +23,7 @@ const ShowBook: React.FC = () => {
   const [showRateWindow, setShowRateWindow] = useState<boolean>(false);
   const [userRatingText, setUserRatingText] = useState<string>("");
   const [reviewError, setReviewError] = useState<boolean>(false);
+  const [showBookDetails, setShowBookDetails] = useState<boolean>(false);
   const navigate = useNavigate();
 
   const openRateWindow = () => {
@@ -35,87 +37,88 @@ const ShowBook: React.FC = () => {
     setShowRateWindow(false);
   };
 
-  useEffect(() => {
+  const openBookDetailsWindow = () => {
+    setShowBookDetails(true);
+  }
 
-    const fetchBookData = async () => {
+  const closeBookDetailsWindow = () => {
+    setShowBookDetails(false);
+  }
+
+  const fetchBookData = async () => {
+    try {
+      const response = await fetch(`${baseUrl}/api/data/book/${bookId}`);
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log(data);
+        setBookData(data);
+      }
+      else if (response.status === 401) {
+        navigate('/login');
+      }
+      else {
+        // Treba prikazati na zaslon da nema nikakvih knjiga!
+        console.log(await response.json());
+      }
+    } catch (error) {
+      console.error("Greška prilikom dohvaćanja knjige:", error);
+    }
+  };
+
+  const fetchRatings = async () => {
+    if (storedToken) {
       try {
-        const response = await fetch(`${baseUrl}/api/data/book/${bookId}`);
+        const response = await fetch(`${baseUrl}/api/data/getRatings/${bookId}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `${storedToken}`
+          },
+        });
 
         if (response.ok) {
           const data = await response.json();
           console.log(data);
-          setBookData(data);
+          setRatings(data);
         }
         else if (response.status === 401) {
           navigate('/login');
         }
         else {
-          // Treba prikazati na zaslon da nema nikakvih knjiga!
-          console.log(await response.json());
+          console.log(await response.json);
         }
       } catch (error) {
-        console.error("Greška prilikom dohvaćanja knjige:", error);
-      }
-    };
-
-    const fetchRatings = async () => {
-      if (storedToken) {
-        try {
-          const response = await fetch(`${baseUrl}/api/data/getRatings/${bookId}`, {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `${storedToken}`
-            },
-          });
-
-          if (response.ok) {
-            const data = await response.json();
-            console.log(data);
-            setRatings(data);
-          }
-          else if (response.status === 401) {
-            navigate('/login');
-          }
-          else {
-            console.log(await response.json);
-          }
-        } catch (error) {
-          console.error("Greška prilikom dohvaćanja recenzije:", error);
-        }
-      }
-    };
-
-    const fetchMyRating = async () => {
-      if(storedToken){
-        try {
-          const response = await fetch(`${baseUrl}/api/data/myRating/${bookId}`, {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `${storedToken}`
-            },
-          });
-
-          if (response.ok) {
-            const data = await response.json();
-            console.log(data);
-            setMyRating(data);
-          }
-          else if (response.status === 401) {
-            navigate('/login');
-          }
-        }
-        catch (error) {
-          console.error("Greška prilikom dohvaćanja moje recenzije:", error);
-        }
+        console.error("Greška prilikom dohvaćanja recenzije:", error);
       }
     }
+  };
 
-    fetchBookData();
-    fetchMyRating();
-    fetchRatings();
-  }, []);
+  const fetchMyRating = async () => {
+    if(storedToken){
+      try {
+        const response = await fetch(`${baseUrl}/api/data/myRating/${bookId}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `${storedToken}`
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          console.log(data);
+          setMyRating(data);
+        }
+        else if (response.status === 401) {
+          navigate('/login');
+        }
+      }
+      catch (error) {
+        console.error("Greška prilikom dohvaćanja moje recenzije:", error);
+      }
+    }
+  }
 
   const handleRate = async (param: number, txtrecenzija: string) => {
     const ocjena = param;
@@ -175,6 +178,12 @@ const ShowBook: React.FC = () => {
     }
   }
 
+  useEffect(() => {
+    fetchBookData();
+    fetchMyRating();
+    fetchRatings();
+  }, []);
+
   return (
     <>
       {bookData && (
@@ -187,25 +196,24 @@ const ShowBook: React.FC = () => {
                         {bookData.imeAutor + " " + bookData.prezAutor}
                       </a>
             </p>
-            <p className="p-1">Genre: {bookData.zanr}</p>
-            <p className="p-1">Published: {bookData.godizd}</p>
             <p className="p-1">Description: {bookData.opis}</p>
-            <p className="p-1">
-              <StarRating
-                rating={myRating.ocjena}
-                onRatingChange={(newRating) => {
-                  if (newRating === myRating.ocjena) {
-                    newRating = 0;
-                  }
-                  setMyRating({...myRating, ocjena: newRating});
-                  handleRate(newRating, myRating.txtrecenzija);
-                }} />
-            </p>
-            {/* My rating */}
+            <p className="p-1"><a onClick={openBookDetailsWindow}><InfoIcon/></a></p>
             <div>
               <div>
                 My rating:
               </div>
+              {/* My rating */}
+              <p className="p-1">
+                <StarRating
+                  rating={myRating.ocjena}
+                  onRatingChange={(newRating) => {
+                    if (newRating === myRating.ocjena) {
+                      newRating = 0;
+                    }
+                    setMyRating({...myRating, ocjena: newRating});
+                    handleRate(newRating, myRating.txtrecenzija);
+                  }} />
+              </p>
               <div>
                 {myRating.txtrecenzija ? 
                   <p className="p-1">
@@ -245,7 +253,7 @@ const ShowBook: React.FC = () => {
                     </a>
                     <StarRating rating={rating.ocjena} />
                   </p>
-                  {rating.txtrating && <p>{rating.txtrating}</p>}
+                  {rating.txtrecenzija && <p>{rating.txtrecenzija}</p>}
                 </div>
               ))}
             </div>
@@ -296,6 +304,20 @@ const ShowBook: React.FC = () => {
               </div>
             </div>
           )}
+
+
+          {showBookDetails && (
+            <div className="background">
+              <div className="window-book-details">
+                <span className="exit" onClick={closeBookDetailsWindow}>&times;</span>
+                <div>
+                    <p className="p-1">Genre: {bookData.zanr}</p>
+                    <p className="p-1">Published: {bookData.godizd}</p>
+                </div>
+              </div>
+            </div>
+          )}
+
         </>
       )}
     </>

@@ -8,8 +8,7 @@ import NavBar from "./components/nav/NavBar";
 // Komponente za rute
 import Home from "../src/components/Home";
 import Login from "../src/components/Login";
-import Profile from "../src/components/Profile";
-import MyProfile from "../src/components/MyProfile";
+import Profile from "./components/Profile";
 import ChangeProfile from "../src/components/ChangeProfile";
 import MyBooks from "../src/components/MyBooks";
 import Logout from "../src/components/Logout";
@@ -33,8 +32,8 @@ const App: React.FC = () => {
             <Route path="/home" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/my-profile" element={<MyProfile />} />
             <Route path="/profile/:id" element={<Profile />} />
+            {/* <Route path="/profile/:id" element={<Profile />} /> */}
             <Route path="/changeProfile" element={<ChangeProfile />} />
             <Route path="/myBooks" element={<MyBooks />} />
             <Route path="/logout" element={<Logout />} />

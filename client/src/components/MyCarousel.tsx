@@ -3,10 +3,10 @@ import Slider from 'react-slick';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Book from './Book';
-import img1 from "../images/1984.jpeg"
-import img2 from "../images/gatsby.jpeg"
-import img3 from "../images/pride.jpeg"
-import img4 from "../images/mockingbird.jpg"
+// import img1 from "../images/1984.jpeg"
+// import img2 from "../images/gatsby.jpeg"
+// import img3 from "../images/pride.jpeg"
+// import img4 from "../images/mockingbird.jpg"
 import "../styles/Carousel.css";
 import { baseUrl } from "@/App";
 import { useEffect, useState } from 'react';
