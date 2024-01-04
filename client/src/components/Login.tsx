@@ -48,7 +48,7 @@ const Login: React.FC = () => {
       <form onSubmit={handleSubmit} method="post">
         <div className="mb-3">
           <label htmlFor="username" className="form-label">
-            Korisničko ime:
+            Username:
           </label>
           <input
             type="text"
@@ -62,7 +62,7 @@ const Login: React.FC = () => {
 
         <div className="mb-3">
           <label htmlFor="password" className="form-label">
-            Lozinka:
+            Password:
           </label>
           <input
             type="password"
@@ -73,8 +73,10 @@ const Login: React.FC = () => {
             }
           />
         </div>
-        <button className="bg-orange-200">Prijava</button>
+        <button className="bg-orange-200">Login</button>
       </form>
+
+      <a href="/register" className="btn btn-primary">Register</a>
     </div>
   );
 };

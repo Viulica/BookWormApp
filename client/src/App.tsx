@@ -20,6 +20,7 @@ import Inbox from "../src/components/Inbox";
 import Messages from "../src/components/Messages";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css"
+import Register from "./components/Register";
 
 // Glavna aplikacija sa rutama i NavBar-om
 const App: React.FC = () => {
@@ -31,7 +32,8 @@ const App: React.FC = () => {
             <Route path="/" element={<Home />} />
             <Route path="/home" element={<Home />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/profile" element={<MyProfile />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/my-profile" element={<MyProfile />} />
             <Route path="/profile/:id" element={<Profile />} />
             <Route path="/changeProfile" element={<ChangeProfile />} />
             <Route path="/myBooks" element={<MyBooks />} />
@@ -49,3 +51,4 @@ const App: React.FC = () => {
 
 export default App;
 export const baseUrl = "http://localhost:3000";
+export const storedToken = sessionStorage.getItem('token');

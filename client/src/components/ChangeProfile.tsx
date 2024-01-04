@@ -43,7 +43,11 @@ const ChangeProfile: React.FC = () => {
             console.log(data);
             setProfileData(data);
             setUsername(data.korime);
-          } else {
+          }
+          else if (response.status === 401) {
+            navigate('/login');
+          }
+          else {
             // Ako odgovor nije uspješan, možete poduzeti određene korake, npr. odjaviti korisnika
             console.error("Neuspješan poziv na /api/profile");
           }
