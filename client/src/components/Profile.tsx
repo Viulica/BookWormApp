@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import "../styles/Profile.css";
 import { MessageIcon } from "./MessageIcon";
 import StarRating from "./StarRating";
+import MyBooks from "./MyBooks";
 
 
 const Profile: React.FC = () => {
@@ -12,10 +13,9 @@ const Profile: React.FC = () => {
   const [profileData, setProfileData] = useState<any>({});
   const profileId = parseInt(window.location.pathname.split("/")[window.location.pathname.split("/").length - 1]);
   const [isAuthor, setIsAuthor] = useState<boolean>(false);
-  const [isMyProfile, setIsMyProfile] = useState<boolean>(false);
+  const [isMyProfile, setIsMyProfile] = useState<boolean>(true);
   const [followStatus, setFollowStatus] = useState<string>("");
-  const [userReadingList, setUserReadingList] = useState<any>([]);
-  const [showUserReadingList, setShowUserReadingList] = useState<boolean>(false);
+  // const [showSavedBooks, setShowSavedBooks] = useState<boolean>(false);
   const navigate = useNavigate();
 
   const fetchMyUserId = async () => {
@@ -30,6 +30,7 @@ const Profile: React.FC = () => {
         if (response.ok) {
           const data = await response.json();
           setMyUserId(data);
+          setIsMyProfile(profileId === data);
         }
         else if (response.status === 401) {
           navigate('/login');
@@ -89,17 +90,21 @@ const Profile: React.FC = () => {
     }
   }
 
+  /*
+  const openSavedBooks = () => {
+    setShowSavedBooks(true);
+  }
+  const closeSavedBooks = () => {
+    setShowSavedBooks(false);
+  }
+  */
+
   useEffect(() => {
     fetchMyUserId();
-    fetchProfileData();
     fetchFollowing();
+    fetchProfileData();
   }, []);
   
-
-  // Možda postoji neki drugi način!
-  useEffect(() => {
-    setIsMyProfile(profileId === myUserId);
-  })
 
   const handleFollowUser = async () => {
     if (storedToken) {
@@ -123,40 +128,6 @@ const Profile: React.FC = () => {
       }
       catch (error) {
         console.log("Greška prilikom praćenja korisnika:", error);
-      }
-    }
-  }
-
-
-  const openUserReadingList = () => {
-    setShowUserReadingList(true);
-  }
-  const closeUserReadingList = () => {
-    setShowUserReadingList(false);
-  }
-
-  // TODO - backend + frontend!!!
-  const handleUserReadingList = async () => {
-    console.log("Reading list");
-    openUserReadingList();
-
-    if (storedToken) {
-      try {
-        const response = await fetch(`${baseUrl}/api/data/profile/reading/${profileId}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `${storedToken}`
-          }
-        })
-  
-        if (response.ok) {
-          const data = await response.json();
-          console.log(data);
-          setUserReadingList(data);
-        }
-      } catch (error) {
-        console.error("Greška prilikom dohvaćanja popisa knjiga:", error);
       }
     }
   }
@@ -225,9 +196,12 @@ const Profile: React.FC = () => {
                 <a href="/changeProfile" className="btn btn-primary">
                   Change
                 </a>
-                <a onClick={handleUserReadingList} className="btn btn-primary">
+                <a href={"/myBooks/"+ profileId} className="btn btn-primary">
                   See reading list
                 </a>
+                {/* <a onClick={openSavedBooks} className="btn btn-primary">
+                  See reading list
+                </a> */}
               </>
             )}
 
@@ -239,46 +213,26 @@ const Profile: React.FC = () => {
                 <a href={"/inbox?idReciever=" + profileId} className="message-icon">
                   <MessageIcon />
                 </a>
-                <a onClick={handleUserReadingList} className="btn btn-primary">
+                <a href={"/myBooks/"+ profileId} className="btn btn-primary">
                   See reading list
                 </a>
+                {/* <a onClick={openSavedBooks} className="btn btn-primary">
+                  See reading list
+                </a> */}
               </>
             )}
 
-            {showUserReadingList && (
+            
+            {/* {showSavedBooks && (
               <div className="background">
                 <div className="window-user-reading-list">
-                  <span className="exit" onClick={closeUserReadingList}>&times;</span>
-                  <div className="user-reading-list">
-                    {userReadingList.map((book: any, index: any) => (
-                      <div key={index}>
-                        <div className="book-title">
-                          <a href={"/book/"+book.idknjiga}>
-                            {book.naslov + " (" + book.godizd + ")"}
-                          </a>
-                        </div>
-                        <div className="book-author">
-                          <a href={"/profile/" + book.idkorisnikAutor}>
-                            {"by "+ book.imeAutor + " " + book.prezAutor}
-                          </a>
-                        </div>
-                        <div className="book-number-of-ratings">
-                          {book.brojRecenzija + " ratings"}
-                        </div>
-                        <div className="book-number-of-reviews">
-                          {book.brojOsvrta + " reviews"}
-                        </div>
-                        <div className="book-avg-rating">
-                          <StarRating rating={book.prosjekOcjena} />
-                          <span>{book.prosjekOcjena}</span>
-                        </div>
-                      </div>
-                    ))}
+                  <span className="exit" onClick={closeSavedBooks}>&times;</span>
+                  <div>
+                    <MyBooks />
                   </div>
                 </div>
               </div>
-            )}
-
+            )} */}
         </>
       )}
     </div>
