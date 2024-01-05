@@ -1,5 +1,20 @@
+.content-profile{
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   gap: 20px;
+}
+
+.container-title{
+   display: flex;
+   width: 60%;
+}
+
 .container-profileData{
    display: flex;
+   align-items: center;
+   gap: 30px;
+   width: 60%;
 }
 
 .container-profileData-image-and-username{
@@ -15,14 +30,33 @@
 
 .container-profileData-info{
    display: flex;
+   height: 80px;
+}
+
+.container-profileData-info div:nth-child(odd){
+   width: 100px;
+   display: flex;
+   flex-direction: column;
+   justify-content: center;
+   align-items: center;
 }
 
 .vertical-line{
-   width: 0;
+   width: 0px;
    height: 100%;
    border: 0.5px solid;
    margin: 0 10px;
 }
+
+.container-change-and-see-reading-list, .container-follow-message-and-see-reading-list{
+   width: 60%;
+   display: flex;
+   align-items: center;
+   gap: 20px;
+}
+
+
+/* ----------------------------------------------------------------------- */
 
 .background {
    position: fixed;

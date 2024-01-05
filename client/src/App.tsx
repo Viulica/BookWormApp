@@ -20,6 +20,7 @@ import Messages from "../src/components/Messages";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css"
 import Register from "./components/Register";
+import AllAuthors from "./components/AllAuthors";
 
 // Glavna aplikacija sa rutama i NavBar-om
 const App: React.FC = () => {
@@ -33,11 +34,11 @@ const App: React.FC = () => {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/profile/:id" element={<Profile />} />
-            {/* <Route path="/profile/:id" element={<Profile />} /> */}
             <Route path="/changeProfile" element={<ChangeProfile />} />
             <Route path="/myBooks/:id" element={<MyBooks />} />
             <Route path="/logout" element={<Logout />} />
             <Route path="/allBooks" element={<AllBooks />} />
+            <Route path="/allAuthors" element={<AllAuthors />} />
             <Route path="/addBook" element={<AddBook />} />
             <Route path="/book/:id" element={<ShowBook />} />
             <Route path="/inbox" element={<Inbox />} />

@@ -1,0 +1,53 @@
+.content {
+   display: flex;
+   justify-content: center;
+   align-items: center;
+}
+
+.container-all-authors,
+.search-authors {
+   width: 60%;
+   display: flex;
+   flex-direction: column;
+   gap: 40px;
+}
+
+.search-authors {
+   position: relative;
+}
+
+.container-searchedAuthors {
+   position: absolute;
+   top: 110%;
+   background-color: white;
+   box-shadow: 2px 2px 8px;
+   padding: 10px;
+   z-index: 10;
+}
+
+input {
+   border-bottom: 0.5px solid;
+   outline: none;
+}
+
+.author {
+   display: flex;
+   gap: 50px;
+}
+
+.author-profile-picture {
+   width: 72px;
+}
+
+.author:hover {
+   background-color: lightgrey;
+   cursor: pointer;
+}
+
+.author-username-following,
+.author-name-and-surname-and-date-of-birth,
+.author-saved-books-and-written-books {
+   display: flex;
+   flex-direction: column;
+   justify-content: center;
+}

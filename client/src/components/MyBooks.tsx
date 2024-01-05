@@ -1,12 +1,11 @@
 import { baseUrl, storedToken } from "@/App";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import '../styles/MyBooks.css';
+import "../styles/MyBooks.css";
 import Slider from "./Slider";
 
 const MyBooks: React.FC = () => {
   const [savedBooks, setSavedBooks] = useState<any>({});
-  const [writtenBooks, setWrittenBooks] = useState<any>([]);
   const [myUserId, setMyUserId] = useState<number>(0);
   const profileId = window.location.href
     .split("/")
@@ -97,47 +96,10 @@ const MyBooks: React.FC = () => {
     }
   };
 
-  const fetchMyWrittenBooks = async () => {
-    console.log("fetchMyWrittenBooks", profileId);
-    if (storedToken) {
-      try {
-        const response = await fetch(
-          `${baseUrl}/api/data/profile/myWrittenBooks`,
-          {
-            headers: {
-              Authorization: `${storedToken}`,
-            },
-          }
-        );
-
-        if (response.ok) {
-          const data = await response.json();
-          console.log(data);
-          setWrittenBooks(data);
-        } else if (response.status === 401) {
-          navigate("/login");
-        } else {
-          // Treba prikazati na zaslon da nema nikakvih knjiga!
-          console.log(await response.json());
-        }
-      } catch (error) {
-        console.error("Greška prilikom dohvaćanja knjiga:", error);
-      } finally {
-        // setLoading(false);
-      }
-    } else {
-      setTimeout(() => {
-        navigate("/login");
-        window.location.reload();
-      }, 1500);
-    }
-  };
-
   useEffect(() => {
     fetchMyUserId();
     fetchProfileData();
     fetchSavedBooksData();
-    fetchMyWrittenBooks();
   }, []);
 
   return (
@@ -147,68 +109,46 @@ const MyBooks: React.FC = () => {
       ) : (
         <>
           <div className="container">
-            {isAuthor ? (
+            {(savedBooks["Read"].length > 0 || savedBooks['Currently reading'].length > 0 || savedBooks['Want to read'].length > 0) ? (
               <>
-                <h1 className="display-6">Written</h1>
-                <div className="written">
-                  {writtenBooks.length > 0 ? (
-                    <Slider books={writtenBooks} id={0} />
-                  ) : (
-                    <a href="" className="btn btn-primary">
-                      Upload book
-                    </a>
-                  )}
-                </div>
+                {savedBooks["Read"].length > 0 ? (
+                  <>
+                    <h1 className="display-6">Saved</h1>
+                    <div className="read">
+                      <p className="p-1 book-status">Read</p>
+                      <Slider books={savedBooks["Read"]} id={1} />
+                    </div>
+                    <hr className="my-4" />
+                  </>
+                ) : (
+                  <></>
+                )}
 
-                <hr className="my-4" />
+                {savedBooks["Currently reading"].length > 0 ? (
+                  <>
+                    <div className="currently-reading">
+                      <p className="p-1 book-status">Currently reading</p>
+                      <Slider books={savedBooks["Currently reading"]} id={2} />
+                    </div>
+                    <hr className="my-4" />
+                  </>
+                ) : (
+                  <></>
+                )}
+
+                {savedBooks["Want to read"].length > 0 ? (
+                  <>
+                    <div className="want-to-read">
+                      <p className="p-1 book-status">Want to read</p>
+                      <Slider books={savedBooks["Want to read"]} id={3} />
+                    </div>
+                  </>
+                ) : (
+                  <></>
+                )}
               </>
             ) : (
-              <></>
-            )}
-
-            {savedBooks["Read"].length > 0 ? (
-              <>
-                <h1 className="display-6">Saved</h1>
-                <div className="read">
-                  <p className="p-1 book-status">Read</p>
-                  <Slider
-                    books={savedBooks["Read"]}
-                    id={1} />
-                </div>
-              </>
-            ) : (
-              <></>
-            )}
-
-            <hr className="my-4" />
-
-            {savedBooks["Currently reading"].length > 0 ? (
-              <>
-                <div className="currently-reading">
-                  <p className="p-1 book-status">Currently reading</p>
-                  <Slider
-                    books={savedBooks["Currently reading"]}
-                    id={2}
-                  />
-                </div>
-              </>
-            ) : (
-              <></>
-            )}
-
-            <hr className="my-4" />
-
-            {savedBooks["Want to read"].length > 0 ? (
-              <>
-                <div className="want-to-read">
-                  <p className="p-1 book-status">Want to read</p>
-                  <Slider
-                    books={savedBooks["Want to read"]}
-                    id={3} />
-                </div>
-              </>
-            ) : (
-              <></>
+              <p className="p-4">User doesn't have any saved book!</p>
             )}
           </div>
         </>

@@ -13,9 +13,6 @@ router.get('/allAuthors', async (req, res) => {
       const allAuthors = await data.korisnik.findAll({
          attributes: [
             'idkorisnik',
-            'ime',
-            'prezime',
-            'korime'
          ],
          where: {
             tipkorisnika: "autor",
@@ -26,6 +23,46 @@ router.get('/allAuthors', async (req, res) => {
       console.log(allAuthors);
 
       if (allAuthors) {
+         for (const a of allAuthors) {
+            var user = await data.korisnik.findOne({
+               attributes: [
+                  'ime',
+                  'prezime',
+                  'korime',
+                  'datrod',
+                  [
+                     Sequelize.literal('(SELECT COUNT(*) FROM prati WHERE prati.idkorisnik1 = korisnik.idkorisnik)'),
+                     'pratim'
+                  ],
+                  [
+                     Sequelize.literal('(SELECT COUNT(*) FROM prati WHERE prati.idkorisnik2 = korisnik.idkorisnik)'),
+                     'pratitelji'
+                  ],
+                  [
+                     Sequelize.literal('(SELECT COUNT(*) FROM cita WHERE cita.idkorisnik = korisnik.idkorisnik)'),
+                     'spremljeneKnjige'
+                  ],
+                  [
+                     Sequelize.literal('(SELECT COUNT(*) FROM knjiga WHERE knjiga.idkorisnik = korisnik.idkorisnik)'),
+                     'napisaoKnjiga'
+                  ]
+               ],
+               where: {
+                  idkorisnik: a.idkorisnik,
+               },
+               raw: true,
+            });
+
+            a.imeAutor = user.ime;
+            a.prezAutor = user.prezime;
+            a.korime = user.korime;
+            a.datrod = user.datrod;
+            a.pratim = user.pratim;
+            a.pratitelji = user.pratitelji;
+            a.spremljeneKnjige = user.spremljeneKnjige;
+            a.napisaoKnjiga = user.napisaoKnjiga;
+         }
+
          res.status(200).json(allAuthors);
       }
       else {
@@ -38,6 +75,68 @@ router.get('/allAuthors', async (req, res) => {
       res.status(500).json({ error: 'Internal Server Error', details: error.message });
    }
 });
+
+router.post('/findAuthors', async (req, res) => {
+   const { searchTerm } = req.body;
+   try {
+      const rezultati = await data.korisnik.findAll({
+         attributes: [
+            'idkorisnik',
+            'korime',
+            'ime',
+            'prezime'
+         ],
+         where: {
+            [Op.or]: [
+               { korime: { [Op.iLike]: `${searchTerm}%` } },
+               { ime: { [Op.iLike]: `${searchTerm}%` } },
+               { prezime: { [Op.iLike]: `${searchTerm}%` } },
+            ],
+            tipkorisnika: "autor"
+         },
+         raw: true,
+      });
+
+      if (rezultati.length > 0) {
+         console.log(rezultati);
+         res.status(200).json(rezultati);
+      }
+   } catch (error) {
+      console.error('Greška prilikom pretraživanja korisnika:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+   }
+})
+
+router.post('/searchAuthor', async (req, res) => {
+   const { searchTerm } = req.body;
+   try {
+      const rezultati = await data.korisnik.findAll({
+         attributes: [
+            'idkorisnik',
+            'korime',
+            'ime',
+            'prezime'
+         ],
+         where: {
+            [Op.or]: [
+               { korime: `${searchTerm}` },
+               { ime:  `${searchTerm}` },
+               { prezime: `${searchTerm}` },
+            ],
+            tipkorisnika: "autor"
+         },
+         raw: true,
+      });
+
+      if (rezultati.length > 0) {
+         console.log(rezultati);
+         res.status(200).json(rezultati);
+      }
+   } catch (error) {
+      console.error('Greška prilikom pretraživanja korisnika:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+   }
+})
 
 // idknjiga, naslov, slika, godizd, idkorisnikAutor, imeAutor, prezAutor, brojRecenzija, brojOsvrta, prosjekOcjena, spremljenoPuta
 router.get('/allBooks', async (req, res) => {
@@ -71,7 +170,7 @@ router.get('/allBooks', async (req, res) => {
                }
             })
 
-            book.brojSpremanja = brojSpremanja; 
+            book.brojSpremanja = brojSpremanja;
 
             const brojRecenzija = await data.recenzija.count({
                where:
@@ -118,14 +217,14 @@ router.get('/allBooks', async (req, res) => {
       else {
          res.status(404).json("Nema knjiga!");
       }
-   } 
+   }
    catch (error) {
       console.error('Error fetching authors:', error);
       res.status(500).json({ error: 'Internal Server Error', details: error.message });
    }
-})
+});
 
-router.get('/recommendedBooks', async(req, res) => {
+router.get('/recommendedBooks', async (req, res) => {
    try {
 
       const allAuthors = await data.korisnik.findAll({
@@ -173,9 +272,9 @@ router.get('/recommendedBooks', async(req, res) => {
       console.error('Error fetching books:', error);
       res.status(500).json({ error: 'Internal Server Error', details: error.message });
    }
-})
+});
 
-router.get('/bestRatedBooks', async(req, res) => {
+router.get('/bestRatedBooks', async (req, res) => {
    try {
 
       const allAuthors = await data.korisnik.findAll({
@@ -224,23 +323,23 @@ router.get('/bestRatedBooks', async(req, res) => {
 
       mostPopular.sort((a, b) => {
          if (a.count < b.count) {
-             return 1;
+            return 1;
          }
          if (a.count > b.count) {
-             return -1;
+            return -1;
          }
          return 0;
-     });
+      });
 
-   console.log("slika:", mostPopular[0].src)
-     for (i = 0; i < 4; i++) {
-      books.push({
-         naslov: mostPopular[i].naslov,
-         autor: mostPopular[i].autor,
-         src: mostPopular[i].src,
-         rating: mostPopular[i].rating
-      })
-     }
+      console.log("slika:", mostPopular[0].src)
+      for (i = 0; i < 4; i++) {
+         books.push({
+            naslov: mostPopular[i].naslov,
+            autor: mostPopular[i].autor,
+            src: mostPopular[i].src,
+            rating: mostPopular[i].rating
+         })
+      }
 
       res.status(200).json(books);
    }
@@ -248,7 +347,7 @@ router.get('/bestRatedBooks', async(req, res) => {
       console.error('Error fetching books:', error);
       res.status(500).json({ error: 'Internal Server Error', details: error.message });
    }
-})
+});
 
 router.get('/getUserId', verifyToken, async (req, res) => {
    try {
@@ -380,7 +479,7 @@ router.get('/getRatings/:bookId', verifyToken, async (req, res) => {
       console.log("Error fetching ratings: ", error);
       res.status(500).json({ error: 'Internal Server Error', details: error.message });
    }
-})
+});
 
 router.get('/myRating/:bookId', verifyToken, async (req, res) => {
    const bookId = req.params.bookId;
@@ -403,22 +502,22 @@ router.get('/myRating/:bookId', verifyToken, async (req, res) => {
       else {
          res.status(404).json(rating);
       }
-   } 
+   }
    catch (error) {
       console.log("Error fetching book: ", error);
       res.status(500).json({ error: 'Internal Server Error', details: error.message });
    }
 
-})
+});
 
 router.post('/rate/:bookId', verifyToken, async (req, res) => {
    const bookId = req.params.bookId;
    const userId = req.user.userId;
-   const {ocjena, txtrecenzija} = req.body;
+   const { ocjena, txtrecenzija } = req.body;
    console.log(req.body);
-   console.log("bookId",bookId);
-   console.log("userId",userId);
-   console.log("grade",req.body.ocjena);
+   console.log("bookId", bookId);
+   console.log("userId", userId);
+   console.log("grade", req.body.ocjena);
    
    try {
       const rating = await data.recenzija.findOne({
@@ -441,11 +540,11 @@ router.post('/rate/:bookId', verifyToken, async (req, res) => {
       }
       else {
          await data.recenzija.update(newData, {
-               where: {
-                  idkorisnik: userId,
-                  idknjiga: bookId
-               }
+            where: {
+               idkorisnik: userId,
+               idknjiga: bookId
             }
+         }
          )
          res.status(200).json("Changed");
       }
@@ -454,7 +553,7 @@ router.post('/rate/:bookId', verifyToken, async (req, res) => {
       console.log("Error fetching book: ", error);
       res.status(500).json({ error: 'Internal Server Error', details: error.message });
    }
-})
+});
 
 router.delete('/deleteRating/:rateId', verifyToken, async (req, res) => {
    try {
@@ -475,11 +574,10 @@ router.delete('/deleteRating/:rateId', verifyToken, async (req, res) => {
    }
    catch (error) {
       console.log("Error fetching book: ", error);
-      res.status(500).json({ error: 'Internal Server Error', details: error.message });   
+      res.status(500).json({ error: 'Internal Server Error', details: error.message });
    }
 
-})
-
+});
 
 router.post('/saveBook/:bookId', verifyToken, async (req, res) => {
    const { statusNumber } = req.body;
