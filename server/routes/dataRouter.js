@@ -4,7 +4,7 @@ const verifyToken = require('./tokenVerification');
 const data = require('../models/data');
 
 const profileRouter = require('./profileRouter');
-const { literal, Op } = require('sequelize');
+const { Sequelize, literal, Op } = require('sequelize');
 
 router.use('/profile', profileRouter);
 
@@ -39,23 +39,18 @@ router.get('/allAuthors', async (req, res) => {
    }
 });
 
+// idknjiga, naslov, slika, godizd, idkorisnikAutor, imeAutor, prezAutor, brojRecenzija, brojOsvrta, prosjekOcjena, spremljenoPuta
 router.get('/allBooks', async (req, res) => {
    try {
       const allBooks = await data.knjiga.findAll({
          attributes: [
             'idknjiga',
             'naslov',
-            'zanr',
             'godizd',
-            'opis',
-            'isbn',
             'slika',
-            [literal('idkorisnik_korisnik.idkorisnik'), 'idkorisnikAutor'],
-            [literal('idkorisnik_korisnik.ime'), 'imeAutor'],
-            [literal('idkorisnik_korisnik.prezime'), 'prezAutor'],
-            [literal('idkorisnik_korisnik.datrod'), 'datrod'],
-            [literal('idkorisnik_korisnik.info'), 'info']
-
+            ['idkorisnik', 'idkorisnikAutor'],
+            [Sequelize.col('idkorisnik_korisnik.ime'), 'imeAutor'],
+            [Sequelize.col('idkorisnik_korisnik.prezime'), 'prezAutor']
          ],
          include: [
             {
@@ -68,6 +63,56 @@ router.get('/allBooks', async (req, res) => {
       })
 
       if (allBooks.length > 0) {
+         for (const book of allBooks) {
+
+            const brojSpremanja = await data.cita.count({
+               where: {
+                  idknjiga: book.idknjiga
+               }
+            })
+
+            book.brojSpremanja = brojSpremanja; 
+
+            const brojRecenzija = await data.recenzija.count({
+               where:
+               {
+                  idknjiga: book.idknjiga
+               }
+            })
+
+            book.brojRecenzija = brojRecenzija;
+
+            const brojOsvrta = await data.recenzija.count({
+               where:
+               {
+                  idknjiga: book.idknjiga,
+                  txtrecenzija: {
+                     [Op.not]: null
+                  }
+               }
+            })
+
+            book.brojOsvrta = brojOsvrta;
+            
+            if (brojRecenzija) {
+               const prosjekOcjena = await data.recenzija.findAll({
+                  attributes: [
+                     [Sequelize.fn('AVG', Sequelize.col('ocjena')), 'prosjekOcjena']
+                  ],
+                  where: {
+                     idknjiga: book.idknjiga,
+                     ocjena: {
+                        [Sequelize.Op.between]: [1, 5]
+                     }
+                  },
+                  raw: true
+               });
+               book.prosjekOcjena = parseFloat(prosjekOcjena[0].prosjekOcjena).toFixed(2);
+            }
+            else {
+               book.prosjekOcjena = 0;
+            }
+         }
          res.status(200).json(allBooks);
       }
       else {

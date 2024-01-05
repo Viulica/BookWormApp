@@ -171,7 +171,9 @@ const MyBooks: React.FC = () => {
                 <h1 className="display-6">Saved</h1>
                 <div className="read">
                   <p className="p-1 book-status">Read</p>
-                  <Slider books={savedBooks["Read"]} id={1} />
+                  <Slider
+                    books={savedBooks["Read"]}
+                    id={1} />
                 </div>
               </>
             ) : (
@@ -200,7 +202,9 @@ const MyBooks: React.FC = () => {
               <>
                 <div className="want-to-read">
                   <p className="p-1 book-status">Want to read</p>
-                  <Slider books={savedBooks["Want to read"]} id={3} />
+                  <Slider
+                    books={savedBooks["Want to read"]}
+                    id={3} />
                 </div>
               </>
             ) : (

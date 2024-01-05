@@ -1,6 +1,7 @@
 import { baseUrl, storedToken } from "@/App";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Slider from "./Slider";
 
 
 
@@ -39,16 +40,7 @@ const AllBooks: React.FC = () => {
    return (
       allBooks && (
          <div className="container allBooks">
-            {allBooks.map((book: any, index: any) => (
-               <div className="book" key={index}>
-                  <div className="book-title">
-                     <a href={"/book/" + book.idknjiga} className="text-primary text-decoration-underline">{book.naslov + " (" + book.godizd + ")"}</a>
-                  </div>
-                  <div className="book-author">
-                     <a href={"/profile/" + book.idkorisnikAutor}>{ book.imeAutor + " " + book.prezAutor}</a>
-                  </div>
-               </div>
-            ))}
+            <Slider books={allBooks} id={4} />
          </div>
       )
    );
