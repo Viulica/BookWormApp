@@ -15,6 +15,7 @@ const NavBar: React.FC = () => {
 
   const [myUserId, setMyUserId] = useState<number>(0);
   const navigate = useNavigate();
+  const currentPath = window.location.pathname;
 
   const fetchMyUserId = async () => {
     if (storedToken) {
@@ -48,15 +49,15 @@ const NavBar: React.FC = () => {
   return (
     <nav className="my-container">
         <ul className="my-navbar">
-        <NavItem href="/">Home</NavItem>
-        <NavItem href="/allBooks">All books</NavItem>
-        <NavItem href="/allAuthors">All authors</NavItem>
-        {storedToken && <NavItem href={"/profile/" + myUserId}>Profile</NavItem>}
-        {storedToken && <NavItem href="/myBooks/">My Books</NavItem>}
-        {storedToken && <NavItem href="/inbox">Inbox</NavItem>}
-        {!storedToken && <NavItem href="/login">Login</NavItem>}
-        {!storedToken && <NavItem href="/register">Register</NavItem>}
-        {storedToken && <NavItem href="/logout">Logout</NavItem>}
+        <NavItem path={currentPath} href="/">Home</NavItem>
+        <NavItem path={currentPath}  href="/allBooks">All books</NavItem>
+        <NavItem path={currentPath}  href="/allAuthors">All authors</NavItem>
+        {storedToken && <NavItem path={currentPath}  href={"/profile/" + myUserId}>Profile</NavItem>}
+        {storedToken && <NavItem path={currentPath}  href="/myBooks/">My Books</NavItem>}
+        {storedToken && <NavItem path={currentPath} href="/inbox">Inbox</NavItem>}
+        {!storedToken && <NavItem path={currentPath}  href="/login">Login</NavItem>}
+        {!storedToken && <NavItem path={currentPath}  href="/register">Register</NavItem>}
+        {storedToken && <NavItem path={currentPath}  href="/logout">Logout</NavItem>}
       <SearchBar></SearchBar>
       </ul>
     </nav>

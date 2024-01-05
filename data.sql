@@ -27,7 +27,12 @@ insert into korisnik(ime, prezime, datrod, tipkorisnika, korime, lozinka) values
  ('George', 'Orwell', '1984-6-25', 'autor', 'gorwell', '$2a$10$0fUw5wFVAoRA.8GjDaGXpu5f8B4WNFRJ.epGq85gAuThKf.famNV6'),
 ('Harper', 'Lee', '1926-4-26', 'autor', 'lharper', '$2a$10$0fUw5wFVAoRA.8GjDaGXpu5f8B4WNFRJ.epGq85gAuThKf.famNV6'),
 ('Jane', 'Austen', '1775-12-16', 'autor', 'jausten', '$2a$10$0fUw5wFVAoRA.8GjDaGXpu5f8B4WNFRJ.epGq85gAuThKf.famNV6'),
-('Scott', 'Fitzgerald', '1896-9-24', 'autor', 'sfitz', '$2a$10$0fUw5wFVAoRA.8GjDaGXpu5f8B4WNFRJ.epGq85gAuThKf.famNV6');
+('Scott', 'Fitzgerald', '1896-9-24', 'autor', 'sfitz', '$2a$10$0fUw5wFVAoRA.8GjDaGXpu5f8B4WNFRJ.epGq85gAuThKf.famNV6'),
+('Lav', 'Tolstoj', '1828-9-9', 'autor', 'ltolstoj', '$2a$10$0fUw5wFVAoRA.8GjDaGXpu5f8B4WNFRJ.epGq85gAuThKf.famNV6'),
+('Alexandre', 'Dumas', '1802-6-24', 'autor', 'adumas', '$2a$10$0fUw5wFVAoRA.8GjDaGXpu5f8B4WNFRJ.epGq85gAuThKf.famNV6'),
+('Gustave', 'Flaubert', '1821-12-12', 'autor', 'gflaubert', '$2a$10$0fUw5wFVAoRA.8GjDaGXpu5f8B4WNFRJ.epGq85gAuThKf.famNV6'),
+('J.D', 'Salinger', '1919-1-1', 'autor', 'jdsalinger', '$2a$10$0fUw5wFVAoRA.8GjDaGXpu5f8B4WNFRJ.epGq85gAuThKf.famNV6');
+
 
 insert into knjiga(naslov, zanr, godIzd, opis, isbn, idkorisnik, slika) values
 ('1984', 'distopija', 1949, 'A dystopian novel that presents a chilling portrayal of a totalitarian regime that exercises extreme control over all aspects of life. The story follows Winston Smith, who begins to question the oppressive system led by the Party and its leader, Big Brother.', '9780451524935', 10, 'https://znanje.hr/product-images/6882dddc-6a4f-436d-8059-5dee2951de26.jpg'),
@@ -36,7 +41,12 @@ insert into knjiga(naslov, zanr, godIzd, opis, isbn, idkorisnik, slika) values
 
 ('Ponos i predrasude', 'romansa, fikcija', 1813, 'A classic novel in English literature, focusing on the emotional development of the protagonist, Elizabeth Bennet, who learns about the repercussions of hasty judgments and comes to appreciate the difference between superficial goodness and actual goodness.', '1234987654561', 12, 'https://images.penguinrandomhouse.com/cover/9780593622452'),
 
-('Veliki Gatsby', 'tragedija', 1925, 'This novel is set in the Jazz Age on Long Island and provides a critical social history of America in the 1920s. The story is centered around the young and mysterious millionaire Jay Gatsby and his quixotic passion for the beautiful Daisy Buchanan.', '9780743273565', 13, 'https://d28hgpri8am2if.cloudfront.net/book_images/onix/cvr9781982146702/the-great-gatsby-9781982146702_hr.jpg');
+('Veliki Gatsby', 'tragedija', 1925, 'This novel is set in the Jazz Age on Long Island and provides a critical social history of America in the 1920s. The story is centered around the young and mysterious millionaire Jay Gatsby and his quixotic passion for the beautiful Daisy Buchanan.', '9780743273565', 13, 'https://d28hgpri8am2if.cloudfront.net/book_images/onix/cvr9781982146702/the-great-gatsby-9781982146702_hr.jpg'),
+
+('Rat i mir', 'epski roman', 1865, 'he book, which is in Russian with significant portions in French, chronicles the Napoleonic era within Russia, particularly detailing the French invasion of Russia and its aftermath, through the interconnected lives of five aristocratic families.', '9781400033416', 14, 'https://www.zuzi.hr/media/img/products/5200/lav-nikolajevic-tolstoj-rat-i-mir-dio-prvi-S7QA.webp'),
+('Grof Monte Cristo', 'roman', 1844, 'This novel tells the story of Edmond Dantès, a young sailor who is falsely accused of treason and imprisoned. After escaping, he discovers a treasure and reinvents himself as the Count of Monte Cristo to seek revenge against those who wronged him.', '9780140449266', 15, 'https://shop.skolskaknjiga.hr/media/catalog/product/cache/1/image/9df78eab33525d08d6e5fb8d27136e95/1/7/178990.jpg'),
+('Madam Bovary', 'roman', 1857, 'The novel follows Emma Bovary, who lives beyond her means in an attempt to escape the banalities and emptiness of provincial life', '9781501117015', 16, 'https://cdn.kobo.com/book-images/3a9fa608-7950-439d-acf0-27751b69e26e/1200/1200/False/madam-bovary-1.jpg'),
+('Lovac u zitu', 'roman', 1957, 'The story is narrated by Holden Caulfield, a teenager who has been expelled from his prep school. Over a weekend before Christmas, he wanders New York City, grappling with themes of angst, alienation, and a critique of superficiality in society. The novel is notable for its portrayal of teenage rebellion and is often read for its exploration of these themes.', '9780345806543', 17, 'https://www.knjigolov.hr/slike/202004081011140.LovacUZitu.jpg');
 
 
 

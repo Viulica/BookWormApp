@@ -19,7 +19,8 @@ interface BookType {
 }
 
 interface CarouselProps {
-  title: string
+  title: string,
+  route: string
 }
 
 
@@ -38,7 +39,7 @@ const MyCarousel = (props: CarouselProps) => {
 
   async function fetchData() {
     try {
-      const response = await fetch(`${baseUrl}/api/data/allBooks`);
+      const response = await fetch(`${baseUrl}/api/data/${props.route}`);
       console.log(response)
       if (!response.ok) {
         throw new Error('Network response was not ok');

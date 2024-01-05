@@ -1,3 +1,7 @@
 .nav-item-custom {
     display: inline-block;
 }
+
+.active {
+    color: #F6A192;
+}

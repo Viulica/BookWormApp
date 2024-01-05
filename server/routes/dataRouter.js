@@ -79,6 +79,131 @@ router.get('/allBooks', async (req, res) => {
    }
 })
 
+router.get('/recommendedBooks', async(req, res) => {
+   try {
+
+      const allAuthors = await data.korisnik.findAll({
+         where: {
+            tipkorisnika: "autor"
+         },
+         raw: true,
+         attributes: ['idkorisnik', 'ime', 'prezime']
+      });
+
+      const allBooks = await data.knjiga.findAll({
+         raw: true,
+         attributes: ['idknjiga', 'naslov', 'idkorisnik', 'slika']
+      });
+
+
+      let books = [];
+      for (let book of allBooks) {
+         for (let author of allAuthors) {
+            if (book.idkorisnik === author.idkorisnik && author.idkorisnik > 13) {
+               const allReviews = await data.recenzija.findAll({
+                  where: {
+                     idknjiga: book.idknjiga
+                  },
+                  raw: true,
+                  attributes: ['ocjena']
+               });
+               let ocjena = 0;
+               for (let i = 0; i < allReviews.length; i++) {
+                  ocjena += allReviews[i].ocjena;
+               }
+               books.push({
+                  naslov: book.naslov,
+                  autor: author.ime + " " + author.prezime,
+                  src: book.slika,
+                  rating: allReviews.length === 0 ? '-' : ocjena / allReviews.length
+               });
+            }
+         }
+      }
+
+      res.status(200).json(books);
+   }
+   catch (error) {
+      console.error('Error fetching books:', error);
+      res.status(500).json({ error: 'Internal Server Error', details: error.message });
+   }
+})
+
+router.get('/bestRatedBooks', async(req, res) => {
+   try {
+
+      const allAuthors = await data.korisnik.findAll({
+         where: {
+            tipkorisnika: "autor"
+         },
+         raw: true,
+         attributes: ['idkorisnik', 'ime', 'prezime']
+      });
+
+      const allBooks = await data.knjiga.findAll({
+         raw: true,
+         attributes: ['idknjiga', 'naslov', 'idkorisnik', 'slika']
+      });
+
+      console.log(allBooks)
+
+      let books = [];
+      let mostPopular = [];
+      for (let book of allBooks) {
+         for (let author of allAuthors) {
+            if (book.idkorisnik === author.idkorisnik) {
+               const allReviews = await data.recenzija.findAll({
+                  where: {
+                     idknjiga: book.idknjiga
+                  },
+                  raw: true,
+                  attributes: ['ocjena']
+               })
+               let ocjena = 0;
+               for (let i = 0; i < allReviews.length; i++) {
+                  ocjena += allReviews[i].ocjena;
+               }
+               mostPopular.push({
+                  naslov: book.naslov,
+                  autor: author.ime + " " + author.prezime,
+                  count: allReviews.length,
+                  src: book.slika,
+                  rating: allReviews.length === 0 ? '-' : ocjena / allReviews.length
+
+               })
+            }
+         }
+      }
+
+
+      mostPopular.sort((a, b) => {
+         if (a.count < b.count) {
+             return 1;
+         }
+         if (a.count > b.count) {
+             return -1;
+         }
+         return 0;
+     });
+
+   console.log("slika:", mostPopular[0].src)
+     for (i = 0; i < 4; i++) {
+      books.push({
+         naslov: mostPopular[i].naslov,
+         autor: mostPopular[i].autor,
+         src: mostPopular[i].src,
+         rating: mostPopular[i].rating
+      })
+     }
+
+      res.status(200).json(books);
+   }
+   catch (error) {
+      console.error('Error fetching books:', error);
+      res.status(500).json({ error: 'Internal Server Error', details: error.message });
+   }
+})
+
 router.get('/getUserId', verifyToken, async (req, res) => {
    try {
       const userId = req.user.userId;

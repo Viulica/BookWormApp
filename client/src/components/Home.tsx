@@ -7,12 +7,12 @@ import { storedToken } from "@/App";
 
     return (
       <div>
-        <Carousel title="Najpopularnije knjige"/>
+        <Carousel title="Tople preporuke" route="recommendedBooks"/>
         {/* <button className="btn btn-primary" onClick={handleShowAllBooks}>Sve knjige</button>
            <button className="btn btn-primary" onClick={handleShowAllUsers}>Svi korisnici</button> */}
   
         {/* Prikaz popularnih knjiga! */}
-        <Carousel title="Najbolje ocijenjene"/>
+        <Carousel title="Najpopularnije knjige" route="bestRatedBooks"/>
       </div>
     );
   }
