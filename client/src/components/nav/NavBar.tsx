@@ -53,7 +53,7 @@ const NavBar: React.FC = () => {
         <NavItem path={currentPath}  href="/allBooks">All books</NavItem>
         <NavItem path={currentPath}  href="/allAuthors">All authors</NavItem>
         {storedToken && <NavItem path={currentPath}  href={"/profile/" + myUserId}>Profile</NavItem>}
-        {storedToken && <NavItem path={currentPath}  href="/myBooks/">My Books</NavItem>}
+        {storedToken && <NavItem path={currentPath}  href={"/myBooks/" + myUserId}>My Books</NavItem>}
         {storedToken && <NavItem path={currentPath} href="/inbox">Inbox</NavItem>}
         {!storedToken && <NavItem path={currentPath}  href="/login">Login</NavItem>}
         {!storedToken && <NavItem path={currentPath}  href="/register">Register</NavItem>}

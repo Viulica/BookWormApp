@@ -1,24 +1,25 @@
 import { baseUrl, storedToken } from "@/App";
-import React, { ReactEventHandler, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import StarRating from "./StarRating";
 import "../styles/ShowBook.css";
 import { useNavigate } from "react-router-dom";
-import {EditIcon} from "./EditIcon";
-import {DeleteIcon} from "./DeleteIcon";
+import { EditIcon } from "./EditIcon";
+import { DeleteIcon } from "./DeleteIcon";
 import { InfoIcon } from "./InfoIcon";
 
 const ShowBook: React.FC = () => {
   const bookId = window.location.href
     .split("/")
     .at(window.location.href.split("/").length - 1);
-
+  const [myUserId, setMyUserId] = useState<number>(0);
+  const [isMyBook, setIsMyBook] = useState<boolean>(false);
   const [bookData, setBookData] = useState<any>(null);
   const [ratings, setRatings] = useState<any>([]);
   const [myRating, setMyRating] = useState<any>({
     idkorisnik: 0,
     ocjena: 0,
     txtrecenzija: null,
-    idknjiga: 0
+    idknjiga: 0,
   });
   const [showRateWindow, setShowRateWindow] = useState<boolean>(false);
   const [userRatingText, setUserRatingText] = useState<string>("");
@@ -40,11 +41,34 @@ const ShowBook: React.FC = () => {
 
   const openBookDetailsWindow = () => {
     setShowBookDetails(true);
-  }
+  };
 
   const closeBookDetailsWindow = () => {
     setShowBookDetails(false);
-  }
+  };
+
+  const fetchMyUserId = async () => {
+    if (storedToken) {
+      try {
+        const response = await fetch(`${baseUrl}/api/data/getUserId`, {
+          headers: {
+            Authorization: `${storedToken}`,
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setMyUserId(data);
+        } else if (response.status === 401) {
+          navigate("/login");
+        } else {
+          console.log(await response.json());
+        }
+      } catch (error) {
+        console.log("Greška prilikom dohvaćanja userId:", error);
+      }
+    }
+  };
 
   const fetchBookData = async () => {
     try {
@@ -54,11 +78,10 @@ const ShowBook: React.FC = () => {
         const data = await response.json();
         console.log(data);
         setBookData(data);
-      }
-      else if (response.status === 401) {
-        navigate('/login');
-      }
-      else {
+        setIsMyBook(myUserId === data.idkorisnikAutor);
+      } else if (response.status === 401) {
+        navigate("/login");
+      } else {
         // Treba prikazati na zaslon da nema nikakvih knjiga!
         console.log(await response.json());
       }
@@ -71,12 +94,12 @@ const ShowBook: React.FC = () => {
     if (storedToken) {
       try {
         const response = await fetch(`${baseUrl}/api/data/saved/${bookId}`, {
-          method: 'GET',
+          method: "GET",
           headers: {
-            'Content-Type': 'application/json',
-            Authorization: `${storedToken}`
+            "Content-Type": "application/json",
+            Authorization: `${storedToken}`,
           },
-        })
+        });
 
         const data = await response.json();
         console.log(data);
@@ -85,28 +108,29 @@ const ShowBook: React.FC = () => {
         console.error("Greška prilikom dohvaćanja knjige:", error);
       }
     }
-  }
+  };
 
   const fetchRatings = async () => {
     if (storedToken) {
       try {
-        const response = await fetch(`${baseUrl}/api/data/getRatings/${bookId}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `${storedToken}`
-          },
-        });
+        const response = await fetch(
+          `${baseUrl}/api/data/getRatings/${bookId}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `${storedToken}`,
+            },
+          }
+        );
 
         if (response.ok) {
           const data = await response.json();
           console.log(data);
           setRatings(data);
-        }
-        else if (response.status === 401) {
-          navigate('/login');
-        }
-        else {
+        } else if (response.status === 401) {
+          navigate("/login");
+        } else {
           console.log(await response.json);
         }
       } catch (error) {
@@ -116,13 +140,13 @@ const ShowBook: React.FC = () => {
   };
 
   const fetchMyRating = async () => {
-    if(storedToken){
+    if (storedToken) {
       try {
         const response = await fetch(`${baseUrl}/api/data/myRating/${bookId}`, {
-          method: 'GET',
+          method: "GET",
           headers: {
-            'Content-Type': 'application/json',
-            Authorization: `${storedToken}`
+            "Content-Type": "application/json",
+            Authorization: `${storedToken}`,
           },
         });
 
@@ -130,105 +154,115 @@ const ShowBook: React.FC = () => {
           const data = await response.json();
           console.log(data);
           setMyRating(data);
+        } else if (response.status === 401) {
+          navigate("/login");
         }
-        else if (response.status === 401) {
-          navigate('/login');
-        }
-      }
-      catch (error) {
+      } catch (error) {
         console.error("Greška prilikom dohvaćanja moje recenzije:", error);
       }
     }
-  }
+  };
 
   const handleRate = async (param: number, txtrecenzija: string) => {
     const ocjena = param;
     console.log(txtrecenzija);
     const data = {
-      ocjena, txtrecenzija
+      ocjena,
+      txtrecenzija,
     };
 
     console.log(data);
-    
+
     if (storedToken) {
       try {
         const response = await fetch(`${baseUrl}/api/data/rate/${bookId}`, {
-          method: 'POST',
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
-            Authorization: `${storedToken}`
+            "Content-Type": "application/json",
+            Authorization: `${storedToken}`,
           },
-          body: JSON.stringify(data)
-        })
+          body: JSON.stringify(data),
+        });
 
         if (response.ok) {
           console.log(await response.json());
           window.location.reload();
+        } else if (response.status === 401) {
+          navigate("/login");
         }
-        else if (response.status === 401) {
-          navigate('/login');
-        }
-      }
-      catch (error) {
+      } catch (error) {
         console.error("Greška prilikom objavljivanja recenzije:", error);
       }
     }
-  }
+  };
 
   const handleDeleteRate = async (idrecenzija: number) => {
     if (storedToken) {
       try {
-        const response = await fetch(`${baseUrl}/api/data/deleteRating/${idrecenzija}`, {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `${storedToken}`
+        const response = await fetch(
+          `${baseUrl}/api/data/deleteRating/${idrecenzija}`,
+          {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `${storedToken}`,
+            },
           }
-        })
-        
+        );
+
         console.log(await response.json());
         if (response.ok) {
           window.location.reload();
-        }
-        else if (response.status === 401) {
-          navigate('/login');
+        } else if (response.status === 401) {
+          navigate("/login");
         }
       } catch (error) {
         console.error("Greška prilikom brisanja recenzije:", error);
       }
     }
-  }
+  };
 
   useEffect(() => {
-    fetchBookData();
-    fetchBookStatus();
-    fetchMyRating();
-    fetchRatings();
+    fetchMyUserId();
   }, []);
+  
+  useEffect(() => {
+    if (myUserId !== 0) {
+      console.log(myUserId);
+      fetchBookStatus();
+      fetchBookData();
+  
+      if (!isMyBook) {
+        fetchMyRating();
+      }
+  
+      fetchRatings();
+    }
+  }, [myUserId, isMyBook]);
+  
 
   const handleBookStatus = async (e: any) => {
-    // console.log(e.target.value);
     console.log(e.target);
 
-    document.querySelectorAll('.status').forEach(btn => {
-      if (btn.classList.contains('btn-success')) {
-        btn.classList.toggle('btn-success');
+    document.querySelectorAll(".status").forEach((btn) => {
+      if (btn.classList.contains("btn-success")) {
+        btn.classList.toggle("btn-success");
       }
     });
-    
-    document.getElementById(`${e.target.id}`)?.classList.toggle('btn-success');
+
+    document.getElementById(`${e.target.id}`)?.classList.toggle("btn-success");
 
     if (storedToken) {
       const statusNumber = e.target.id;
       try {
         const response = await fetch(`${baseUrl}/api/data/saveBook/${bookId}`, {
-          method: 'POST',
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
-            Authorization: `${storedToken}`
+            "Content-Type": "application/json",
+            Authorization: `${storedToken}`,
           },
-          body: JSON.stringify({statusNumber})
-        })
+          body: JSON.stringify({ statusNumber }),
+        });
 
         console.log(await response.text());
         fetchBookStatus();
@@ -236,9 +270,7 @@ const ShowBook: React.FC = () => {
         console.error("Greška prilikom brisanja recenzije:", error);
       }
     }
-
-
-  }
+  };
 
   return (
     <>
@@ -247,64 +279,100 @@ const ShowBook: React.FC = () => {
           <div className="container">
             <p className="p-1">Title: {bookData.naslov}</p>
             <p className="p-1" data-id={bookData.idkorisnikAutor}>
-              Author: <a href={"/profile/" + bookData.idkorisnikAutor}
-                        className="text-primary text-decoration-underline">
-                        {bookData.imeAutor + " " + bookData.prezAutor}
-                      </a>
+              Author:{" "}
+              <a
+                href={"/profile/" + bookData.idkorisnikAutor}
+                className="text-primary text-decoration-underline"
+              >
+                {bookData.imeAutor + " " + bookData.prezAutor}
+              </a>
             </p>
             <p className="p-1">
-              <button className={bookStatus === 1 ? "btn btn-success": "btn status"} id="1" onClick={(e) => handleBookStatus(e)}>
+              <button
+                className={bookStatus === 1 ? "btn btn-success" : "btn status"}
+                id="1"
+                onClick={(e) => handleBookStatus(e)}
+              >
                 Read
               </button>
 
-              <button className={bookStatus === 2 ? "btn btn-success": "btn status"} id="2" onClick={(e) => handleBookStatus(e)}>
+              <button
+                className={bookStatus === 2 ? "btn btn-success" : "btn status"}
+                id="2"
+                onClick={(e) => handleBookStatus(e)}
+              >
                 Currently reading
               </button>
-              
-              <button className={bookStatus === 3 ? "btn btn-success": "btn status"} id="3" onClick={(e) => handleBookStatus(e)}>
+
+              <button
+                className={bookStatus === 3 ? "btn btn-success" : "btn status"}
+                id="3"
+                onClick={(e) => handleBookStatus(e)}
+              >
                 Want to read
               </button>
             </p>
             <p className="p-1">Description: {bookData.opis}</p>
-            <p className="p-1"><a onClick={openBookDetailsWindow}><InfoIcon/></a></p>
-            <div>
-              <div>
-                My rating:
-              </div>
-              {/* My rating */}
-              <p className="p-1">
-                <StarRating
-                  rating={myRating.ocjena}
-                  onRatingChange={(newRating) => {
-                    if (newRating === myRating.ocjena) {
-                      newRating = 0;
-                    }
-                    setMyRating({...myRating, ocjena: newRating});
-                    handleRate(newRating, myRating.txtrecenzija);
-                  }} />
-              </p>
-              <div>
-                {myRating.txtrecenzija ? 
-                  <p className="p-1">
-                      <a className="delete-icon" onClick={() => {handleDeleteRate(myRating.idrecenzija)}}><DeleteIcon /></a>
-                      <a className="edit-icon" onClick={openRateWindow}><EditIcon /></a>
-                      {myRating.txtrecenzija}
-                    </p>
-                  :
-                    <p className="p-1">
-                      <a className="btn btn-primary" onClick={openRateWindow}>Rate</a>
-                    </p>
-                }
-              </div>
-            </div>
             <p className="p-1">
-              <a
-                href={"/inbox?idReciever=" + bookData.idkorisnikAutor}
-                className="btn btn-primary"
-              >
-                Send message to author
+              <a onClick={openBookDetailsWindow}>
+                <InfoIcon />
               </a>
             </p>
+
+            {!isMyBook && (
+              <div>
+                <div>My rating:</div>
+                {/* My rating */}
+                <p className="p-1">
+                  <StarRating
+                    rating={myRating.ocjena}
+                    onRatingChange={(newRating) => {
+                      if (newRating === myRating.ocjena) {
+                        newRating = 0;
+                      }
+                      setMyRating({ ...myRating, ocjena: newRating });
+                      handleRate(newRating, myRating.txtrecenzija);
+                    }}
+                  />
+                </p>
+                <div>
+                  {myRating.txtrecenzija ? (
+                    <p className="p-1">
+                      <a
+                        className="delete-icon"
+                        onClick={() => {
+                          handleDeleteRate(myRating.idrecenzija);
+                        }}
+                      >
+                        <DeleteIcon />
+                      </a>
+                      <a className="edit-icon" onClick={openRateWindow}>
+                        <EditIcon />
+                      </a>
+                      {myRating.txtrecenzija}
+                    </p>
+                  ) : (
+                    <p className="p-1">
+                      <a className="btn btn-primary" onClick={openRateWindow}>
+                        Rate
+                      </a>
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {!isMyBook && (
+              <p className="p-1">
+                <a
+                  href={"/inbox?idReciever=" + bookData.idkorisnikAutor}
+                  className="btn btn-primary"
+                >
+                  Send message to author
+                </a>
+              </p>
+            )}
+            
           </div>
 
           <hr className="my-4" />
@@ -362,8 +430,11 @@ const ShowBook: React.FC = () => {
                         setReviewError(true);
                       } else {
                         setReviewError(false);
-                          setMyRating({...myRating, txtrecenzija: userRatingText});
-                          handleRate(myRating.ocjena, userRatingText);
+                        setMyRating({
+                          ...myRating,
+                          txtrecenzija: userRatingText,
+                        });
+                        handleRate(myRating.ocjena, userRatingText);
                       }
                     }}
                   >
@@ -374,19 +445,19 @@ const ShowBook: React.FC = () => {
             </div>
           )}
 
-
           {showBookDetails && (
             <div className="background">
               <div className="window-book-details">
-                <span className="exit" onClick={closeBookDetailsWindow}>&times;</span>
+                <span className="exit" onClick={closeBookDetailsWindow}>
+                  &times;
+                </span>
                 <div>
-                    <p className="p-1">Genre: {bookData.zanr}</p>
-                    <p className="p-1">Published: {bookData.godizd}</p>
+                  <p className="p-1">Genre: {bookData.zanr}</p>
+                  <p className="p-1">Published: {bookData.godizd}</p>
                 </div>
               </div>
             </div>
           )}
-
         </>
       )}
     </>
