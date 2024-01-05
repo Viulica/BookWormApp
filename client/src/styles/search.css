@@ -1,0 +1,43 @@
+.search-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 50px;
+    width: 200px;
+    background-color: white;
+    border: 1px solid lightgray;
+    box-shadow: 2px;
+    margin-top: 2px;
+}
+
+
+.search-img {
+    height: 100%;
+    width: 15%;
+}
+
+.search-naslov {
+    font-family: "playfair";
+    font-size: small;
+    font-weight: 700;
+}
+
+.search-autor {
+    font-family: "playfair";
+    font-size: small;
+}
+
+.my-dropdown {
+    position:absolute;
+    top:100%;
+    left:0;
+    z-index:5;
+}
+
+.search-body {
+    width: 80%;
+}
+
+.my-form {
+    position: relative;
+}

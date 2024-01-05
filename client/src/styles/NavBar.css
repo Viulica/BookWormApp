@@ -7,18 +7,19 @@
    margin: 5px;
    background-color: var(--bg-main); /* Add background color */
    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add subtle shadow */
+    position: relative;
  }
 
  .my-container {
-   width: 100vw; 
+   width: 100vw;
+   position: relative;
  }
 
  .my-navbar li {
   padding: 10px 20px; /* Add padding to each item */
   transition: background-color 0.3s; /* Smooth transition for hover effect */
 }
-.my-navbar li:hover {
-}
+
 .my-navbar a {
   text-decoration: none; /* Remove underline from links */
   font-family: "playfair";

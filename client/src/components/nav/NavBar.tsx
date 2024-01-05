@@ -8,14 +8,38 @@ import "../../styles/NavBar.css"
 import { baseUrl } from "@/App";
 import { useNavigate } from "react-router-dom";
 
+interface BookType {
+  naslov: string,
+  imeAutor: string,
+  prezAutor: string,
+  slika : string,
+  rating: number, 
+}
 
 const NavBar: React.FC = () => {
   const storedToken = sessionStorage.getItem("token");
 
 
   const [myUserId, setMyUserId] = useState<number>(0);
+  const [data, setData] = useState<BookType[]>([]);
   const navigate = useNavigate();
   const currentPath = window.location.pathname;
+
+  const fetchBooks = async() => {
+
+    try {
+
+      const response = await fetch(`${baseUrl}/api/data/allBooks`);
+      if (response.ok) {
+        const data = await response.json();
+        setData(data);
+      }
+
+    } catch(error) {
+      console.log("Greška prilikom dohvaćanja knjiga:", error);
+    }
+
+  };
 
   const fetchMyUserId = async () => {
     if (storedToken) {
@@ -46,6 +70,10 @@ const NavBar: React.FC = () => {
     fetchMyUserId();
   }, []);
 
+  useEffect(() => {
+    fetchBooks();
+  }, [])
+
   return (
     <nav className="my-container">
         <ul className="my-navbar">
@@ -58,7 +86,7 @@ const NavBar: React.FC = () => {
         {!storedToken && <NavItem path={currentPath}  href="/login">Login</NavItem>}
         {!storedToken && <NavItem path={currentPath}  href="/register">Register</NavItem>}
         {storedToken && <NavItem path={currentPath}  href="/logout">Logout</NavItem>}
-      <SearchBar></SearchBar>
+      <SearchBar books={data}></SearchBar>
       </ul>
     </nav>
   );

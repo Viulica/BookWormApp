@@ -49,6 +49,7 @@ router.get('/allBooks', async (req, res) => {
             'godizd',
             'opis',
             'isbn',
+            'slika',
             [literal('idkorisnik_korisnik.idkorisnik'), 'idkorisnikAutor'],
             [literal('idkorisnik_korisnik.ime'), 'imeAutor'],
             [literal('idkorisnik_korisnik.prezime'), 'prezAutor'],
