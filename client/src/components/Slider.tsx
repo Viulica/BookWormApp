@@ -19,6 +19,17 @@ interface SliderProps {
   id: number;
 }
 
+export const getImageSource = (bookData: any) => {
+  if (bookData && bookData.type === "Buffer" && bookData.data) {
+    const uint8Array = new Uint8Array(bookData.data);
+    const byteArray = Array.from(uint8Array);
+    const base64Image = btoa(String.fromCharCode.apply(null, byteArray));
+    const imageUrl = `data:image/jpeg;base64,${base64Image}`;
+    return imageUrl;
+  }
+  return "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCAzMiAzMiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBmaWxsPSIjMDAwMDAwIiBkPSJNMzAgMy40MTRMMjguNTg2IDJMMiAyOC41ODZMMy40MTQgMzBsMi0ySDI2YTIuMDAzIDIuMDAzIDAgMCAwIDItMlY1LjQxNHpNMjYgMjZINy40MTRsNy43OTMtNy43OTNsMi4zNzkgMi4zNzlhMiAyIDAgMCAwIDIuODI4IDBMMjIgMTlsNCAzLjk5N3ptMC01LjgzMmwtMi41ODYtMi41ODZhMiAyIDAgMCAwLTIuODI4IDBMMTkgMTkuMTY4bC0yLjM3Ny0yLjM3N0wyNiA3LjQxNHpNNiAyMnYtM2w1LTQuOTk3bDEuMzczIDEuMzc0bDEuNDE2LTEuNDE2bC0xLjM3NS0xLjM3NWEyIDIgMCAwIDAtMi44MjggMEw2IDE2LjE3MlY2aDE2VjRINmEyLjAwMiAyLjAwMiAwIDAgMC0yIDJ2MTZ6Ii8+PC9zdmc+";
+};
+
 const Slider: React.FC<SliderProps> = ({ books, id }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const totalBooks = books.length;
@@ -66,18 +77,6 @@ const Slider: React.FC<SliderProps> = ({ books, id }) => {
   useEffect(() => {
     updateSlider();
   }, [currentPage]);
-
-  const getImageSource = (bookData: any) => {
-    if (bookData && bookData.type === "Buffer" && bookData.data) {
-      const uint8Array = new Uint8Array(bookData.data);
-      const byteArray = Array.from(uint8Array);
-      const base64Image = btoa(String.fromCharCode.apply(null, byteArray));
-      const imageUrl = `data:image/jpeg;base64,${base64Image}`;
-      return imageUrl;
-    }
-
-    return "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCAzMiAzMiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBmaWxsPSIjMDAwMDAwIiBkPSJNMzAgMy40MTRMMjguNTg2IDJMMiAyOC41ODZMMy40MTQgMzBsMi0ySDI2YTIuMDAzIDIuMDAzIDAgMCAwIDItMlY1LjQxNHpNMjYgMjZINy40MTRsNy43OTMtNy43OTNsMi4zNzkgMi4zNzlhMiAyIDAgMCAwIDIuODI4IDBMMjIgMTlsNCAzLjk5N3ptMC01LjgzMmwtMi41ODYtMi41ODZhMiAyIDAgMCAwLTIuODI4IDBMMTkgMTkuMTY4bC0yLjM3Ny0yLjM3N0wyNiA3LjQxNHpNNiAyMnYtM2w1LTQuOTk3bDEuMzczIDEuMzc0bDEuNDE2LTEuNDE2bC0xLjM3NS0xLjM3NWEyIDIgMCAwIDAtMi44MjggMEw2IDE2LjE3MlY2aDE2VjRINmEyLjAwMiAyLjAwMiAwIDAgMC0yIDJ2MTZ6Ii8+PC9zdmc+";
-  };
 
   return (
     <>

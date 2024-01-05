@@ -199,9 +199,6 @@ const Profile: React.FC = () => {
                 <a href={"/myBooks/"+ profileId} className="btn btn-primary">
                   See reading list
                 </a>
-                {/* <a onClick={openSavedBooks} className="btn btn-primary">
-                  See reading list
-                </a> */}
               </>
             )}
 
@@ -216,9 +213,6 @@ const Profile: React.FC = () => {
                 <a href={"/myBooks/"+ profileId} className="btn btn-primary">
                   See reading list
                 </a>
-                {/* <a onClick={openSavedBooks} className="btn btn-primary">
-                  See reading list
-                </a> */}
               </>
             )}
 

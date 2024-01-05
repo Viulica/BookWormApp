@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { EditIcon } from "./EditIcon";
 import { DeleteIcon } from "./DeleteIcon";
 import { InfoIcon } from "./InfoIcon";
+import { getImageSource } from "./Slider";
 
 const ShowBook: React.FC = () => {
   const bookId = window.location.href
@@ -67,6 +68,9 @@ const ShowBook: React.FC = () => {
       } catch (error) {
         console.log("Greška prilikom dohvaćanja userId:", error);
       }
+    }
+    else {
+      navigate('/login');
     }
   };
 
@@ -225,21 +229,20 @@ const ShowBook: React.FC = () => {
   useEffect(() => {
     fetchMyUserId();
   }, []);
-  
+
   useEffect(() => {
     if (myUserId !== 0) {
       console.log(myUserId);
       fetchBookStatus();
       fetchBookData();
-  
+
       if (!isMyBook) {
         fetchMyRating();
       }
-  
+
       fetchRatings();
     }
   }, [myUserId, isMyBook]);
-  
 
   const handleBookStatus = async (e: any) => {
     console.log(e.target);
@@ -275,50 +278,84 @@ const ShowBook: React.FC = () => {
   return (
     <>
       {bookData && (
-        <>
-          <div className="container">
-            <p className="p-1">Title: {bookData.naslov}</p>
-            <p className="p-1" data-id={bookData.idkorisnikAutor}>
-              Author:{" "}
-              <a
-                href={"/profile/" + bookData.idkorisnikAutor}
-                className="text-primary text-decoration-underline"
-              >
-                {bookData.imeAutor + " " + bookData.prezAutor}
-              </a>
-            </p>
-            <p className="p-1">
-              <button
-                className={bookStatus === 1 ? "btn btn-success" : "btn status"}
-                id="1"
-                onClick={(e) => handleBookStatus(e)}
-              >
-                Read
-              </button>
+        <div className="content">
+          <div className="container-show-book">
+            <div className="book-image-and-details">
+              <div className="book-image">
+                <img src={getImageSource(bookData.slika)} alt="Book cover" />
+              </div>
+              <div className="book-details">
+                <div className="book-details-title">
+                  Title: {bookData.naslov}
+                </div>
+                <div
+                  className="book-details-author"
+                  data-id={bookData.idkorisnikAutor}
+                >
+                  <span>
+                    Author:{" "}
+                    <a
+                      href={"/profile/" + bookData.idkorisnikAutor}
+                      className="text-primary text-decoration-underline"
+                    >
+                      {bookData.imeAutor + " " + bookData.prezAutor}
+                    </a>
+                  </span>
+                  {!isMyBook && (
+                    <span>
+                      <a
+                        href={"/inbox?idReciever=" + bookData.idkorisnikAutor}
+                        className="btn btn-warning"
+                      >
+                        Send message
+                      </a>
+                    </span>
+                  )}
+                </div>
+                <div className="book-details-reading-status">
+                  <button
+                    className={
+                      bookStatus === 1 ? "btn btn-success" : "btn status"
+                    }
+                    id="1"
+                    onClick={(e) => handleBookStatus(e)}
+                  >
+                    Read
+                  </button>
 
-              <button
-                className={bookStatus === 2 ? "btn btn-success" : "btn status"}
-                id="2"
-                onClick={(e) => handleBookStatus(e)}
-              >
-                Currently reading
-              </button>
+                  <button
+                    className={
+                      bookStatus === 2 ? "btn btn-success" : "btn status"
+                    }
+                    id="2"
+                    onClick={(e) => handleBookStatus(e)}
+                  >
+                    Currently reading
+                  </button>
 
-              <button
-                className={bookStatus === 3 ? "btn btn-success" : "btn status"}
-                id="3"
-                onClick={(e) => handleBookStatus(e)}
-              >
-                Want to read
-              </button>
-            </p>
-            <p className="p-1">Description: {bookData.opis}</p>
-            <p className="p-1">
-              <a onClick={openBookDetailsWindow}>
-                <InfoIcon />
-              </a>
-            </p>
+                  <button
+                    className={
+                      bookStatus === 3 ? "btn btn-success" : "btn status"
+                    }
+                    id="3"
+                    onClick={(e) => handleBookStatus(e)}
+                  >
+                    Want to read
+                  </button>
+                </div>
+                <div className="book-details-description">
+                  Description: {bookData.opis}
+                </div>
+                <div className="book-details-more-info">
+                  <a onClick={openBookDetailsWindow} className="info-icon">
+                    <InfoIcon />
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
 
+          <div className="container-book-my-rating">
             {!isMyBook && (
               <div>
                 <div>My rating:</div>
@@ -361,38 +398,28 @@ const ShowBook: React.FC = () => {
                 </div>
               </div>
             )}
-
-            {!isMyBook && (
-              <p className="p-1">
-                <a
-                  href={"/inbox?idReciever=" + bookData.idkorisnikAutor}
-                  className="btn btn-primary"
-                >
-                  Send message to author
-                </a>
-              </p>
-            )}
-            
           </div>
 
           <hr className="my-4" />
-          <div className="container">
-            <h2 className="display-7">Ratings</h2>
+          <div className="container-book-ratings">
             <div>
-              {ratings.map((rating: any, index: any) => (
-                <div key={index}>
-                  <p className="p-4">
-                    <a
-                      href={"/profile/" + rating.idkorisnik}
-                      className="text-primary text-decoration-underline"
-                    >
-                      {rating.korime}
-                    </a>
-                    <StarRating rating={rating.ocjena} />
-                  </p>
-                  {rating.txtrecenzija && <p>{rating.txtrecenzija}</p>}
-                </div>
-              ))}
+              <h2 className="display-7">Ratings</h2>
+              <div>
+                {ratings.map((rating: any, index: any) => (
+                  <div key={index}>
+                    <p className="p-4">
+                      <a
+                        href={"/profile/" + rating.idkorisnik}
+                        className="text-primary text-decoration-underline"
+                      >
+                        {rating.korime}
+                      </a>
+                      <StarRating rating={rating.ocjena} />
+                    </p>
+                    {rating.txtrecenzija && <p>{rating.txtrecenzija}</p>}
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 
@@ -451,14 +478,18 @@ const ShowBook: React.FC = () => {
                 <span className="exit" onClick={closeBookDetailsWindow}>
                   &times;
                 </span>
-                <div>
+                <div className="more-info">
+                  <p className="p-1">ISBN: {bookData.isbn}</p>
                   <p className="p-1">Genre: {bookData.zanr}</p>
                   <p className="p-1">Published: {bookData.godizd}</p>
+                  <p className="p-1">
+                    Author's date of birth: {bookData.datrod}
+                  </p>
                 </div>
               </div>
             </div>
           )}
-        </>
+        </div>
       )}
     </>
   );

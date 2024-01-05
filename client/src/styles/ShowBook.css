@@ -14,8 +14,8 @@
 .window-rate, .window-book-details {
    background-color: white;
    padding: 20px;
-   width: 80%;
-   height: 80%;
+   width: fit-content;
+   height: fit-content;
    display: flex;
    flex-direction: column;
    align-items: center;
@@ -40,6 +40,51 @@
    display: inline-block;
 }
 
-.edit-icon:hover, .delete-icon:hover{
+.edit-icon:hover, .delete-icon:hover, .info-icon:hover{
    cursor: pointer;
 }
+
+.content{
+   display: flex;
+   flex-direction: column;
+   gap: 20px;
+}
+
+.container-show-book, .container-book-my-rating, .container-book-ratings{
+   display: flex;
+   justify-content: center;
+}
+
+.container-book-my-rating>div, .container-book-ratings>div{
+   width: 70%;
+}
+
+.book-image-and-details{
+   width: 70%;
+   display: flex;
+   gap: 30px;
+}
+
+.book-image{
+   width: 30%;
+   height: 100%;
+   border: 0.5px solid;
+}
+
+.book-image img{
+   width: 100%;
+   height: 100%;
+}
+
+.book-details{
+   width: 70%;
+   display: flex;
+   flex-direction: column;
+   gap: 20px;
+}
+
+.book-details-author{
+   display: flex;
+   gap: 20px;
+}
+

@@ -78,7 +78,6 @@ const MyBooks: React.FC = () => {
           const data = await response.json();
           console.log(data);
           setSavedBooks(data);
-          setLoading(false);
         } else if (response.status === 401) {
           navigate("/login");
         } else {
@@ -87,6 +86,8 @@ const MyBooks: React.FC = () => {
         }
       } catch (error) {
         console.error("Greška prilikom dohvaćanja knjiga:", error);
+      } finally {
+        setLoading(false);
       }
     } else {
       setTimeout(() => {
@@ -113,7 +114,6 @@ const MyBooks: React.FC = () => {
           const data = await response.json();
           console.log(data);
           setWrittenBooks(data);
-          setLoading(false);
         } else if (response.status === 401) {
           navigate("/login");
         } else {
@@ -123,7 +123,7 @@ const MyBooks: React.FC = () => {
       } catch (error) {
         console.error("Greška prilikom dohvaćanja knjiga:", error);
       } finally {
-        setLoading(false);
+        // setLoading(false);
       }
     } else {
       setTimeout(() => {
