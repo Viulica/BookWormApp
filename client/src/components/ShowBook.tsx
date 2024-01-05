@@ -1,5 +1,5 @@
 import { baseUrl, storedToken } from "@/App";
-import React, { useEffect, useState } from "react";
+import React, { ReactEventHandler, useEffect, useState } from "react";
 import StarRating from "./StarRating";
 import "../styles/ShowBook.css";
 import { useNavigate } from "react-router-dom";
@@ -24,6 +24,7 @@ const ShowBook: React.FC = () => {
   const [userRatingText, setUserRatingText] = useState<string>("");
   const [reviewError, setReviewError] = useState<boolean>(false);
   const [showBookDetails, setShowBookDetails] = useState<boolean>(false);
+  const [bookStatus, setBookStatus] = useState<number>(0);
   const navigate = useNavigate();
 
   const openRateWindow = () => {
@@ -65,6 +66,26 @@ const ShowBook: React.FC = () => {
       console.error("Greška prilikom dohvaćanja knjige:", error);
     }
   };
+
+  const fetchBookStatus = async () => {
+    if (storedToken) {
+      try {
+        const response = await fetch(`${baseUrl}/api/data/saved/${bookId}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `${storedToken}`
+          },
+        })
+
+        const data = await response.json();
+        console.log(data);
+        setBookStatus(data.statusNumber);
+      } catch (error) {
+        console.error("Greška prilikom dohvaćanja knjige:", error);
+      }
+    }
+  }
 
   const fetchRatings = async () => {
     if (storedToken) {
@@ -180,9 +201,44 @@ const ShowBook: React.FC = () => {
 
   useEffect(() => {
     fetchBookData();
+    fetchBookStatus();
     fetchMyRating();
     fetchRatings();
   }, []);
+
+  const handleBookStatus = async (e: any) => {
+    // console.log(e.target.value);
+    console.log(e.target);
+
+    document.querySelectorAll('.status').forEach(btn => {
+      if (btn.classList.contains('btn-success')) {
+        btn.classList.toggle('btn-success');
+      }
+    });
+    
+    document.getElementById(`${e.target.id}`)?.classList.toggle('btn-success');
+
+    if (storedToken) {
+      const statusNumber = e.target.id;
+      try {
+        const response = await fetch(`${baseUrl}/api/data/saveBook/${bookId}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `${storedToken}`
+          },
+          body: JSON.stringify({statusNumber})
+        })
+
+        console.log(await response.text());
+        fetchBookStatus();
+      } catch (error) {
+        console.error("Greška prilikom brisanja recenzije:", error);
+      }
+    }
+
+
+  }
 
   return (
     <>
@@ -195,6 +251,19 @@ const ShowBook: React.FC = () => {
                         className="text-primary text-decoration-underline">
                         {bookData.imeAutor + " " + bookData.prezAutor}
                       </a>
+            </p>
+            <p className="p-1">
+              <button className={bookStatus === 1 ? "btn btn-success": "btn status"} id="1" onClick={(e) => handleBookStatus(e)}>
+                Read
+              </button>
+
+              <button className={bookStatus === 2 ? "btn btn-success": "btn status"} id="2" onClick={(e) => handleBookStatus(e)}>
+                Currently reading
+              </button>
+              
+              <button className={bookStatus === 3 ? "btn btn-success": "btn status"} id="3" onClick={(e) => handleBookStatus(e)}>
+                Want to read
+              </button>
             </p>
             <p className="p-1">Description: {bookData.opis}</p>
             <p className="p-1"><a onClick={openBookDetailsWindow}><InfoIcon/></a></p>

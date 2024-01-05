@@ -2,30 +2,20 @@ import React, { useState, useEffect } from "react";
 import { baseUrl, storedToken } from "../App";
 import { useNavigate } from "react-router-dom";
 import "../styles/Profile.css";
+import { MessageIcon } from "./MessageIcon";
+import StarRating from "./StarRating";
 
 
 const Profile: React.FC = () => {
-  // const [profileData, setProfileData] = useState<Profile>({
-  //   ime: "",
-  //   prezime: "",
-  //   korime: "",
-  //   lozinka: "",
-  //   info: "",
-  //   datrod: "",
-  //   pratim: "",
-  //   pratitelji: "",
-  //   spremljeneKnjige: ""
-  // });
-  // const [loading, setLoading] = useState<boolean>(true);
-  // const [username, setUsername] = useState<string>("");
-  
-  
   const [loading, setLoading] = useState<boolean>(true);
   const [myUserId, setMyUserId] = useState<number>(0);
   const [profileData, setProfileData] = useState<any>({});
   const profileId = parseInt(window.location.pathname.split("/")[window.location.pathname.split("/").length - 1]);
   const [isAuthor, setIsAuthor] = useState<boolean>(false);
   const [isMyProfile, setIsMyProfile] = useState<boolean>(false);
+  const [followStatus, setFollowStatus] = useState<string>("");
+  const [userReadingList, setUserReadingList] = useState<any>([]);
+  const [showUserReadingList, setShowUserReadingList] = useState<boolean>(false);
   const navigate = useNavigate();
 
   const fetchMyUserId = async () => {
@@ -79,9 +69,30 @@ const Profile: React.FC = () => {
     }
   };
 
+  const fetchFollowing = async () => {
+    if (storedToken) {
+      try {
+        const response = await fetch(`${baseUrl}/api/data/profile/following/${profileId}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `${storedToken}`
+          }
+        })
+
+        const data = await response.text();
+        setFollowStatus(data);
+
+      } catch (error) {
+        console.error("Greška prilikom dohvaćanja praćenja", error);
+      }
+    }
+  }
+
   useEffect(() => {
     fetchMyUserId();
     fetchProfileData();
+    fetchFollowing();
   }, []);
   
 
@@ -91,12 +102,10 @@ const Profile: React.FC = () => {
   })
 
   const handleFollowUser = async () => {
-    console.log("Follow");
-
     if (storedToken) {
       try {
         const response = await fetch(`${baseUrl}/api/data/profile/follow/${profileId}`, {
-          method: 'POST',
+          method: 'GET',
           headers: {
             'Content-Type': 'application/json',
             Authorization: `${storedToken}`
@@ -110,7 +119,7 @@ const Profile: React.FC = () => {
         else if (response.status === 200) {
           setProfileData({ ...profileData, pratitelji: parseInt(profileData.pratitelji) + 1 });
         }
-        
+        fetchFollowing();
       }
       catch (error) {
         console.log("Greška prilikom praćenja korisnika:", error);
@@ -119,9 +128,37 @@ const Profile: React.FC = () => {
   }
 
 
+  const openUserReadingList = () => {
+    setShowUserReadingList(true);
+  }
+  const closeUserReadingList = () => {
+    setShowUserReadingList(false);
+  }
+
   // TODO - backend + frontend!!!
-  const handleUserReadingList = () => {
+  const handleUserReadingList = async () => {
     console.log("Reading list");
+    openUserReadingList();
+
+    if (storedToken) {
+      try {
+        const response = await fetch(`${baseUrl}/api/data/profile/reading/${profileId}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `${storedToken}`
+          }
+        })
+  
+        if (response.ok) {
+          const data = await response.json();
+          console.log(data);
+          setUserReadingList(data);
+        }
+      } catch (error) {
+        console.error("Greška prilikom dohvaćanja popisa knjiga:", error);
+      }
+    }
   }
 
   return (
@@ -188,16 +225,19 @@ const Profile: React.FC = () => {
                 <a href="/changeProfile" className="btn btn-primary">
                   Change
                 </a>
+                <a onClick={handleUserReadingList} className="btn btn-primary">
+                  See reading list
+                </a>
               </>
             )}
 
             {(!isMyProfile && storedToken) && (
               <>
-                <a onClick={handleFollowUser} className="btn btn-primary" id="follow-btn">
-                  Follow
+                <a onClick={handleFollowUser} className={followStatus === "Follow" ? "btn btn-success" : "btn btn-outline-warning"} id="follow-btn">
+                  {followStatus}
                 </a>
-                <a href={"/inbox?idReciever=" + profileId} className="btn btn-primary">
-                  Write message
+                <a href={"/inbox?idReciever=" + profileId} className="message-icon">
+                  <MessageIcon />
                 </a>
                 <a onClick={handleUserReadingList} className="btn btn-primary">
                   See reading list
@@ -205,6 +245,39 @@ const Profile: React.FC = () => {
               </>
             )}
 
+            {showUserReadingList && (
+              <div className="background">
+                <div className="window-user-reading-list">
+                  <span className="exit" onClick={closeUserReadingList}>&times;</span>
+                  <div className="user-reading-list">
+                    {userReadingList.map((book: any, index: any) => (
+                      <div key={index}>
+                        <div className="book-title">
+                          <a href={"/book/"+book.idknjiga}>
+                            {book.naslov + " (" + book.godizd + ")"}
+                          </a>
+                        </div>
+                        <div className="book-author">
+                          <a href={"/profile/" + book.idkorisnikAutor}>
+                            {"by "+ book.imeAutor + " " + book.prezAutor}
+                          </a>
+                        </div>
+                        <div className="book-number-of-ratings">
+                          {book.brojRecenzija + " ratings"}
+                        </div>
+                        <div className="book-number-of-reviews">
+                          {book.brojOsvrta + " reviews"}
+                        </div>
+                        <div className="book-avg-rating">
+                          <StarRating rating={book.prosjekOcjena} />
+                          <span>{book.prosjekOcjena}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
 
         </>
       )}

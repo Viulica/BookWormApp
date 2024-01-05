@@ -4,7 +4,7 @@ const data = require('../models/data');
 const verifyToken = require('./tokenVerification');
 
 const multer = require('multer');
-const {Sequelize, literal} = require('sequelize');
+const { Sequelize, Op } = require('sequelize');
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
@@ -166,7 +166,7 @@ router.get('/admin/allBooks', verifyToken, async (req, res) => {
    }
 });
 
-router.post('/change', verifyToken,async (req, res) => {
+router.post('/change', verifyToken, async (req, res) => {
    try {
       const userId = req.user.userId;
       const { ime, prezime, info, korime, lozinka, datrod } = req.body;
@@ -185,12 +185,12 @@ router.post('/change', verifyToken,async (req, res) => {
             idkorisnik: userId
          }
       });
-      
+
       if (result[0] === 1) {
          res.status(200).json({ message: 'Podaci su uspješno ažurirani.' });
-       } else {
+      } else {
          res.status(404).json({ message: 'Korisnik nije pronađen ili podaci nisu ažurirani.' });
-       }
+      }
    }
    catch (error) {
       console.error('Greška prilikom ažuriranja:', error);
@@ -216,12 +216,12 @@ router.get('/:id', async (req, res) => {
             'datrod',
             'tipkorisnika',
             [
-              Sequelize.literal('(SELECT COUNT(*) FROM prati WHERE prati.idkorisnik1 = korisnik.idkorisnik)'),
-              'pratim'
+               Sequelize.literal('(SELECT COUNT(*) FROM prati WHERE prati.idkorisnik1 = korisnik.idkorisnik)'),
+               'pratim'
             ],
             [
-              Sequelize.literal('(SELECT COUNT(*) FROM prati WHERE prati.idkorisnik2 = korisnik.idkorisnik)'),
-              'pratitelji'
+               Sequelize.literal('(SELECT COUNT(*) FROM prati WHERE prati.idkorisnik2 = korisnik.idkorisnik)'),
+               'pratitelji'
             ],
             [
                Sequelize.literal('(SELECT COUNT(*) FROM cita WHERE cita.idkorisnik = korisnik.idkorisnik)'),
@@ -231,14 +231,14 @@ router.get('/:id', async (req, res) => {
                Sequelize.literal('(SELECT COUNT(*) FROM knjiga WHERE knjiga.idkorisnik = korisnik.idkorisnik)'),
                'napisaoKnjiga'
             ]
-          ],
-          where: {
+         ],
+         where: {
             idkorisnik: userId,
-          },
+         },
       });
       console.log(user.dataValues);
 
-      
+
       if (user) {
          if (user.dataValues.tipkorisnika === "čitatelj") {
             delete user.dataValues.napisaoKnjiga;
@@ -254,7 +254,8 @@ router.get('/:id', async (req, res) => {
    }
 });
 
-router.post('/follow/:profileId', verifyToken, async (req, res) => {
+
+router.get('/follow/:profileId', verifyToken, async (req, res) => {
    const profileId = req.params.profileId;
    const userId = req.user.userId;
    try {
@@ -275,7 +276,7 @@ router.post('/follow/:profileId', verifyToken, async (req, res) => {
                idkorisnik2: profileId
             },
          });
-         res.status(204).send("Follow");
+         res.status(204).json("Follow");
       }
       else {
          await data.prati.create({ idkorisnik1: userId, idkorisnik2: profileId });
@@ -286,10 +287,153 @@ router.post('/follow/:profileId', verifyToken, async (req, res) => {
       console.error('Error fetching authors:', error);
       res.status(500).json({ error: 'Internal Server Error', details: error.message });
    }
+});
+
+router.post('/follows', verifyToken, async (req, res) => {
+   const { profileId } = req.body;
+   const userId = req.user.userId;
+   try {
+      const follow = await data.prati.findOne({
+         where: {
+            idkorisnik1: userId,
+            idkorisnik2: profileId
+         },
+         raw: true,
+      })
+
+      console.log(follow);
+
+      if (follow) {
+         // To znači da pratim korisnika
+         res.status(200).json("Unfollow");
+      }
+      else {
+         res.status(404).json("Not following");
+      }
+   }
+   catch (error) {
+      console.error('Error fetching authors:', error);
+      res.status(500).json({ error: 'Internal Server Error', details: error.message });
+   }
 })
 
 router.get('/following/:profileId', verifyToken, async (req, res) => {
+   const profileId = req.params.profileId;
+   const userId = req.user.userId;
+   try {
+      const follow = await data.prati.findOne({
+         where: {
+            idkorisnik1: userId,
+            idkorisnik2: profileId
+         },
+         raw: true,
+      })
 
+      console.log(follow);
+
+      if (follow) {
+         // To znači da pratim korisnika
+         res.status(200).send("Unfollow"); // ovo će se prikazati u buttonu za praćenje
+      }
+      else {
+         // To znači da ne pratim korisnika
+         res.status(404).send("Follow"); // ovo će se prikazati u buttonu za praćenje
+      }
+   }
+   catch (error) {
+      console.error('Error fetching authors:', error);
+      res.status(500).json({ error: 'Internal Server Error', details: error.message });
+   }
 })
+
+router.get('/reading/:profileId', verifyToken, async (req, res) => {
+   const profileId = req.params.profileId;
+   try {
+      const reading = await data.cita.findAll({
+         attributes: [
+            'status',
+            'idknjiga',
+            [Sequelize.col('idknjiga_knjiga.naslov'), 'naslov'],
+            [Sequelize.col('idknjiga_knjiga.slika'), 'slika'],
+            [Sequelize.col('idknjiga_knjiga.godizd'), 'godizd'],
+            [Sequelize.col('idknjiga_knjiga.idkorisnik_korisnik.idkorisnik'), 'idkorisnikAutor'],
+            [Sequelize.col('idknjiga_knjiga.idkorisnik_korisnik.ime'), 'imeAutor'],
+            [Sequelize.col('idknjiga_knjiga.idkorisnik_korisnik.prezime'), 'prezAutor'],
+         ],
+         where: {
+            idkorisnik: profileId
+         },
+         include: [
+            {
+               model: data.knjiga,
+               as: 'idknjiga_knjiga',
+               attributes: [],
+               include: [
+                  {
+                     model: data.korisnik,
+                     as: 'idkorisnik_korisnik',
+                     attributes: []
+                  }
+               ]
+            }
+         ],
+         raw: true,
+      });
+
+      console.log(reading);
+
+
+      if (reading) {
+         for (const r of reading) {
+            const brojRecenzija = await data.recenzija.count({
+               where:
+               {
+                  idknjiga: r.idknjiga
+               }
+            })
+
+            r.brojRecenzija = brojRecenzija;
+
+            const brojOsvrta = await data.recenzija.count({
+               where:
+               {
+                  idknjiga: r.idknjiga,
+                  txtrecenzija: {
+                     [Op.not]: null
+                  }
+               }
+            })
+
+            r.brojOsvrta = brojOsvrta;
+            
+            if (brojRecenzija) {
+               const prosjekOcjena = await data.recenzija.findAll({
+                  attributes: [
+                     [Sequelize.fn('AVG', Sequelize.col('ocjena')), 'prosjekOcjena']
+                  ],
+                  where: {
+                     idknjiga: r.idknjiga,
+                     ocjena: {
+                        [Sequelize.Op.between]: [1, 5]
+                     }
+                  },
+                  raw: true
+               });
+               r.prosjekOcjena = parseFloat(prosjekOcjena[0].prosjekOcjena).toFixed(2);
+            }
+            else {
+               r.prosjekOcjena = 0;
+            }
+         }
+         res.status(200).json(reading);
+      }
+      else {
+         res.status(404).json("Nema ništa");
+      }
+   } catch (error) {
+      console.error('Error fetching authors:', error);
+      res.status(500).json({ error: 'Internal Server Error', details: error.message });
+   }
+});
 
 module.exports = router;

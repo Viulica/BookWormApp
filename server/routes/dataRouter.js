@@ -309,4 +309,124 @@ router.delete('/deleteRating/:rateId', verifyToken, async (req, res) => {
 
 })
 
+
+router.post('/saveBook/:bookId', verifyToken, async (req, res) => {
+   const { statusNumber } = req.body;
+   const userId = req.user.userId;
+   const bookId = req.params.bookId;
+
+   try {
+      console.log(userId);
+      console.log(statusNumber);
+      console.log(bookId);
+
+      var status;
+      if (statusNumber == 1) {
+         status = "Pročitano";
+      }
+      else if (statusNumber == 2) {
+         status = "Trenutno čitam";
+      }
+      else if (statusNumber == 3) {
+         status = "Želim pročitati";
+      }
+
+      const saved = await data.cita.findOne({
+         where: {
+            idkorisnik: userId,
+            status: status,
+            idknjiga: bookId
+         }
+      })
+
+      if (saved) {
+         await data.cita.destroy({
+            where: {
+               idkorisnik: userId,
+               status: status,
+               idknjiga: bookId
+            }
+         })
+         res.status(204).send("Uklonjeno");
+      }
+      else {
+         const temp = await data.cita.findOne({
+            where: {
+               idkorisnik: userId,
+               idknjiga: bookId
+            }
+         })
+
+         if (temp) {
+            await data.cita.update(
+               {
+                  status: status,
+               },
+               {
+                  where: {
+                     idkorisnik: userId,
+                     idknjiga: bookId
+                  }
+               }
+            )
+         }
+         else {
+            await data.cita.create({
+               idkorisnik: userId,
+               status: status,
+               idknjiga: bookId
+            })
+            
+         }
+
+         res.status(200).send(status);
+      }
+
+   } catch (error) {
+      console.log("Error fetching book: ", error);
+      res.status(500).json({ error: 'Internal Server Error', details: error.message });
+   }
+});
+
+router.get('/saved/:bookId', verifyToken, async (req, res) => {
+   const userId = req.user.userId;
+   const bookId = req.params.bookId;
+
+   try {
+      const saved = await data.cita.findOne({
+         attributes: ['status'],
+         where: {
+            idkorisnik: userId,
+            idknjiga: bookId
+         },
+         raw: true,
+      });
+
+      console.log(saved);
+
+      if (saved) {
+         const status = saved.status;
+
+         // Ako želite koristiti vaše statusNumber
+         let statusNumber;
+         if (status == "Pročitano") {
+            statusNumber = 1;
+         } else if (status == "Trenutno čitam") {
+            statusNumber = 2;
+         } else if (status == "Želim pročitati") {
+            statusNumber = 3;
+         }
+
+         res.status(200).send({ statusNumber });
+      } else {
+         res.status(404).send({ statusNumber: 0 });
+      }
+
+   } catch (error) {
+      console.log("Error fetching book: ", error);
+      res.status(500).json({ error: 'Internal Server Error', details: error.message });
+   }
+});
+
+
 module.exports = router;

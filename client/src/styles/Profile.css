@@ -23,3 +23,41 @@
    border: 0.5px solid;
    margin: 0 10px;
 }
+
+.background {
+   position: fixed;
+   top: 0;
+   left: 0;
+   width: 100%;
+   height: 100%;
+   background: rgba(0, 0, 0, 0.5);
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   z-index: 1;
+}
+
+.window-user-reading-list {
+   background-color: white;
+   padding: 20px;
+   width: 80%;
+   height: 80%;
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   border-radius: 10px;
+   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+   position: relative;
+   text-align: center;
+   justify-content: center;
+   align-content: center;
+   font-family: Helvetica, sans-serif;
+}
+
+.exit {
+   position: absolute;
+   top: 10px;
+   right: 10px;
+   font-size: 20px;
+   cursor: pointer;
+}
