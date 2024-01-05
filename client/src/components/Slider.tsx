@@ -81,39 +81,44 @@ const Slider: React.FC<SliderProps> = ({ books, id }) => {
 
   return (
     <>
-    
       <div className="slider-container">
-        <button onClick={handlePrevClick}>&#60;</button>
-        <div className={"books-" + id}>
-          {books.slice(currentPage - 1, currentPage).map((book, index) => (
-            <a href={"/book/" + book.idknjiga} key={index} className="book-link">
-              <div className={`book`} id={`book-${index + 1}`}>
-                <div className="book-image">
-                  <img src={getImageSource(book.slika)} alt="Book cover" />
+        <div>
+          <button onClick={handlePrevClick}>&#60;</button>
+          <div className={"books-" + id}>
+            {books.slice(currentPage - 1, currentPage).map((book, index) => (
+              <a
+                href={"/book/" + book.idknjiga}
+                key={index}
+                className="book-link"
+              >
+                <div className={`book`} id={`book-${index + 1}`}>
+                  <div className="book-image">
+                    <img src={getImageSource(book.slika)} alt="Book cover" />
+                  </div>
+                  <div className="book-title-and-published">
+                    {book.naslov + " (" + book.godizd + ")"}
+                  </div>
+                  <div className="book-author">
+                    {"by " + book.imeAutor + " " + book.prezAutor}
+                  </div>
+                  <div className="book-number-of-ratings">
+                    {book.brojRecenzija + " ratings"}
+                  </div>
+                  <div className="book-number-of-reviews">
+                    {book.brojOsvrta + " reviews"}
+                  </div>
+                  <div className="book-avg-rating">
+                    <StarRating rating={book.prosjekOcjena} />
+                    <span>{book.prosjekOcjena}</span>
+                  </div>
                 </div>
-                <div className="book-title-and-published">
-                  {book.naslov + " (" + book.godizd + ")"}
-                </div>
-                <div className="book-author">
-                  {"by " + book.imeAutor + " " + book.prezAutor}
-                </div>
-                <div className="book-number-of-ratings">
-                  {book.brojRecenzija + " ratings"}
-                </div>
-                <div className="book-number-of-reviews">
-                  {book.brojOsvrta + " reviews"}
-                </div>
-                <div className="book-avg-rating">
-                  <StarRating rating={book.prosjekOcjena} />
-                  <span>{book.prosjekOcjena}</span>
-                </div>
-              </div>
-            </a>
-          ))}
+              </a>
+            ))}
+          </div>
+          <button onClick={handleNextClick}>&#62;</button>
         </div>
-        <button onClick={handleNextClick}>&#62;</button>
+        <div className="page-indicator">{currentPage + "/" + totalBooks}</div>
       </div>
-      <div className="page-indicator">{currentPage + "/" + totalBooks}</div>
     </>
   );
 };
