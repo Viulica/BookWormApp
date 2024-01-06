@@ -68,9 +68,8 @@ const ShowBook: React.FC = () => {
       } catch (error) {
         console.log("Greška prilikom dohvaćanja userId:", error);
       }
-    }
-    else {
-      navigate('/login');
+    } else {
+      navigate("/login");
     }
   };
 
@@ -279,15 +278,22 @@ const ShowBook: React.FC = () => {
     <>
       {bookData && (
         <div className="content">
+
+          {/* <div className="go-back">
+            <a href="" className="btn btn-primary">
+              Back
+            </a>
+          </div> */}
+          <div className="book-details-title">
+            <h1 className="display-5">Title: {bookData.naslov}</h1>
+          </div>
+
           <div className="container-show-book">
             <div className="book-image-and-details">
               <div className="book-image">
                 <img src={getImageSource(bookData.slika)} alt="Book cover" />
               </div>
               <div className="book-details">
-                <div className="book-details-title">
-                  Title: {bookData.naslov}
-                </div>
                 <div
                   className="book-details-author"
                   data-id={bookData.idkorisnikAutor}
@@ -315,7 +321,9 @@ const ShowBook: React.FC = () => {
                 <div className="book-details-reading-status">
                   <button
                     className={
-                      bookStatus === 1 ? "btn btn-success" : "btn status"
+                      bookStatus === 1
+                        ? "btn btn-success"
+                        : "btn btn-outline-success"
                     }
                     id="1"
                     onClick={(e) => handleBookStatus(e)}
@@ -325,7 +333,9 @@ const ShowBook: React.FC = () => {
 
                   <button
                     className={
-                      bookStatus === 2 ? "btn btn-success" : "btn status"
+                      bookStatus === 2
+                        ? "btn btn-success"
+                        : "btn btn-outline-success"
                     }
                     id="2"
                     onClick={(e) => handleBookStatus(e)}
@@ -335,7 +345,9 @@ const ShowBook: React.FC = () => {
 
                   <button
                     className={
-                      bookStatus === 3 ? "btn btn-success" : "btn status"
+                      bookStatus === 3
+                        ? "btn btn-success"
+                        : "btn btn-outline-success"
                     }
                     id="3"
                     onClick={(e) => handleBookStatus(e)}
@@ -360,7 +372,7 @@ const ShowBook: React.FC = () => {
               <div>
                 <div>My rating:</div>
                 {/* My rating */}
-                <p className="p-1">
+                <div className="book-my-rating-stars">
                   <StarRating
                     rating={myRating.ocjena}
                     onRatingChange={(newRating) => {
@@ -371,52 +383,62 @@ const ShowBook: React.FC = () => {
                       handleRate(newRating, myRating.txtrecenzija);
                     }}
                   />
-                </p>
-                <div>
+                </div>
+                <div className="book-my-rating-icons-and-txtrating">
                   {myRating.txtrecenzija ? (
-                    <p className="p-1">
-                      <a
-                        className="delete-icon"
-                        onClick={() => {
-                          handleDeleteRate(myRating.idrecenzija);
-                        }}
-                      >
-                        <DeleteIcon />
-                      </a>
-                      <a className="edit-icon" onClick={openRateWindow}>
-                        <EditIcon />
-                      </a>
-                      {myRating.txtrecenzija}
-                    </p>
+                    <>
+                      <div className="book-my-rating-icons">
+                        <a
+                          className="delete-icon"
+                          onClick={() => {
+                            handleDeleteRate(myRating.idrecenzija);
+                          }}
+                        >
+                          <DeleteIcon />
+                        </a>
+                        <a className="edit-icon" onClick={openRateWindow}>
+                          <EditIcon />
+                        </a>
+                      </div>
+                      <div className="book-my-rating-txtrating">
+                        {myRating.txtrecenzija}
+                      </div>
+                    </>
                   ) : (
-                    <p className="p-1">
+                    <div className="book-my-rating-rate">
                       <a className="btn btn-primary" onClick={openRateWindow}>
                         Rate
                       </a>
-                    </p>
+                    </div>
                   )}
                 </div>
               </div>
             )}
           </div>
 
-          <hr className="my-4" />
+          <div className="horizontal-line"></div>
+          
           <div className="container-book-ratings">
             <div>
-              <h2 className="display-7">Ratings</h2>
-              <div>
+              <div className="book-ratings-title">Ratings</div>
+
+              <div className="book-ratings">
                 {ratings.map((rating: any, index: any) => (
-                  <div key={index}>
-                    <p className="p-4">
+                  <div key={index} className="book-rating">
+                    <div className="book-rating-username-and-stars">
+                      <StarRating rating={rating.ocjena} />
                       <a
                         href={"/profile/" + rating.idkorisnik}
                         className="text-primary text-decoration-underline"
                       >
                         {rating.korime}
                       </a>
-                      <StarRating rating={rating.ocjena} />
-                    </p>
-                    {rating.txtrecenzija && <p>{rating.txtrecenzija}</p>}
+                    </div>
+                    {rating.txtrecenzija && (
+                      <div className="book-rating-txtrating">
+                        {rating.txtrecenzija}
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
@@ -441,7 +463,8 @@ const ShowBook: React.FC = () => {
                   <textarea
                     rows={10}
                     cols={30}
-                    className="textarea-review"
+                    className="form-control"
+                    id="textarea-review"
                     value={userRatingText}
                     onChange={(e) => {
                       setUserRatingText(e.target.value);

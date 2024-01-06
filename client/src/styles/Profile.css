@@ -55,6 +55,24 @@
    gap: 20px;
 }
 
+.container-about-me{
+   display: flex;
+   flex-direction: column;
+   gap: 10px;
+   width: 70%;
+}
+
+.container-written-books{
+   width: 70%;
+   display: flex;
+   flex-direction: column;
+   gap: 20px;
+   height: 80vh;
+}
+
+.written-books-title{
+   text-align: center;
+}
 
 /* ----------------------------------------------------------------------- */
 

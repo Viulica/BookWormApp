@@ -1,0 +1,17 @@
+.container-add-book{
+   display: flex;
+   flex-direction: column;
+   justify-content: center;
+   align-items: center;
+}
+
+.container-add-book-title{
+   width: 50%;
+}
+
+.container-bookData{
+   display: flex;
+   flex-direction: column;
+   width: 50%;
+   
+}

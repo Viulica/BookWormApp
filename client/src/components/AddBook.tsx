@@ -1,54 +1,114 @@
 import React, { useState, useEffect } from "react";
-import { baseUrl } from "../App";
-import { useNavigate } from "react-router-dom";
+import { baseUrl, storedToken } from "../App";
+import '../styles/AddBook.css';
 
 const AddBook: React.FC = () => {
   const [allAuthors, setAllAuthors] = useState<any[]>([]);
-
   const [title, setTitle] = useState("");
   const [genre, setGenre] = useState("");
   const [published, setPublished] = useState("");
   const [about, setAbout] = useState("");
   const [isbn, setIsbn] = useState("");
-  const [userId, setUserId] = useState<number>();
+  const [userId, setUserId] = useState<number>(0);
   const [coverImage, setCoverImage] = useState<File | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  const profileId = window.location.search.split("=")[1] || null;
+  console.log(profileId);
+
+  const fetchAllAuthors = async () => {
+    const response = await fetch(`${baseUrl}/api/data/allAuthors`, {});
+
+    if (response.ok) {
+      const data = await response.json();
+      setAllAuthors(data);
+    } else {
+      console.log(response);
+    }
+  };
 
   useEffect(() => {
-    const fetchAllAuthors = async () => {
-      const response = await fetch(`${baseUrl}/api/data/allAuthors`, {});
-
-      if (response.ok) {
-        const data = await response.json();
-        // console.log(await response.json());
-        setAllAuthors(data);
-      } else {
-        console.log(response);
-      }
-    };
-
-    fetchAllAuthors();
+    if (!profileId) {
+      fetchAllAuthors();
+    }
+    setLoading(false);
   }, []);
 
-  const handleAddBook = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const data = {
-      title,
-      genre,
-      published,
-      about,
-      isbn,
-      userId,
-      coverImage,
-    };
 
-    console.log(data);
+  const clearValidationMessage = (className: string) => {
+    const validation = document.querySelector(className);
+    if (validation) {
+      validation.innerHTML = "";
+
+      // setValidationError(false);
+    }
+  };
+
+  const setValidationMessage = (className: string, message: string) => {
+    const validation = document.querySelector(className);
+    if (validation) {
+      validation.innerHTML = message;
+
+      // setValidationError(true);
+    }
+  };
+
+  const checkISBN = async () => {
+    if (storedToken) {
+      try {
+        const response = await fetch(`${baseUrl}/api/data/checkISBN/${isbn}`, {
+          method: 'POST',
+          headers: {
+            Authorization: `${storedToken}`
+          }
+        });
+        
+        if (response.status === 400) {
+          setValidationMessage(".container-validation", await response.text());
+        }
+        
+      } catch (error) {
+        console.error("Greška prilikom dohvaćanja ISBN:", error);
+      }
+    }
+  }
+
+  const validateISBN = () => {
+    
+  }
+
+  const handleAddBook = async () => {
+
+    if (title === "" || genre === "" || published === "" || about === "" || isbn === "" || userId === 0 || !coverImage) {
+      setValidationMessage(".container-validation", "All fields are required!");
+      return;
+    }
+    else if (isbn !== "") {
+      checkISBN();
+    }
+
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("genre", genre);
+    formData.append("published", published);
+    formData.append("about", about);
+    formData.append("isbn", isbn);
+
+    if (userId) {
+      formData.append("userId", userId.toString());
+    }
+
+    if (coverImage) {
+      formData.append("coverImage", coverImage);
+    }
+
+    console.log(formData);
+
+
     try {
       const response = await fetch(`${baseUrl}/api/data/addBook`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
+        body: formData,
       });
 
       if (response.ok) {
@@ -59,86 +119,143 @@ const AddBook: React.FC = () => {
     } catch (error) {
       console.error("Greška prilikom dohvaćanja podataka profila", error);
     }
-
-    // console.log(document.getElementById('author'));
   };
 
   return (
-    // title, genre, published, about, isbn, userId
-    <form method="post" onSubmit={handleAddBook} encType="multipart/form-data">
-      <input
-        type="text"
-        placeholder="Title"
-        onChange={(e) => {
-          setTitle(e.target.value);
-        }}
-        required
-      />
-      <input
-        type="text"
-        placeholder="Genre"
-        onChange={(e) => {
-          setGenre(e.target.value);
-        }}
-        required
-      />
-      <input
-        type="text"
-        placeholder="Published"
-        onChange={(e) => {
-          setPublished(e.target.value);
-        }}
-        required
-      />
-      <input
-        type="text"
-        placeholder="About"
-        onChange={(e) => {
-          setAbout(e.target.value);
-        }}
-        required
-      />
-      <input
-        type="text"
-        placeholder="Isbn"
-        onChange={(e) => {
-          setIsbn(e.target.value);
-        }}
-        required
-      />
-      <select
-        name="author"
-        id="author"
-        onChange={(e) => {
-          setUserId(parseInt(e.target.value));
-        }}
-        required
-      >
-        <option value="">Odaberi autora</option>
-        {allAuthors.map((author, index) => (
-          <option value={author.idkorisnik} key={index}>
-            {author.ime} {author.prezime}
-          </option>
-        ))}
-      </select>
+    <div className="container-add-book">
+      {loading ? (
+        <>
+          <p className="p-4">Loading...</p>
+        </>
+      ) : (
+          <>
+            <div className="container-add-book-title">
+              <h1 className="display-6">Add book</h1>
+            </div>
 
-      <input
-        type="file"
-        id="coverImage"
-        name="coverImage"
-        accept="image/*"
-        onChange={(e) => {
-          const files = e.target.files;
+            <div className="container-validation"></div>
+            
+          <div className="container-bookData">
+            <div className="mb-3">
+              <label htmlFor="title">Title:</label>
+              <input
+                type="text"
+                  name="title"
+                  className="form-control"
+                id="title"
+                onChange={(e) => {
+                  setTitle(e.target.value);
+                  clearValidationMessage('.container-validation');
+                }}
+                required
+              />
+            </div>
+            <div className="mb-3">
+              <label htmlFor="genre">Genre:</label>
+              <input
+                type="text"
+                  name="genre"
+                  className="form-control"
+                id="genre"
+                onChange={(e) => {
+                  setGenre(e.target.value);
+                  clearValidationMessage('.container-validation');
+                }}
+                required
+              />
+            </div>
+            <div className="mb-3">
+              <label htmlFor="published">Published:</label>
+              <input
+                type="number"
+                  name="published"
+                  className="form-control"
+                id="published"
+                onChange={(e) => {
+                  setPublished(e.target.value);
+                  clearValidationMessage('.container-validation');
+                }}
+                required
+              />
+            </div>
 
-          if (files && files.length > 0) {
-            const file = files[0];
-            setCoverImage(file);
-          }
-        }}
-      ></input>
+            <div className="mb-3">
+              <label htmlFor="about">About:</label>
+              <input
+                type="text"
+                  name="about"
+                  className="form-control"
+                id="about"
+                onChange={(e) => {
+                  setAbout(e.target.value);
+                  clearValidationMessage('.container-validation');
+                }}
+                required
+              />
+            </div>
 
-      <button type="submit">Pošalji</button>
-    </form>
+            <div className="mb-3">
+              <label htmlFor="isbn">ISBN:</label>
+              <input
+                type="number"
+                  name="isbn"
+                  className="form-control"
+                id="isbn"
+                onChange={(e) => {
+                  setIsbn(e.target.value);
+                  clearValidationMessage('.container-validation');
+                }}
+                required
+              />
+            </div>
+            {!profileId && (
+              <div className="mb-3">
+                <select
+                  name="author"
+                    id="author"
+                    className="form-control"
+                  onChange={(e) => {
+                    setUserId(parseInt(e.target.value));
+                    clearValidationMessage('.container-validation');
+                  }}
+                  required
+                >
+                  <option value={0}>Odaberi autora</option>
+                  {allAuthors.map((author, index) => (
+                    <option value={author.idkorisnik} key={index}>
+                      {author.imeAutor} {author.prezAutor}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            <div className="mb-3">
+              <label htmlFor="coverImage">Image</label>
+
+              <input
+                type="file"
+                id="coverImage"
+                name="coverImage"
+                  accept="image/*"
+                  className="form-control"
+                onChange={(e) => {
+                  const files = e.target.files;
+                  if (files && files.length > 0) {
+                    const file = files[0];
+                    setCoverImage(file);
+                    clearValidationMessage('.container-validation');
+                  }
+                }}
+              />
+            </div>
+            <a onClick={handleAddBook} className="btn btn-primary">
+              Add
+            </a>
+          </div>
+        </>
+      )}
+    </div>
   );
 };
 

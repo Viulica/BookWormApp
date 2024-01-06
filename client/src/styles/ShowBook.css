@@ -36,7 +36,7 @@
    cursor: pointer;
 }
 
-.edit-icon, .delete-icon{
+.edit-icon, .delete-icon, .info-icon{
    display: inline-block;
 }
 
@@ -50,14 +50,11 @@
    gap: 20px;
 }
 
-.container-show-book, .container-book-my-rating, .container-book-ratings{
+.container-show-book{
    display: flex;
    justify-content: center;
 }
 
-.container-book-my-rating>div, .container-book-ratings>div{
-   width: 70%;
-}
 
 .book-image-and-details{
    width: 70%;
@@ -88,3 +85,71 @@
    gap: 20px;
 }
 
+.book-details-reading-status{
+   display: flex;
+   gap: 20px;
+}
+
+.container-book-my-rating{
+   width: 70%;
+}
+
+.container-book-my-rating>div{
+   display: flex;
+   flex-direction: column;
+   gap: 10px;
+}
+
+.book-my-rating-icons-and-txtrating{
+   display: flex;
+   gap: 20px;
+}
+
+.book-my-rating-icons{
+   display: flex;
+   gap: 10px;
+}
+
+.horizontal-line{
+   background-color: black;
+   display: flex;
+   padding: 1px;
+   width: 70%;
+}
+
+
+.container-book-ratings{
+   width: 70%;
+}
+
+.container-book-ratings{
+   display: flex;
+   flex-direction: column;
+   gap: 10px;
+}
+
+.book-ratings{
+   display: flex;
+   flex-direction: column;
+   gap: 20px;
+   min-height: 50vh;
+}
+
+.book-rating{
+   display: flex;
+   flex-direction: column;
+   gap: 10px;
+   padding: 20px;
+   border-bottom: 0.5px solid;
+}
+
+.book-rating-username-and-stars{
+   display: flex;
+   align-items: center;
+   gap: 20px;
+}
+
+#textarea-review{
+   resize: none;
+   border: 0.5px solid;
+}

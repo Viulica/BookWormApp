@@ -2,12 +2,9 @@ const express = require('express');
 const router = express.Router();
 const data = require('../models/data');
 const verifyToken = require('./tokenVerification');
+const bcrypt = require('bcrypt');
 
-const multer = require('multer');
 const { Sequelize, Op, literal } = require('sequelize');
-
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
 
 
 // status, idknjiga, naslov, slika, godizd, idkorisnikAutor, imeAutor, prezAutor, brojRecenzija, brojOsvrta, prosjekOcjena
@@ -355,29 +352,6 @@ router.get('/myWrittenBooks/:profileId', async (req, res) => {
    }
 })
 
-router.post('/author/addBook', upload.single('coverImage'), async (req, res) => {
-   try {
-      const { title, genre, published, about, isbn, userId, coverImage } = req.body;
-      // const coverImage = req.file.buffer; // binarni podaci slike
-
-      // Kreiraj novu knjigu
-      const newBook = await data.knjiga.create({
-         naslov: title,
-         zanr: genre,
-         godizd: published,
-         opis: about,
-         isbn: isbn,
-         idkorisnik: userId,
-         slika: coverImage,
-      });
-
-      return res.status(201).json(newBook);
-   } catch (error) {
-      console.error('Greška prilikom dodavanja knjige:', error);
-      return res.status(500).json({ error: 'Interna server greška' });
-   }
-});
-
 router.get('/admin/allUsers', verifyToken, async (req, res) => {
    const typeOfUser = req.user.typeOfUser;
    if (typeOfUser !== "admin") {
@@ -438,15 +412,62 @@ router.get('/admin/allBooks', verifyToken, async (req, res) => {
    }
 });
 
-router.post('/change', verifyToken, async (req, res) => {
+router.post('/checkUsername/:userId', verifyToken, async (req, res) => {
    try {
-      const userId = req.user.userId;
-      const { ime, prezime, info, korime, lozinka, datrod } = req.body;
+      // Provjera je li korime već zauzeto!
+      const userId = req.params.userId;
+      const { korime } = req.body;
+      const existingUsername = await data.korisnik.findOne({
+         where: {
+            korime: korime,
+            idkorisnik: {
+               [Sequelize.Op.ne]: userId
+            }
+         }
+      });
+
+      if (existingUsername) {
+         return res.status(400).send('This username already exists.');
+      }
+      else {
+         res.status(200).send("");
+      }
+   } catch (error) {
+      console.error('Greška prilikom ažuriranja:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+   }
+});
+
+router.post('/change/:userId', verifyToken, async (req, res) => {
+   try {
+      const userId = req.params.userId;
+      var { ime, prezime, info, korime, lozinka, datrod } = req.body;
+
+      // Provjera postoji li korisnik!
+      const existingUser = await data.korisnik.findOne({
+         where: {
+            idkorisnik: userId
+         }
+      });
+
+      if (!existingUser) {
+         return res.status(404).send('Korisnik nije pronađen.');
+      }
+
+      // Provjera lozinke!
+      const isPasswordValid = await bcrypt.compare(lozinka, existingUser.lozinka);
+
+      if (!isPasswordValid) {
+         return res.status(401).send('Incorrect password! Try again.');
+      }
+
+      if (info === "") {
+         info = null;
+      }
 
       const newData = {
          datrod,
          korime,
-         lozinka,
          ime,
          prezime,
          info
@@ -459,9 +480,9 @@ router.post('/change', verifyToken, async (req, res) => {
       });
 
       if (result[0] === 1) {
-         res.status(200).json({ message: 'Podaci su uspješno ažurirani.' });
+         res.status(200).send('Podaci su uspješno ažurirani.');
       } else {
-         res.status(404).json({ message: 'Korisnik nije pronađen ili podaci nisu ažurirani.' });
+         res.status(404).send('Podaci nisu ažurirani.');
       }
    }
    catch (error) {
@@ -469,6 +490,8 @@ router.post('/change', verifyToken, async (req, res) => {
       res.status(500).json({ error: 'Internal Server Error' });
    }
 });
+
+
 
 router.get('/', verifyToken, async (req, res) => {
    res.redirect(`/api/data/profile/${req.user.userId}`);

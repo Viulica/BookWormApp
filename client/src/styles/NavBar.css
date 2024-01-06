@@ -1,31 +1,43 @@
 .my-navbar {
-   display: flex; /* Use Flexbox */
-   justify-content: space-evenly; /* Equal spacing between items */
-   align-items: center; /* Align items vertically */
-   list-style: none; /* Remove default list styling */
-   padding: 10px; /* Remove default padding */
-   margin: 5px;
-   background-color: var(--bg-main); /* Add background color */
-   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add subtle shadow */
-    position: relative;
- }
+  display: flex;
+  /* Use Flexbox */
+  justify-content: space-evenly;
+  /* Equal spacing between items */
+  align-items: center;
+  /* Align items vertically */
+  list-style: none;
+  /* Remove default list styling */
+  padding: 10px;
+  /* Remove default padding */
+  margin: 5px;
+  background-color: var(--bg-main);
+  /* Add background color */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  /* Add subtle shadow */
+  position: relative;
+}
 
- .my-container {
-   width: 100vw;
-   position: relative;
- }
+.my-container {
+  width: 100%;
+  position: relative;
+}
 
- .my-navbar li {
-  padding: 10px 20px; /* Add padding to each item */
-  transition: background-color 0.3s; /* Smooth transition for hover effect */
+.my-navbar li {
+  padding: 10px 20px;
+  /* Add padding to each item */
+  transition: background-color 0.3s;
+  /* Smooth transition for hover effect */
 }
 
 .my-navbar a {
-  text-decoration: none; /* Remove underline from links */
+  text-decoration: none;
+  /* Remove underline from links */
   font-family: "playfair";
-  transition: color 0.2s; /* Smooth transition for color change */
+  transition: color 0.2s;
+  /* Smooth transition for color change */
 }
 
 .my-navbar a:hover {
-  color:#F6A192; /* Change link color on hover */
+  color: #F6A192;
+  /* Change link color on hover */
 }

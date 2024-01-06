@@ -76,7 +76,7 @@ const MyBooks: React.FC = () => {
         if (response.ok) {
           const data = await response.json();
           console.log(data);
-          setSavedBooks(data);
+          setSavedBooks({...data});
         } else if (response.status === 401) {
           navigate("/login");
         } else {
@@ -108,7 +108,8 @@ const MyBooks: React.FC = () => {
         <p className="p-4">Loading...</p>
       ) : (
         <>
-          <div className="container">
+            <div className="container">
+
             {(savedBooks["Read"].length > 0 || savedBooks['Currently reading'].length > 0 || savedBooks['Want to read'].length > 0) ? (
               <>
                 {savedBooks["Read"].length > 0 ? (

@@ -2,9 +2,13 @@ const express = require('express');
 const router = express.Router();
 const verifyToken = require('./tokenVerification');
 const data = require('../models/data');
+const multer = require('multer');
 
 const profileRouter = require('./profileRouter');
 const { Sequelize, literal, Op } = require('sequelize');
+
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
 router.use('/profile', profileRouter);
 
@@ -68,11 +72,55 @@ router.get('/allAuthors', async (req, res) => {
       else {
          res.status(404).json("Nema autora!");
       }
-      
+
    }
    catch (error) {
       console.error('Error fetching authors:', error);
       res.status(500).json({ error: 'Internal Server Error', details: error.message });
+   }
+});
+
+router.post('/checkISBN/:ISBN', verifyToken, async (req, res) => {
+   try {
+      const ISBN = req.params.ISBN;
+      const existingBook = await data.knjiga.findOne({
+         where: {
+            isbn: ISBN
+         }
+      });
+
+      if (existingBook) {
+         return res.status(400).send('This book already exists.');
+      }
+      else {
+         res.status(200).send("");
+      }
+   }
+   catch (error) {
+      console.error('Greška prilikom dodavanja knjige:', error);
+      res.status(500).json({ error: 'Interna server greška', details: error.message });
+   }
+});
+
+router.post('/addBook', upload.single('coverImage'), async (req, res) => {
+   try {
+      const { title, genre, published, about, isbn, userId } = req.body;
+      const coverImage = req.file.buffer;
+
+      const newBook = await data.knjiga.create({
+         naslov: title,
+         zanr: genre,
+         godizd: published,
+         opis: about,
+         isbn: isbn,
+         idkorisnik: userId,
+         slika: coverImage,
+      });
+
+      res.status(201).json(newBook);
+   } catch (error) {
+      console.error('Greška prilikom dodavanja knjige:', error);
+      res.status(500).json({ error: 'Interna server greška', details: error.message });
    }
 });
 
@@ -120,7 +168,7 @@ router.post('/searchAuthor', async (req, res) => {
          where: {
             [Op.or]: [
                { korime: `${searchTerm}` },
-               { ime:  `${searchTerm}` },
+               { ime: `${searchTerm}` },
                { prezime: `${searchTerm}` },
             ],
             tipkorisnika: "autor"
@@ -192,7 +240,7 @@ router.get('/allBooks', async (req, res) => {
             })
 
             book.brojOsvrta = brojOsvrta;
-            
+
             if (brojRecenzija) {
                const prosjekOcjena = await data.recenzija.findAll({
                   attributes: [
@@ -518,7 +566,7 @@ router.post('/rate/:bookId', verifyToken, async (req, res) => {
    console.log("bookId", bookId);
    console.log("userId", userId);
    console.log("grade", req.body.ocjena);
-   
+
    try {
       const rating = await data.recenzija.findOne({
          where: {
@@ -645,7 +693,7 @@ router.post('/saveBook/:bookId', verifyToken, async (req, res) => {
                status: status,
                idknjiga: bookId
             })
-            
+
          }
 
          res.status(200).send(status);

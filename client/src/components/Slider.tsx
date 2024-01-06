@@ -92,7 +92,8 @@ const Slider: React.FC<SliderProps> = ({ books, id }) => {
               >
                 <div className={`book`} id={`book-${index + 1}`}>
                   <div className="book-image">
-                    <img src={book.slika} alt="Book cover" />
+                    {/* <img src={book.slika} alt="Book cover" /> */}
+                    <img src={getImageSource(book.slika)} alt="Book cover" />
                   </div>
                   <div className="book-title-and-published">
                     {book.naslov + " (" + book.godizd + ")"}

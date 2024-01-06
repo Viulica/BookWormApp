@@ -26,7 +26,8 @@ const knjiga = sequelize.define('knjiga', {
   },
   isbn: {
     type: DataTypes.STRING(13),
-    allowNull: false
+    allowNull: false,
+    unique: true,
   },
   idkorisnik: {
     type: DataTypes.INTEGER,

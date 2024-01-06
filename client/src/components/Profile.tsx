@@ -17,7 +17,7 @@ const Profile: React.FC = () => {
     ]
   );
   const [isAuthor, setIsAuthor] = useState<boolean>(false);
-  const [isMyProfile, setIsMyProfile] = useState<boolean>(true);
+  const [isMyProfile, setIsMyProfile] = useState<boolean>(false);
   const [followStatus, setFollowStatus] = useState<string>("");
   // const [showSavedBooks, setShowSavedBooks] = useState<boolean>(false);
   const [writtenBooks, setWrittenBooks] = useState<any>([]);
@@ -100,7 +100,7 @@ const Profile: React.FC = () => {
         `${baseUrl}/api/data/profile/myWrittenBooks/${profileId}`,
         {
           headers: {
-            'Content-Type': 'application/json'
+            "Content-Type": "application/json",
           },
         }
       );
@@ -235,6 +235,11 @@ const Profile: React.FC = () => {
               <a href={"/myBooks/" + profileId} className="btn btn-primary">
                 See reading list
               </a>
+                {isAuthor && (
+                  <a href={"/addBook?profileId=" + myUserId} className="btn btn-primary">
+                    Upload book
+                  </a>
+              )}
             </div>
           )}
 
@@ -263,21 +268,45 @@ const Profile: React.FC = () => {
             </div>
           )}
 
+          <div className="horizontal-line"></div>
+
+          <div className="container-about-me">
+            <div className="about-me-title-and-dateOfBirth">
+              <div className="about-me-title">
+                <p className="fs-4">
+                  {profileData.ime + " " + profileData.prezime}
+                </p>
+              </div>
+              <div className="about-me-dateOfBirth">
+                <p className="fs-6">{profileData.datrod}</p>
+              </div>
+            </div>
+            {profileData.info && (
+              <div className="about-me-title-and-info">
+                <div className="about-me-title">
+                  <p className="fs-5">About me:</p>
+                </div>
+                <div className="about-me-info">{profileData.info}</div>
+              </div>
+            )}
+          </div>
+          <div className="horizontal-line"></div>
+
           {isAuthor ? (
-            <>
-              <h1 className="display-6">Written</h1>
+            <div className="container-written-books">
+              <div className="written-books-title">
+                <h1 className="display-6">Written books</h1>
+              </div>
               <div className="written">
                 {writtenBooks.length > 0 ? (
                   <Slider books={writtenBooks} id={0} />
                 ) : (
-                  <a href="" className="btn btn-primary">
-                    Upload book
-                  </a>
+                  <>
+                    <p className="p-4">No written books!</p>
+                  </>
                 )}
               </div>
-
-              <hr className="my-4" />
-            </>
+            </div>
           ) : (
             <></>
           )}
