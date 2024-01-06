@@ -14,13 +14,20 @@ router.post('/', async (req, res) => {
          }
       })
 
-      bcrypt.compare(password, user.lozinka, (err, result) => { // result is true when passwords is a match
+      bcrypt.compare(password, user.lozinka, (err, result) => {
          if (err) {
             console.log("[ERROR] Error hashing password");
             throw new Error("Hashing error");
          } else {
             if (result) {
-               const token = jwt.sign({ userId: user.idkorisnik, username: user.korime, typeOfUser: user.tipkorisnika }, 'tajna_lozinka', { expiresIn: '1h' });
+               const token = jwt.sign({
+                  userId: user.idkorisnik,
+                  username: user.korime,
+                  typeOfUser: user.tipkorisnika
+               },
+                  'tajna_lozinka')
+               // { expiresIn: '1h' }};
+
                res.status(200).send(token);
             } else {
                res.status(404).json({ error: "User not found" });

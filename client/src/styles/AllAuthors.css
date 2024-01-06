@@ -30,16 +30,22 @@ input {
    outline: none;
 }
 
-.author {
+.author{
    display: flex;
-   gap: 50px;
+   gap: 20px;
+   align-items: center;
+}
+
+.author-data{
+   display: flex;
+   gap: 30px;
 }
 
 .author-profile-picture {
    width: 72px;
 }
 
-.author:hover {
+.author-data:hover {
    background-color: lightgrey;
    cursor: pointer;
 }

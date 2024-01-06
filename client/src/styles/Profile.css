@@ -48,7 +48,7 @@
    margin: 0 10px;
 }
 
-.container-change-and-see-reading-list, .container-follow-message-and-see-reading-list{
+.container-change-and-see-reading-list, .container-follow-message-and-see-reading-list, .container-see-all-books-and-all-users{
    width: 60%;
    display: flex;
    align-items: center;
@@ -76,6 +76,55 @@
 
 /* ----------------------------------------------------------------------- */
 
+.container-all-users{
+   display: flex;
+   flex-direction: column;
+   gap: 20px;
+   overflow-y: scroll;
+   width: 90%;
+}
+
+.all-users{
+   display: flex;
+   flex-direction: column;
+   gap: 20px;
+}
+
+.user{
+   display: flex;
+   align-items: center;
+}
+
+.user-data{
+   display: flex;
+}
+
+.user-data>div{
+   width: 100px;
+}
+
+.user-data>div:last-child{
+   width: 250px;
+}
+
+.user-profile-picture{
+   display: flex;
+   justify-content: center;
+   align-items: center;
+}
+
+.user-profile-picture img {
+   width: 72px;
+}
+
+.user-name-and-surname-and-dateOfBirth{
+   display: flex;
+   flex-direction: column;
+   align-items: start;
+   gap: 10px;
+}
+
+
 .background {
    position: fixed;
    top: 0;
@@ -89,7 +138,7 @@
    z-index: 1;
 }
 
-.window-user-reading-list {
+.window-user-reading-list, .window-all-books, .window-all-users {
    background-color: white;
    padding: 20px;
    width: 80%;

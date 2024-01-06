@@ -1,16 +1,22 @@
 import React, { useState, useEffect } from "react";
-import { baseUrl, storedToken } from "../App";
+import { baseUrl, storedToken } from "../../App";
 import { useNavigate } from "react-router-dom";
-import "../styles/Profile.css";
-import { MessageIcon } from "./MessageIcon";
-import StarRating from "./StarRating";
-import MyBooks from "./MyBooks";
-import Slider from "./Slider";
+import "../../styles/Profile.css";
+import { MessageIcon } from "../MessageIcon";
+import StarRating from "../StarRating";
+import MyBooks from "../MyBooks";
+import Slider from "../Slider";
 
-const Profile: React.FC = () => {
+interface Role {
+  role: string;
+}
+
+const AdminViewProfile: React.FC<Role> = (props) => {
+  const role = props.role;
+  const [isMyProfile, setIsMyProfile] = useState<boolean>(false);
+
   const [loading, setLoading] = useState<boolean>(true);
   const [myUserId, setMyUserId] = useState<number>(0);
-  const [role, setRole] = useState<string>("");
   const [profileData, setProfileData] = useState<any>({});
   const profileId = parseInt(
     window.location.pathname.split("/")[
@@ -18,7 +24,6 @@ const Profile: React.FC = () => {
     ]
   );
   const [isAuthor, setIsAuthor] = useState<boolean>(false);
-  const [isMyProfile, setIsMyProfile] = useState<boolean>(false);
   const [followStatus, setFollowStatus] = useState<string>("");
   // const [showSavedBooks, setShowSavedBooks] = useState<boolean>(false);
   const [showAllBooks, setShowAllBooks] = useState<boolean>(false);
@@ -49,30 +54,6 @@ const Profile: React.FC = () => {
         }
       } catch (error) {
         console.log("Greška prilikom dohvaćanja userId:", error);
-      }
-    }
-  };
-
-  const fetchGetRole = async () => {
-    if (storedToken) {
-      try {
-        const response = await fetch(`${baseUrl}/api/data/profile/getRole`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `${storedToken}`,
-          },
-        });
-
-        if (response.ok) {
-          const data = await response.text();
-          console.log(data);
-          setRole(data);
-        } else {
-          console.log(await response.json());
-        }
-      } catch (error) {
-        console.error("Greška prilikom dohvaćanja uloge:", error);
       }
     }
   };
@@ -245,19 +226,18 @@ const Profile: React.FC = () => {
 
   useEffect(() => {
     fetchMyUserId();
-    fetchGetRole();
   }, []);
 
   useEffect(() => {
-    if (role != "admin") {
-      console.log("Izvrši");
+    if (role === "admin" && isMyProfile) {
+      console.log("Izvrši", isMyProfile);
+      fetchAllDataAdmin();
+    } else {
       fetchFollowing();
       fetchProfileData();
       fetchMyWrittenBooks();
-    } else {
-      fetchAllDataAdmin();
     }
-  }, [role]);
+  }, [myUserId]);
 
   const handleFollowUser = async () => {
     if (storedToken) {
@@ -341,7 +321,7 @@ const Profile: React.FC = () => {
               </div>
             </div>
             <div className="container-profileData-info">
-              {role !== "admin" || !isMyProfile ? (
+              {!isMyProfile ? (
                 <>
                   <div className="container-profileData-info-followers">
                     <div>{profileData.pratitelji}</div>
@@ -390,49 +370,40 @@ const Profile: React.FC = () => {
             </div>
           </div>
 
-          {storedToken && isMyProfile && role !== "admin" && (
-            <div className="container-change-and-see-reading-list">
-              <a href="/changeProfile" className="btn btn-primary">
-                Change
-              </a>
-              <a href={"/myBooks/" + profileId} className="btn btn-primary">
-                See reading list
-              </a>
-              {isAuthor && (
-                <a
-                  href={"/addBook?profileId=" + myUserId}
-                  className="btn btn-primary"
-                >
-                  Upload book
+          {storedToken && isMyProfile && (
+            <>
+              <div className="container-change-and-see-reading-list">
+                <a href="/changeProfile" className="btn btn-primary">
+                  Change
                 </a>
-              )}
-            </div>
+                {/* <a href={"/myBooks/" + profileId} className="btn btn-primary">
+                See reading list
+              </a> */}
+                  
+            {/* Hoće li admin moći dodati knjigu? */}
+                {isAuthor ||
+                  (isMyProfile && (
+                    <a
+                      href={"/addBook?profileId=" + myUserId}
+                      className="btn btn-primary"
+                    >
+                      Upload book
+                    </a>
+                  ))}
+              </div>
+              <div className="container-see-all-books-and-all-users">
+                <a className="btn btn-primary" onClick={openShowAllBooks}>
+                  See all books
+                </a>
+                <a className="btn btn-primary" onClick={openShowAllUsers}>
+                  See all users
+                </a>
+              </div>
+            </>
           )}
 
-          {storedToken && isMyProfile && role === "admin" && (
-            <div className="container-see-all-books-and-all-users">
-              <a className="btn btn-primary" onClick={openShowAllBooks}>
-                See all books
-              </a>
-              <a className="btn btn-primary" onClick={openShowAllUsers}>
-                See all users
-              </a>
-            </div>
-          )}
-
-          {!isMyProfile && storedToken && role !== "admin" && (
+          {!isMyProfile && storedToken  && (
             <div className="container-follow-message-and-see-reading-list">
-              <a
-                onClick={handleFollowUser}
-                className={
-                  followStatus === "Follow"
-                    ? "btn btn-success"
-                    : "btn btn-outline-warning"
-                }
-                id="follow-btn"
-              >
-                {followStatus}
-              </a>
               <a href={"/myBooks/" + profileId} className="btn btn-primary">
                 See reading list
               </a>
@@ -445,7 +416,7 @@ const Profile: React.FC = () => {
             </div>
           )}
 
-          {role !== "admin" && (
+          {!isMyProfile && (
             <>
               <div className="horizontal-line"></div>
 
@@ -576,4 +547,4 @@ const Profile: React.FC = () => {
   );
 };
 
-export default Profile;
+export default AdminViewProfile;

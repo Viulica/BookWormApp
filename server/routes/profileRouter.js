@@ -352,65 +352,50 @@ router.get('/myWrittenBooks/:profileId', async (req, res) => {
    }
 })
 
-router.get('/admin/allUsers', verifyToken, async (req, res) => {
-   const typeOfUser = req.user.typeOfUser;
-   if (typeOfUser !== "admin") {
-      res.status(401).json("Nemaš pristup!");
-   }
+// router.get('/admin/allBooks', verifyToken, async (req, res) => {
+//    const typeOfUser = req.user.typeOfUser;
+//    if (typeOfUser !== "admin") {
+//       res.status(401).json("Nemaš pristup!");
+//    }
 
-   try {
-      const allUsers = await data.korisnik.findAll();
-      res.status(200).json(allUsers);
-   } catch (error) {
-      console.error('Error fetching users:', error);
-      res.status(500).json({ error: 'Internal Server Error', details: error.message });
-   }
-});
+//    try {
+//       const allBooks = (await data.knjiga.findAll({
+//          include: [
+//             {
+//                model: data.korisnik,
+//                as: 'idkorisnik_korisnik',
+//                attributes: ['ime', 'prezime', 'datrod', 'info']
+//             }
+//          ]
+//       }));
 
-router.get('/admin/allBooks', verifyToken, async (req, res) => {
-   const typeOfUser = req.user.typeOfUser;
-   if (typeOfUser !== "admin") {
-      res.status(401).json("Nemaš pristup!");
-   }
+//       // const allBooks = await data.knjiga.findAll();
+//       const formattedBooks = allBooks.map(book => {
+//          const formattedBook = book.get({ plain: true }); // Pretvaranje Sequelize instance u običan objekt
 
-   try {
-      const allBooks = (await data.knjiga.findAll({
-         include: [
-            {
-               model: data.korisnik,
-               as: 'idkorisnik_korisnik',
-               attributes: ['ime', 'prezime', 'datrod', 'info']
-            }
-         ]
-      }));
+//          // Zamjena asocijativnog modela s atributima
+//          formattedBook.naslov = formattedBook.naslov;
+//          formattedBook.zanr = formattedBook.zanr;
+//          formattedBook.opis = formattedBook.opis;
+//          formattedBook.datizd = formattedBook.datizd;
+//          formattedBook.isbn = formattedBook.isbn;
+//          formattedBook.ime = formattedBook.idkorisnik_korisnik.ime;
+//          formattedBook.prezime = formattedBook.idkorisnik_korisnik.prezime;
+//          formattedBook.datrod = formattedBook.idkorisnik_korisnik.datrod;
+//          formattedBook.info = formattedBook.idkorisnik_korisnik.info;
 
-      // const allBooks = await data.knjiga.findAll();
-      const formattedBooks = allBooks.map(book => {
-         const formattedBook = book.get({ plain: true }); // Pretvaranje Sequelize instance u običan objekt
+//          delete formattedBook.idkorisnik_korisnik; // Uklanjanje originalnog asocijativnog modela
 
-         // Zamjena asocijativnog modela s atributima
-         formattedBook.naslov = formattedBook.naslov;
-         formattedBook.zanr = formattedBook.zanr;
-         formattedBook.opis = formattedBook.opis;
-         formattedBook.datizd = formattedBook.datizd;
-         formattedBook.isbn = formattedBook.isbn;
-         formattedBook.ime = formattedBook.idkorisnik_korisnik.ime;
-         formattedBook.prezime = formattedBook.idkorisnik_korisnik.prezime;
-         formattedBook.datrod = formattedBook.idkorisnik_korisnik.datrod;
-         formattedBook.info = formattedBook.idkorisnik_korisnik.info;
-
-         delete formattedBook.idkorisnik_korisnik; // Uklanjanje originalnog asocijativnog modela
-
-         return formattedBook;
-      })
-      // console.log(formattedBooks);
-      res.status(200).json(formattedBooks);
-   }
-   catch (error) {
-      console.log('Error fetching books:', error);
-      res.status(500).json({ error: 'Internal Server Error', details: error.message });
-   }
-});
+//          return formattedBook;
+//       })
+//       // console.log(formattedBooks);
+//       res.status(200).json(formattedBooks);
+//    }
+//    catch (error) {
+//       console.log('Error fetching books:', error);
+//       res.status(500).json({ error: 'Internal Server Error', details: error.message });
+//    }
+// });
 
 router.post('/checkUsername/:userId', verifyToken, async (req, res) => {
    try {

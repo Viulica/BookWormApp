@@ -9,6 +9,7 @@ import NavBar from "./components/nav/NavBar";
 import Home from "../src/components/Home";
 import Login from "../src/components/Login";
 import Profile from "./components/Profile";
+import ProfileRedirect from "./components/ProfileRedirect";
 import ChangeProfile from "../src/components/ChangeProfile";
 import MyBooks from "../src/components/MyBooks";
 import Logout from "../src/components/Logout";
@@ -33,7 +34,8 @@ const App: React.FC = () => {
             <Route path="/home" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/profile/:id" element={<Profile />} />
+          {/* <Route path="/profile/:id" element={<Profile />} /> */}
+          <Route path="/profile/:id" element={<ProfileRedirect />} />
             <Route path="/changeProfile" element={<ChangeProfile />} />
             <Route path="/myBooks/:id" element={<MyBooks />} />
             <Route path="/logout" element={<Logout />} />

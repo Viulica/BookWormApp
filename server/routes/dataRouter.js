@@ -10,7 +10,38 @@ const { Sequelize, literal, Op } = require('sequelize');
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
+
+// Šablona
+// try {
+      
+// } catch (error) {
+//    console.error('Error fetching books:', error);
+//    res.status(500).json({ error: 'Internal Server Error', details: error.message });
+// }
+
 router.use('/profile', profileRouter);
+
+router.get('/allUsers', verifyToken, async (req, res) => {
+   const typeOfUser = req.user.typeOfUser;
+   if (typeOfUser !== "admin") {
+      res.status(401).json("Nemaš pristup!");
+   }
+
+   try {
+      const userId = req.user.userId;
+      const allUsers = await data.korisnik.findAll({
+         where: {
+            idkorisnik: {
+               [Op.ne] : userId
+            }
+         }
+      });
+      res.status(200).json(allUsers);
+   } catch (error) {
+      console.error('Error fetching users:', error);
+      res.status(500).json({ error: 'Internal Server Error', details: error.message });
+   }
+});
 
 router.get('/allAuthors', async (req, res) => {
    try {
@@ -79,111 +110,6 @@ router.get('/allAuthors', async (req, res) => {
       res.status(500).json({ error: 'Internal Server Error', details: error.message });
    }
 });
-
-router.post('/checkISBN/:ISBN', verifyToken, async (req, res) => {
-   try {
-      const ISBN = req.params.ISBN;
-      const existingBook = await data.knjiga.findOne({
-         where: {
-            isbn: ISBN
-         }
-      });
-
-      if (existingBook) {
-         return res.status(400).send('This book already exists.');
-      }
-      else {
-         res.status(200).send("");
-      }
-   }
-   catch (error) {
-      console.error('Greška prilikom dodavanja knjige:', error);
-      res.status(500).json({ error: 'Interna server greška', details: error.message });
-   }
-});
-
-router.post('/addBook', upload.single('coverImage'), async (req, res) => {
-   try {
-      const { title, genre, published, about, isbn, userId, coverImage } = req.body;
-
-      const newBook = await data.knjiga.create({
-         naslov: title,
-         zanr: genre,
-         godizd: published,
-         opis: about,
-         isbn: isbn,
-         idkorisnik: userId,
-         slika: coverImage,
-      });
-
-      res.status(201).json(newBook);
-   } catch (error) {
-      console.error('Greška prilikom dodavanja knjige:', error);
-      res.status(500).json({ error: 'Interna server greška', details: error.message });
-   }
-});
-
-router.post('/findAuthors', async (req, res) => {
-   const { searchTerm } = req.body;
-   try {
-      const rezultati = await data.korisnik.findAll({
-         attributes: [
-            'idkorisnik',
-            'korime',
-            'ime',
-            'prezime'
-         ],
-         where: {
-            [Op.or]: [
-               { korime: { [Op.iLike]: `${searchTerm}%` } },
-               { ime: { [Op.iLike]: `${searchTerm}%` } },
-               { prezime: { [Op.iLike]: `${searchTerm}%` } },
-            ],
-            tipkorisnika: "autor"
-         },
-         raw: true,
-      });
-
-      if (rezultati.length > 0) {
-         console.log(rezultati);
-         res.status(200).json(rezultati);
-      }
-   } catch (error) {
-      console.error('Greška prilikom pretraživanja korisnika:', error);
-      res.status(500).json({ error: 'Internal Server Error' });
-   }
-})
-
-router.post('/searchAuthor', async (req, res) => {
-   const { searchTerm } = req.body;
-   try {
-      const rezultati = await data.korisnik.findAll({
-         attributes: [
-            'idkorisnik',
-            'korime',
-            'ime',
-            'prezime'
-         ],
-         where: {
-            [Op.or]: [
-               { korime: `${searchTerm}` },
-               { ime: `${searchTerm}` },
-               { prezime: `${searchTerm}` },
-            ],
-            tipkorisnika: "autor"
-         },
-         raw: true,
-      });
-
-      if (rezultati.length > 0) {
-         console.log(rezultati);
-         res.status(200).json(rezultati);
-      }
-   } catch (error) {
-      console.error('Greška prilikom pretraživanja korisnika:', error);
-      res.status(500).json({ error: 'Internal Server Error' });
-   }
-})
 
 // idknjiga, naslov, slika, godizd, idkorisnikAutor, imeAutor, prezAutor, brojRecenzija, brojOsvrta, prosjekOcjena, spremljenoPuta
 router.get('/allBooks', async (req, res) => {
@@ -270,6 +196,192 @@ router.get('/allBooks', async (req, res) => {
       res.status(500).json({ error: 'Internal Server Error', details: error.message });
    }
 });
+
+router.get('/getAllData', verifyToken, async (req, res) => {
+   if (req.user.typeOfUser !== "admin") {
+      res.status(403).send("You have no permission");
+   }
+
+   try {
+      const numberOfUsers = await data.korisnik.count();
+      const numberOfBooks = await data.knjiga.count();
+
+      const allData = {
+         ukBrojKorisnika: numberOfUsers,
+         ukBrojKnjiga: numberOfBooks
+      }
+
+      res.status(200).json(allData);
+   } catch (error) {
+      console.error('Error fetching books:', error);
+      res.status(500).json({ error: 'Internal Server Error', details: error.message });
+   }
+})
+
+router.delete('/deleteUser/:userId', verifyToken, async (req, res) => {
+   try {
+      const userId = req.params.userId;
+
+      const user = await data.korisnik.findOne({
+         where: {
+            idkorisnik: userId
+         }
+      })
+
+      if (user) {
+         await data.korisnik.destroy({
+            where: {
+               idkorisnik: userId
+            }
+         });
+
+         res.status(200).send("User deleted");
+      }
+      else {
+         res.status(404).send("No such user!");
+      }
+      
+   } catch (error) {
+      console.error('Greška prilikom pretraživanja korisnika:', error);
+      res.status(500).json({ error: 'Internal Server Error', details: error.message });
+   }
+});
+
+router.delete('/deleteBook/:bookId', verifyToken, async (req, res) => {
+   try {
+      const bookId = req.params.bookId;
+      const book = await data.korisnik.findOne({
+         where: {
+            idknjiga: bookId
+         }
+      })
+
+      if (book) {
+         await data.knjiga.destroy({
+            where: {
+               idknjiga: bookId
+            }
+         })
+
+         res.status(200).send("Book deleted");
+      }
+      else {
+         res.status(404).send("No such book!");
+      }
+   } catch (error) {
+      console.error('Greška prilikom pretraživanja korisnika:', error);
+      res.status(500).json({ error: 'Internal Server Error', details: error.message });
+   }
+})
+
+
+router.post('/checkISBN/:ISBN', verifyToken, async (req, res) => {
+   try {
+      const ISBN = req.params.ISBN;
+      const existingBook = await data.knjiga.findOne({
+         where: {
+            isbn: ISBN
+         }
+      });
+
+      if (existingBook) {
+         return res.status(400).send('This book already exists.');
+      }
+      else {
+         res.status(200).send("");
+      }
+   }
+   catch (error) {
+      console.error('Greška prilikom dodavanja knjige:', error);
+      res.status(500).json({ error: 'Interna server greška', details: error.message });
+   }
+});
+
+
+// Još vidi što je s ovom rutom???
+router.post('/addBook', upload.single('coverImage'), async (req, res) => {
+   try {
+      const { title, genre, published, about, isbn, userId, coverImage } = req.body;
+
+      const newBook = await data.knjiga.create({
+         naslov: title,
+         zanr: genre,
+         godizd: published,
+         opis: about,
+         isbn: isbn,
+         idkorisnik: userId,
+         slika: coverImage,
+      });
+
+      res.status(201).json(newBook);
+   } catch (error) {
+      console.error('Greška prilikom dodavanja knjige:', error);
+      res.status(500).json({ error: 'Interna server greška', details: error.message });
+   }
+});
+
+router.post('/findAuthors', async (req, res) => {
+   const { searchTerm } = req.body;
+   try {
+      const rezultati = await data.korisnik.findAll({
+         attributes: [
+            'idkorisnik',
+            'korime',
+            'ime',
+            'prezime'
+         ],
+         where: {
+            [Op.or]: [
+               { korime: { [Op.iLike]: `${searchTerm}%` } },
+               { ime: { [Op.iLike]: `${searchTerm}%` } },
+               { prezime: { [Op.iLike]: `${searchTerm}%` } },
+            ],
+            tipkorisnika: "autor"
+         },
+         raw: true,
+      });
+
+      if (rezultati.length > 0) {
+         console.log(rezultati);
+         res.status(200).json(rezultati);
+      }
+   } catch (error) {
+      console.error('Greška prilikom pretraživanja korisnika:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+   }
+})
+
+router.post('/searchAuthor', async (req, res) => {
+   const { searchTerm } = req.body;
+   try {
+      const rezultati = await data.korisnik.findAll({
+         attributes: [
+            'idkorisnik',
+            'korime',
+            'ime',
+            'prezime'
+         ],
+         where: {
+            [Op.or]: [
+               { korime: `${searchTerm}` },
+               { ime: `${searchTerm}` },
+               { prezime: `${searchTerm}` },
+            ],
+            tipkorisnika: "autor"
+         },
+         raw: true,
+      });
+
+      if (rezultati.length > 0) {
+         console.log(rezultati);
+         res.status(200).json(rezultati);
+      }
+   } catch (error) {
+      console.error('Greška prilikom pretraživanja korisnika:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+   }
+})
+
 
 router.get('/recommendedBooks', async (req, res) => {
    try {
