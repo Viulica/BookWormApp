@@ -104,8 +104,7 @@ router.post('/checkISBN/:ISBN', verifyToken, async (req, res) => {
 
 router.post('/addBook', upload.single('coverImage'), async (req, res) => {
    try {
-      const { title, genre, published, about, isbn, userId } = req.body;
-      const coverImage = req.file.buffer;
+      const { title, genre, published, about, isbn, userId, coverImage } = req.body;
 
       const newBook = await data.knjiga.create({
          naslov: title,

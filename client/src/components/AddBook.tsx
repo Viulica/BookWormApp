@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { baseUrl, storedToken } from "../App";
 import '../styles/AddBook.css';
 
+let imageServer = "http://localhost:3500";
+
 const AddBook: React.FC = () => {
   const [allAuthors, setAllAuthors] = useState<any[]>([]);
   const [title, setTitle] = useState("");
@@ -79,7 +81,10 @@ const AddBook: React.FC = () => {
 
   const handleAddBook = async () => {
 
-    if (title === "" || genre === "" || published === "" || about === "" || isbn === "" || userId === 0 || !coverImage) {
+    console.log(title, genre, published, about, isbn, userId, coverImage)
+
+    // TODO Maknula sa check za userid samo da probam jel slike rade
+    if (title === "" || genre === "" || published === "" || about === "" || isbn === "" || !coverImage) {
       setValidationMessage(".container-validation", "All fields are required!");
       return;
     }
@@ -93,14 +98,37 @@ const AddBook: React.FC = () => {
     formData.append("published", published);
     formData.append("about", about);
     formData.append("isbn", isbn);
+    formData.append("userId", "4");
 
     if (userId) {
       formData.append("userId", userId.toString());
     }
 
     if (coverImage) {
-      formData.append("coverImage", coverImage);
+      let extension = coverImage.name.split(".")[coverImage.name.split(".").length - 1];
+      if (extension !== "png" && extension !== "jpeg" && extension !== "jpg") {
+        // TODO bolja validacija
+        console.log("Unsupported image type");
+      }
+      let imageNameRes = await fetch(`${imageServer}/upload`, {
+        method: "POST",
+        headers: {
+          "content-type": extension === "png" ? "image/png" : "image/jpeg"
+        },
+        body: coverImage
+      })
+
+      if (imageNameRes.status === 400) {
+        // TODO bolja validacija
+        console.log("Error saving image on the server.");
+      }
+
+      let imageName = await imageNameRes.text();
+
+      formData.append("coverImage", `${imageServer}/images/${imageName}.${extension}`);
     }
+
+
 
     console.log(formData);
 

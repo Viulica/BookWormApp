@@ -1,1 +1,3 @@
 node_modules
+/imageServer/images/*
+/server/node_modules
