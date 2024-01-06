@@ -291,7 +291,8 @@ const ShowBook: React.FC = () => {
           <div className="container-show-book">
             <div className="book-image-and-details">
               <div className="book-image">
-                <img src={getImageSource(bookData.slika)} alt="Book cover" />
+                {/* <img src={getImageSource(bookData.slika)} alt="Book cover" /> */}
+                <img src={bookData.slika} alt="Book cover" />
               </div>
               <div className="book-details">
                 <div

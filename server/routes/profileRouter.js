@@ -491,7 +491,30 @@ router.post('/change/:userId', verifyToken, async (req, res) => {
    }
 });
 
+router.get('/getRole', verifyToken, async (req, res) => {
+   try {
+      const userId = req.user.userId;
+      const user = await data.korisnik.findOne({
+         attributes: [
+            'tipkorisnika'
+         ],
+         where: {
+            idkorisnik: userId,
+         },
+         raw: true,
+      })
 
+      if (user) {
+         res.status(200).send(user.tipkorisnika);
+      }
+      else {
+         res.status(404).send({ message: "No user found" });
+      }
+   } catch (error) {
+      console.error('Error fetching authors:', error);
+      res.status(500).json({ error: 'Internal Server Error', details: error.message });
+   }
+});
 
 router.get('/', verifyToken, async (req, res) => {
    res.redirect(`/api/data/profile/${req.user.userId}`);
