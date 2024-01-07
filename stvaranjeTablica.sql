@@ -9,6 +9,7 @@ CREATE TABLE KORISNIK
   prezime VARCHAR(255),
   info TEXT,
   tipKorisnika VARCHAR(10) NOT NULL,
+  slika BYTEA
   PRIMARY KEY (idKorisnik)
 );
 
@@ -22,8 +23,8 @@ CREATE TABLE KNJIGA
   opis TEXT NOT NULL,
   ISBN VARCHAR(13) NOT NULL UNIQUE,
   idKorisnik INT NOT NULL,
-  -- slika BYTEA,
-  slika VARCHAR(250),
+  slika BYTEA,
+  -- slika VARCHAR(250),
   PRIMARY KEY (idKnjiga),
   FOREIGN KEY (idKorisnik) REFERENCES KORISNIK(idKorisnik) ON DELETE CASCADE
 );

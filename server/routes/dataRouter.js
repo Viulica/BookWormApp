@@ -3,6 +3,7 @@ const router = express.Router();
 const verifyToken = require('./tokenVerification');
 const data = require('../models/data');
 const multer = require('multer');
+const axios = require('axios');
 
 const profileRouter = require('./profileRouter');
 const { Sequelize, literal, Op } = require('sequelize');
@@ -298,12 +299,29 @@ router.post('/checkISBN/:ISBN', verifyToken, async (req, res) => {
       res.status(500).json({ error: 'Interna server greška', details: error.message });
    }
 });
-
-
-// Još vidi što je s ovom rutom???
-router.post('/addBook', upload.single('coverImage'), async (req, res) => {
+ 
+const getImageBufferFromUrl = async (url) => {
    try {
-      const { title, genre, published, about, isbn, userId, coverImage } = req.body;
+     const response = await axios.get(url, { responseType: 'arraybuffer' });
+     const buffer = Buffer.from(response.data, 'binary');
+      return buffer;
+      
+   } catch (error) {
+     console.error('Greška prilikom dohvaćanja slike s URL-a:', error.message);
+     throw error;
+   }
+ };
+
+ router.post('/addBook', upload.single('coverImage'), async (req, res) => {
+   try {
+      const { title, genre, published, about, isbn, userId, imageUrl } = req.body;
+      let slika;
+
+      if (imageUrl) {
+         slika = await getImageBufferFromUrl(imageUrl);
+      } else if (req.file) {
+         slika = req.file.buffer;
+      }
 
       const newBook = await data.knjiga.create({
          naslov: title,
@@ -312,7 +330,7 @@ router.post('/addBook', upload.single('coverImage'), async (req, res) => {
          opis: about,
          isbn: isbn,
          idkorisnik: userId,
-         slika: coverImage,
+         slika: slika,
       });
 
       res.status(201).json(newBook);
@@ -320,7 +338,8 @@ router.post('/addBook', upload.single('coverImage'), async (req, res) => {
       console.error('Greška prilikom dodavanja knjige:', error);
       res.status(500).json({ error: 'Interna server greška', details: error.message });
    }
-});
+}); 
+ 
 
 router.post('/findAuthors', async (req, res) => {
    const { searchTerm } = req.body;

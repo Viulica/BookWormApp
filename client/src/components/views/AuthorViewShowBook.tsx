@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { EditIcon } from "../EditIcon";
 import { DeleteIcon } from "../DeleteIcon";
 import { InfoIcon } from "../InfoIcon";
+import { getImageSource } from "../Slider";
 
 const AuthorViewShowBook: React.FC = () => {
   const bookId = window.location.href
@@ -280,7 +281,7 @@ const AuthorViewShowBook: React.FC = () => {
           <div className="container-show-book">
             <div className="book-image-and-details">
               <div className="book-image">
-                <img src={bookData.slika} alt="Book cover" />
+                <img src={getImageSource(bookData.slika)} alt="Book cover" />
               </div>
               <div className="book-details">
                 <div

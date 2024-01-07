@@ -13,10 +13,11 @@ const AddBook: React.FC = () => {
   const [isbn, setIsbn] = useState("");
   const [userId, setUserId] = useState<number>(0);
   const [coverImage, setCoverImage] = useState<File | null>(null);
+  const [imagePath, setImagePath] = useState("");
   const [loading, setLoading] = useState<boolean>(true);
   const [role, setRole] = useState<string>("");
   const [roleFetched, setRoleFetched] = useState<boolean>(false);
-
+  const [selectedInput, setSelectedInput] = useState<"file" | "text">("file");
   const profileId = window.location.search.split("=")[1] || null;
   // console.log(profileId);
 
@@ -123,8 +124,7 @@ const AddBook: React.FC = () => {
       genre === "" ||
       published === "" ||
       about === "" ||
-      userId === 0 ||
-      !coverImage
+      userId === 0
     ) {
       setValidationMessage(".container-validation", "All fields are required!");
       return;
@@ -153,34 +153,12 @@ const AddBook: React.FC = () => {
     formData.append("isbn", isbn);
     formData.append("userId", userId.toString());
 
-    console.log(coverImage);
-
-    if (coverImage) {
-      let extension = coverImage.name.split(".")[coverImage.name.split(".").length - 1];
-      if (extension !== "png" && extension !== "jpeg" && extension !== "jpg") {
-        // TODO bolja validacija
-        console.log("Unsupported image type");
-      }
-      let imageNameRes = await fetch(`${baseUrl}/upload`, {
-        method: "POST",
-        headers: {
-          "content-type": extension === "png" ? "image/png" : "image/jpeg"
-        },
-        body: coverImage
-      })
-
-      if (imageNameRes.status === 400) {
-        // TODO bolja validacija
-        console.log("Error saving image on the server.");
-      }
-
-      let imageName = await imageNameRes.text();
-
-      formData.append("coverImage", `${baseUrl}/images/${imageName}.${extension}`);
+    if (imagePath && selectedInput === "text") {
+      formData.append("imageUrl", imagePath);
+    } else if (coverImage && selectedInput === "file") {
+      // Ako korisnik unese datoteku, dodajte je u FormData
+      formData.append("coverImage", coverImage!);
     }
-
-    
-
 
     try {
       const response = await fetch(`${baseUrl}/api/data/addBook`, {
@@ -196,6 +174,10 @@ const AddBook: React.FC = () => {
     } catch (error) {
       console.error("Greška prilikom dohvaćanja podataka profila", error);
     }
+  };
+
+  const handleInputChange = (inputType: "file" | "text") => {
+    setSelectedInput(inputType);
   };
 
   return (
@@ -292,6 +274,7 @@ const AddBook: React.FC = () => {
                 </div>
                 {!profileId && (
                   <div className="mb-3">
+                    <label htmlFor="author">Author</label>
                     <select
                       name="author"
                       id="author"
@@ -302,7 +285,7 @@ const AddBook: React.FC = () => {
                       }}
                       required
                     >
-                      <option value={0}>Odaberi autora</option>
+                      <option value={0}>Choose author</option>
                       {allAuthors.map((author, index) => (
                         <option value={author.idkorisnik} key={index}>
                           {author.imeAutor} {author.prezAutor}
@@ -313,25 +296,58 @@ const AddBook: React.FC = () => {
                 )}
 
                 <div className="mb-3">
-                  <label htmlFor="coverImage">Image</label>
-
-                  <input
-                    type="file"
-                    id="coverImage"
-                    name="coverImage"
-                    accept="image/*"
-                    className="form-control"
-                    onChange={(e) => {
-                      const files = e.target.files;
-                      if (files && files.length > 0) {
-                        const file = files[0];
-                        setCoverImage(file);
-                        console.log(file);
-                        clearValidationMessage(".container-validation");
-                      }
-                    }}
-                  />
+                  <label htmlFor="inputSelector">Select Image Input Type</label>
+                  <div className="options">
+                    <button
+                      className="btn btn-primary"
+                      onClick={() => handleInputChange("file")}
+                    >
+                      File Input
+                    </button>
+                    <button
+                      className="btn btn-primary"
+                      onClick={() => handleInputChange("text")}
+                    >
+                      Text Input
+                    </button>
+                  </div>
                 </div>
+
+                {selectedInput === "file" && (
+                  <div className="mb-3">
+                    <input
+                      type="file"
+                      id="coverImage"
+                      name="coverImage"
+                      accept="image/*"
+                      className="form-control"
+                      onChange={(e) => {
+                        const files = e.target.files;
+                        if (files && files.length > 0) {
+                          const file = files[0];
+                          setCoverImage(file);
+                          console.log(file);
+                          console.log(files);
+                          clearValidationMessage(".container-validation");
+                        }
+                      }}
+                    />
+                  </div>
+                )}
+
+                {selectedInput === "text" && (
+                  <div className="mb-3">
+                    <input
+                      type="text"
+                      name="imageUrl"
+                      id="imageUrl"
+                      className="form-control"
+                      placeholder="path"
+                      value={imagePath}
+                      onChange={(e) => setImagePath(e.target.value)}
+                    />
+                  </div>
+                )}
                 <a onClick={handleAddBook} className="btn btn-primary">
                   Add
                 </a>
