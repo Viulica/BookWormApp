@@ -11,8 +11,6 @@ const ReaderViewShowBook: React.FC = () => {
   const bookId = window.location.href
     .split("/")
     .at(window.location.href.split("/").length - 1);
-  const [myUserId, setMyUserId] = useState<number>(0);
-  const [isMyBook, setIsMyBook] = useState<boolean>(false);
   const [bookData, setBookData] = useState<any>(null);
   const [ratings, setRatings] = useState<any>([]);
   const [myRating, setMyRating] = useState<any>({
@@ -23,7 +21,6 @@ const ReaderViewShowBook: React.FC = () => {
   });
   const [showRateWindow, setShowRateWindow] = useState<boolean>(false);
   const [userRatingText, setUserRatingText] = useState<string>("");
-  const [reviewError, setReviewError] = useState<boolean>(false);
   const [showBookDetails, setShowBookDetails] = useState<boolean>(false);
   const [bookStatus, setBookStatus] = useState<number>(0);
   const navigate = useNavigate();
@@ -47,46 +44,16 @@ const ReaderViewShowBook: React.FC = () => {
     setShowBookDetails(false);
   };
 
-  const fetchMyUserId = async () => {
-    if (storedToken) {
-      try {
-        const response = await fetch(`${baseUrl}/api/data/getUserId`, {
-          headers: {
-            Authorization: `${storedToken}`,
-          },
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          setMyUserId(data);
-        } else if (response.status === 401) {
-          navigate("/login");
-        } else {
-          console.log(await response.json());
-        }
-      } catch (error) {
-        console.log("Greška prilikom dohvaćanja userId:", error);
-      }
-    } else {
-      navigate("/login");
-    }
-  };
-
   const fetchBookData = async () => {
     try {
       const response = await fetch(`${baseUrl}/api/data/book/${bookId}`);
 
       if (response.ok) {
         const data = await response.json();
-        console.log(data);
         setBookData(data);
-        setIsMyBook(myUserId === data.idkorisnikAutor);
       } else if (response.status === 401) {
         navigate("/login");
-      } else {
-        // Treba prikazati na zaslon da nema nikakvih knjiga!
-        console.log(await response.json());
-      }
+      } 
     } catch (error) {
       console.error("Greška prilikom dohvaćanja knjige:", error);
     }
@@ -104,7 +71,6 @@ const ReaderViewShowBook: React.FC = () => {
         });
 
         const data = await response.json();
-        console.log(data);
         setBookStatus(data.statusNumber);
       } catch (error) {
         console.error("Greška prilikom dohvaćanja knjige:", error);
@@ -113,33 +79,27 @@ const ReaderViewShowBook: React.FC = () => {
   };
 
   const fetchRatings = async () => {
-    if (storedToken) {
-      try {
-        const response = await fetch(
-          `${baseUrl}/api/data/getRatings/${bookId}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `${storedToken}`,
-            },
-          }
-        );
-
-        if (response.ok) {
-          const data = await response.json();
-          console.log(data);
-          setRatings(data);
-        } else if (response.status === 401) {
-          navigate("/login");
-        } else {
-          console.log(await response.json);
-        }
-      } catch (error) {
-        console.error("Greška prilikom dohvaćanja recenzije:", error);
+   try {
+      const response = await fetch(
+      `${baseUrl}/api/data/getRatings/${bookId}`,
+      {
+         method: "GET",
+         headers: {
+            "Content-Type": "application/json",
+         },
       }
-    }
-  };
+      );
+
+      if (response.ok) {
+      const data = await response.json();
+      setRatings(data);
+      } else if (response.status === 401) {
+      navigate("/login");
+      } 
+   } catch (error) {
+      console.error("Greška prilikom dohvaćanja recenzije:", error);
+   }
+ };
 
   const fetchMyRating = async () => {
     if (storedToken) {
@@ -154,7 +114,6 @@ const ReaderViewShowBook: React.FC = () => {
 
         if (response.ok) {
           const data = await response.json();
-          console.log(data);
           setMyRating(data);
         } else if (response.status === 401) {
           navigate("/login");
@@ -225,22 +184,12 @@ const ReaderViewShowBook: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchMyUserId();
+    fetchBookData();
+    fetchRatings();
+    fetchMyRating();
+    fetchBookStatus();
   }, []);
 
-  useEffect(() => {
-    if (myUserId !== 0) {
-      console.log(myUserId);
-      fetchBookStatus();
-      fetchBookData();
-
-      if (!isMyBook) {
-        fetchMyRating();
-      }
-
-      fetchRatings();
-    }
-  }, [myUserId, isMyBook]);
 
   const handleBookStatus = async (e: any) => {
     console.log(e.target);
@@ -306,16 +255,22 @@ const ReaderViewShowBook: React.FC = () => {
                       {bookData.imeAutor + " " + bookData.prezAutor}
                     </a>
                   </span>
-                  {!isMyBook && (
-                    <span>
-                      <a
-                        href={"/inbox?idReciever=" + bookData.idkorisnikAutor}
-                        className="btn btn-warning"
-                      >
-                        Send message
-                      </a>
-                    </span>
-                  )}
+                  <span>
+                     <a
+                     href={"/inbox?idReciever=" + bookData.idkorisnikAutor}
+                     className="btn btn-warning"
+                     >
+                     Send message
+                     </a>
+                  </span>
+                </div>
+                <div className="book-details-description">
+                  Description: {bookData.opis}
+                </div>
+                <div className="book-details-more-info">
+                  <a onClick={openBookDetailsWindow} className="info-icon">
+                    <InfoIcon />
+                  </a>
                 </div>
                 <div className="book-details-reading-status">
                   <button
@@ -354,65 +309,55 @@ const ReaderViewShowBook: React.FC = () => {
                     Want to read
                   </button>
                 </div>
-                <div className="book-details-description">
-                  Description: {bookData.opis}
-                </div>
-                <div className="book-details-more-info">
-                  <a onClick={openBookDetailsWindow} className="info-icon">
-                    <InfoIcon />
-                  </a>
-                </div>
               </div>
             </div>
           </div>
 
           <div className="container-book-my-rating">
-            {!isMyBook && (
-              <div>
-                <div>My rating:</div>
-                {/* My rating */}
-                <div className="book-my-rating-stars">
-                  <StarRating
-                    rating={myRating.ocjena}
-                    onRatingChange={(newRating) => {
-                      if (newRating === myRating.ocjena) {
-                        newRating = 0;
-                      }
-                      setMyRating({ ...myRating, ocjena: newRating });
-                      handleRate(newRating, myRating.txtrecenzija);
-                    }}
-                  />
-                </div>
-                <div className="book-my-rating-icons-and-txtrating">
-                  {myRating.txtrecenzija ? (
-                    <>
-                      <div className="book-my-rating-icons">
-                        <a
-                          className="delete-icon"
-                          onClick={() => {
-                            handleDeleteRate(myRating.idrecenzija);
-                          }}
-                        >
-                          <DeleteIcon />
-                        </a>
-                        <a className="edit-icon" onClick={openRateWindow}>
-                          <EditIcon />
-                        </a>
-                      </div>
-                      <div className="book-my-rating-txtrating">
-                        {myRating.txtrecenzija}
-                      </div>
-                    </>
-                  ) : (
-                    <div className="book-my-rating-rate">
-                      <a className="btn btn-primary" onClick={openRateWindow}>
-                        Rate
-                      </a>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
+            <div>
+               <div>My rating:</div>
+               {/* My rating */}
+               <div className="book-my-rating-stars">
+               <StarRating
+                  rating={myRating.ocjena}
+                  onRatingChange={(newRating) => {
+                     if (newRating === myRating.ocjena) {
+                     newRating = 0;
+                     }
+                     setMyRating({ ...myRating, ocjena: newRating });
+                     handleRate(newRating, myRating.txtrecenzija);
+                  }}
+               />
+               </div>
+               <div className="book-my-rating-icons-and-txtrating">
+               {myRating.txtrecenzija ? (
+                  <>
+                     <div className="book-my-rating-icons">
+                     <a
+                        className="delete-icon"
+                        onClick={() => {
+                           handleDeleteRate(myRating.idrecenzija);
+                        }}
+                     >
+                        <DeleteIcon />
+                     </a>
+                     <a className="edit-icon" onClick={openRateWindow}>
+                        <EditIcon />
+                     </a>
+                     </div>
+                     <div className="book-my-rating-txtrating">
+                     {myRating.txtrecenzija}
+                     </div>
+                  </>
+               ) : (
+                  <div className="book-my-rating-rate">
+                     <a className="btn btn-primary" onClick={openRateWindow}>
+                     Rate
+                     </a>
+                  </div>
+               )}
+               </div>
+            </div>
           </div>
 
           <div className="horizontal-line"></div>
@@ -451,13 +396,6 @@ const ReaderViewShowBook: React.FC = () => {
                   &times;
                 </span>
                 <div>Write rating!</div>
-                {reviewError ? (
-                  <div>
-                    <p className="error-text">Missing data</p>
-                  </div>
-                ) : (
-                  <></>
-                )}
                 <div>
                   <textarea
                     rows={10}
@@ -475,16 +413,11 @@ const ReaderViewShowBook: React.FC = () => {
                     className="btn btn-primary"
                     id="post-review"
                     onClick={() => {
-                      if (userRatingText === "") {
-                        setReviewError(true);
-                      } else {
-                        setReviewError(false);
-                        setMyRating({
-                          ...myRating,
-                          txtrecenzija: userRatingText,
-                        });
-                        handleRate(myRating.ocjena, userRatingText);
-                      }
+                      setMyRating({
+                        ...myRating,
+                        txtrecenzija: userRatingText,
+                      });
+                      handleRate(myRating.ocjena, userRatingText);
                     }}
                   >
                     Post

@@ -23,7 +23,6 @@ const AuthorViewShowBook: React.FC = () => {
   });
   const [showRateWindow, setShowRateWindow] = useState<boolean>(false);
   const [userRatingText, setUserRatingText] = useState<string>("");
-  const [reviewError, setReviewError] = useState<boolean>(false);
   const [showBookDetails, setShowBookDetails] = useState<boolean>(false);
   const [bookStatus, setBookStatus] = useState<number>(0);
   const navigate = useNavigate();
@@ -60,7 +59,7 @@ const AuthorViewShowBook: React.FC = () => {
           const data = await response.json();
           setMyUserId(data);
         } else if (response.status === 401) {
-          navigate("/login");
+          navigate("/logout");
         } else {
           console.log(await response.json());
         }
@@ -82,7 +81,7 @@ const AuthorViewShowBook: React.FC = () => {
         setBookData(data);
         setIsMyBook(myUserId === data.idkorisnikAutor);
       } else if (response.status === 401) {
-        navigate("/login");
+        navigate("/logout");
       } else {
         // Treba prikazati na zaslon da nema nikakvih knjiga!
         console.log(await response.json());
@@ -113,31 +112,23 @@ const AuthorViewShowBook: React.FC = () => {
   };
 
   const fetchRatings = async () => {
-    if (storedToken) {
-      try {
-        const response = await fetch(
-          `${baseUrl}/api/data/getRatings/${bookId}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `${storedToken}`,
-            },
-          }
-        );
+    try {
+      const response = await fetch(`${baseUrl}/api/data/getRatings/${bookId}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
-        if (response.ok) {
-          const data = await response.json();
-          console.log(data);
-          setRatings(data);
-        } else if (response.status === 401) {
-          navigate("/login");
-        } else {
-          console.log(await response.json);
-        }
-      } catch (error) {
-        console.error("Greška prilikom dohvaćanja recenzije:", error);
+      if (response.ok) {
+        const data = await response.json();
+        console.log(data);
+        setRatings(data);
+      } else if (response.status === 401) {
+        navigate("/logout");
       }
+    } catch (error) {
+      console.error("Greška prilikom dohvaćanja recenzije:", error);
     }
   };
 
@@ -157,7 +148,7 @@ const AuthorViewShowBook: React.FC = () => {
           console.log(data);
           setMyRating(data);
         } else if (response.status === 401) {
-          navigate("/login");
+          navigate("/logout");
         }
       } catch (error) {
         console.error("Greška prilikom dohvaćanja moje recenzije:", error);
@@ -190,7 +181,7 @@ const AuthorViewShowBook: React.FC = () => {
           console.log(await response.json());
           window.location.reload();
         } else if (response.status === 401) {
-          navigate("/login");
+          navigate("/logout");
         }
       } catch (error) {
         console.error("Greška prilikom objavljivanja recenzije:", error);
@@ -216,7 +207,7 @@ const AuthorViewShowBook: React.FC = () => {
         if (response.ok) {
           window.location.reload();
         } else if (response.status === 401) {
-          navigate("/login");
+          navigate("/logout");
         }
       } catch (error) {
         console.error("Greška prilikom brisanja recenzije:", error);
@@ -277,7 +268,6 @@ const AuthorViewShowBook: React.FC = () => {
     <>
       {bookData && (
         <div className="content">
-
           {/* <div className="go-back">
             <a href="" className="btn btn-primary">
               Back
@@ -317,43 +307,6 @@ const AuthorViewShowBook: React.FC = () => {
                     </span>
                   )}
                 </div>
-                <div className="book-details-reading-status">
-                  <button
-                    className={
-                      bookStatus === 1
-                        ? "btn btn-success"
-                        : "btn btn-outline-success"
-                    }
-                    id="1"
-                    onClick={(e) => handleBookStatus(e)}
-                  >
-                    Read
-                  </button>
-
-                  <button
-                    className={
-                      bookStatus === 2
-                        ? "btn btn-success"
-                        : "btn btn-outline-success"
-                    }
-                    id="2"
-                    onClick={(e) => handleBookStatus(e)}
-                  >
-                    Currently reading
-                  </button>
-
-                  <button
-                    className={
-                      bookStatus === 3
-                        ? "btn btn-success"
-                        : "btn btn-outline-success"
-                    }
-                    id="3"
-                    onClick={(e) => handleBookStatus(e)}
-                  >
-                    Want to read
-                  </button>
-                </div>
                 <div className="book-details-description">
                   Description: {bookData.opis}
                 </div>
@@ -362,6 +315,47 @@ const AuthorViewShowBook: React.FC = () => {
                     <InfoIcon />
                   </a>
                 </div>
+                {!isMyBook && (
+                  <>
+                    <div className="book-details-reading-status">
+                      <button
+                        className={
+                          bookStatus === 1
+                            ? "btn btn-success"
+                            : "btn btn-outline-success"
+                        }
+                        id="1"
+                        onClick={(e) => handleBookStatus(e)}
+                      >
+                        Read
+                      </button>
+
+                      <button
+                        className={
+                          bookStatus === 2
+                            ? "btn btn-success"
+                            : "btn btn-outline-success"
+                        }
+                        id="2"
+                        onClick={(e) => handleBookStatus(e)}
+                      >
+                        Currently reading
+                      </button>
+
+                      <button
+                        className={
+                          bookStatus === 3
+                            ? "btn btn-success"
+                            : "btn btn-outline-success"
+                        }
+                        id="3"
+                        onClick={(e) => handleBookStatus(e)}
+                      >
+                        Want to read
+                      </button>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -416,7 +410,7 @@ const AuthorViewShowBook: React.FC = () => {
           </div>
 
           <div className="horizontal-line"></div>
-          
+
           <div className="container-book-ratings">
             <div>
               <div className="book-ratings-title">Ratings</div>
@@ -451,13 +445,6 @@ const AuthorViewShowBook: React.FC = () => {
                   &times;
                 </span>
                 <div>Write rating!</div>
-                {reviewError ? (
-                  <div>
-                    <p className="error-text">Missing data</p>
-                  </div>
-                ) : (
-                  <></>
-                )}
                 <div>
                   <textarea
                     rows={10}
@@ -475,16 +462,11 @@ const AuthorViewShowBook: React.FC = () => {
                     className="btn btn-primary"
                     id="post-review"
                     onClick={() => {
-                      if (userRatingText === "") {
-                        setReviewError(true);
-                      } else {
-                        setReviewError(false);
-                        setMyRating({
-                          ...myRating,
-                          txtrecenzija: userRatingText,
-                        });
-                        handleRate(myRating.ocjena, userRatingText);
-                      }
+                      setMyRating({
+                        ...myRating,
+                        txtrecenzija: userRatingText,
+                      });
+                      handleRate(myRating.ocjena, userRatingText);
                     }}
                   >
                     Post

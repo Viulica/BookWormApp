@@ -9,7 +9,7 @@ const Logout: React.FC = () => {
    useEffect(() => {
       sessionStorage.removeItem("token");
       setTimeout(() => {
-         navigate('/');
+         navigate('/login');
          window.location.reload();
       }, 1000)
    }, []);

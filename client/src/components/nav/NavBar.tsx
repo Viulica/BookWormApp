@@ -19,7 +19,8 @@ interface BookType {
 const NavBar: React.FC = () => {
   const storedToken = sessionStorage.getItem("token");
 
-
+  const [role, setRole] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(true);
   const [myUserId, setMyUserId] = useState<number>(0);
   const [data, setData] = useState<BookType[]>([]);
   const navigate = useNavigate();
@@ -53,6 +54,7 @@ const NavBar: React.FC = () => {
         if (response.ok) {
           const data = await response.json();
           setMyUserId(data);
+          setLoading(false);
         }
         else if (response.status === 401) {
           navigate('/login');
@@ -66,8 +68,33 @@ const NavBar: React.FC = () => {
     }
   };
 
+  const fetchGetRole = async () => {
+    if (storedToken) {
+      try {
+        const response = await fetch(`${baseUrl}/api/data/profile/getRole`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `${storedToken}`,
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.text();
+          setRole(data);
+        }
+      } catch (error) {
+        console.error("Greška prilikom dohvaćanja uloge:", error);
+      }
+    }
+    else {
+      setRole("user");
+    }
+  };
+
   useEffect(() => {
     fetchMyUserId();
+    fetchGetRole();
   }, []);
 
   useEffect(() => {
@@ -75,13 +102,15 @@ const NavBar: React.FC = () => {
   }, [])
 
   return (
-    <nav className="my-container">
+    !loading && (
+      <nav className="my-container">
         <ul className="my-navbar">
         <NavItem path={currentPath} href="/">Home</NavItem>
         <NavItem path={currentPath}  href="/allBooks">All books</NavItem>
         <NavItem path={currentPath}  href="/allAuthors">All authors</NavItem>
         {storedToken && <NavItem path={currentPath}  href={"/profile/" + myUserId}>Profile</NavItem>}
-        {storedToken && <NavItem path={currentPath}  href={"/myBooks/" + myUserId}>My Books</NavItem>}
+        {(storedToken && role !== "admin") && <NavItem path={currentPath} href={"/myBooks/" + myUserId}>My Books</NavItem>}
+        {(storedToken && role === "admin") && <NavItem path={currentPath} href="/addBook">Add Book</NavItem>}
         {storedToken && <NavItem path={currentPath} href="/inbox">Inbox</NavItem>}
         {!storedToken && <NavItem path={currentPath}  href="/login">Login</NavItem>}
         {!storedToken && <NavItem path={currentPath}  href="/register">Register</NavItem>}
@@ -89,6 +118,7 @@ const NavBar: React.FC = () => {
       <SearchBar books={data}></SearchBar>
       </ul>
     </nav>
+    )
   );
 };
 

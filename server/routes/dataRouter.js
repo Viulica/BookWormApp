@@ -602,8 +602,7 @@ router.get('/book/:id', async (req, res) => {
    }
 });
 
-router.get('/getRatings/:bookId', verifyToken, async (req, res) => {
-   const userId = req.user.userId;
+router.get('/getRatings/:bookId', async (req, res) => {
    const bookId = req.params.bookId;
    try {
       const ratings = await data.recenzija.findAll({
@@ -618,9 +617,23 @@ router.get('/getRatings/:bookId', verifyToken, async (req, res) => {
          ],
          where: {
             idknjiga: bookId,
-            idkorisnik: {
-               [Op.not]: userId
-            }
+            [Op.and]: [
+               {
+                 [Op.or]: [
+                   {
+                     ocjena: {
+                       [Op.between]: [1, 5],
+                     },
+                   },
+                   {
+                     txtrecenzija: {
+                       [Op.not]: "",
+                     },
+                   },
+                 ],
+               },
+             ],
+
          },
          include: [
             {
@@ -849,7 +862,7 @@ router.get('/saved/:bookId', verifyToken, async (req, res) => {
 
          res.status(200).send({ statusNumber });
       } else {
-         res.status(404).send({ statusNumber: 0 });
+         res.send({ statusNumber: 0 });
       }
 
    } catch (error) {
