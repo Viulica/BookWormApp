@@ -3,7 +3,7 @@ import { baseUrl, storedToken } from "../../App";
 import { useNavigate } from "react-router-dom";
 import "../../styles/Profile.css";
 import { MessageIcon } from "../MessageIcon";
-import Slider from "../Slider";
+import Slider, { getImageSource } from "../Slider";
 
 const AdminViewProfile: React.FC = () => {
   const [userRole, setUserRole] = useState<string>("");
@@ -478,7 +478,7 @@ const AdminViewProfile: React.FC = () => {
                           <div className="book-data-row">
                             <div className="book-id-row">{book.idknjiga}</div>
                             <div className="book-image-row">
-                              <img src={book.slika} alt="" />
+                              <img src={getImageSource(book.slika)} alt="" />
                             </div>
 
                             <div className="book-genre-row">{book.zanr}</div>

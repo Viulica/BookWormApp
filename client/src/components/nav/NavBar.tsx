@@ -21,7 +21,6 @@ const NavBar: React.FC = () => {
   const storedToken = sessionStorage.getItem("token");
 
   const [role, setRole] = useState<string>("");
-  const [loading, setLoading] = useState<boolean>(true);
   const [myUserId, setMyUserId] = useState<number>(0);
   const [data, setData] = useState<BookType[]>([]);
   const navigate = useNavigate();
@@ -55,7 +54,6 @@ const NavBar: React.FC = () => {
         if (response.ok) {
           const data = await response.json();
           setMyUserId(data);
-          setLoading(false);
         }
         else if (response.status === 401) {
           navigate('/login');
@@ -90,7 +88,6 @@ const NavBar: React.FC = () => {
     }
     else {
       setRole("user");
-      setLoading(false)
     }
   };
 
@@ -98,12 +95,14 @@ const NavBar: React.FC = () => {
     fetchMyUserId();
     fetchGetRole();
     fetchBooks();
-    console.log("Hello from navbar")
   }, []);
+  
+  useEffect(() => {
+    fetchGetRole();
+  }, [role]);
 
 
   return (
-    !loading && (
       <nav className="my-container">
         <ul className="my-navbar">
         <NavItem path={currentPath} href="/">Home</NavItem>
@@ -119,7 +118,6 @@ const NavBar: React.FC = () => {
       <SearchBar books={data}></SearchBar>
       </ul>
     </nav>
-    )
   );
 };
 

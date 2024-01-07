@@ -35,7 +35,11 @@ const korisnik = sequelize.define('korisnik', {
   tipkorisnika: {
     type: DataTypes.STRING(10),
     allowNull: false
-  }
+  },
+  slika: {
+    type: DataTypes.BLOB,
+    allowNull: true
+  },
 }, {
   sequelize,
   tableName: 'korisnik',

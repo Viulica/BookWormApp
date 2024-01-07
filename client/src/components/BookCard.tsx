@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import StarRating from "./StarRating";
+import { getImageSource } from "./Slider";
 
 interface Book {
   idknjiga: number;
@@ -10,7 +11,7 @@ interface Book {
   brojRecenzija: number;
   brojOsvrta: number;
   prosjekOcjena: number;
-  slika?: string;
+  slika: { type: string; data: number[] };
 }
 
 interface BookCardProps {
@@ -27,7 +28,7 @@ const BookCard = ({book, index}: BookCardProps) => {
               >
                 <div className={`book`} id={`book-${index + 1}`}>
                   <div className="book-image">
-                    <img src={book.slika} alt="Book cover" />
+                    <img src={getImageSource(book.slika)} alt="Book cover" />
                     {/* <img src={getImageSource(book.slika)} alt="Book cover" /> */}
                   </div>
                   <div className="book-title-and-published">

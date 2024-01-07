@@ -38,8 +38,8 @@ const knjiga = sequelize.define('knjiga', {
     }
   },
   slika: {
-    type: DataTypes.STRING(512),
-    allowNull: false
+    type: DataTypes.BLOB,
+    allowNull: true
   },
 
 }, {

@@ -6,13 +6,14 @@ import Book from './Book';
 import "../styles/Carousel.css";
 import { baseUrl } from "@/App";
 import { useEffect, useState } from 'react';
+import { getImageSource } from './Slider';
 
 interface BookType {
   naslov: string,
   autor: string,
-  src: string,
   rating: number, 
   idknjiga: number
+  src: { type: string; data: number[] },
 }
 
 interface CarouselProps {
@@ -59,12 +60,12 @@ const MyCarousel = (props: CarouselProps) => {
       <h3 className='carousel-title'>{props.title}</h3>
       <Slider  {...settings}>
             {data.map(book => (
-             
               <a href={"/book/" + book.idknjiga}>
-                   <div key={book.naslov}>
-                    <Book naslov={book.naslov} autor={book.autor} src={book.src} rating={book.rating} />
+                <div key={book.naslov}>
+                    <Book naslov={book.naslov} autor={book.autor} src={getImageSource(book.src)} rating={book.rating} />
                 </div>
-              </ a>
+              </a>
+
             ))}
       </Slider>
     </div>

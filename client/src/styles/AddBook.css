@@ -15,3 +15,8 @@
    width: 50%;
    
 }
+
+.options{
+   display: flex;
+   gap: 30px;
+}
