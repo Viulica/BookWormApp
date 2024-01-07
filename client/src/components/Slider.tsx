@@ -85,7 +85,7 @@ const Slider: React.FC<SliderProps> = ({ books, id }) => {
           <button onClick={handlePrevClick}>&#60;</button>
           <div className={"books-" + id}>
             {books.slice(currentPage - 1, currentPage).map((book, index) => (
-              <BookCard index={index} book={book} />
+              <BookCard index={index} book={book} key={index} />
             ))}
           </div>
           <button onClick={handleNextClick}>&#62;</button>

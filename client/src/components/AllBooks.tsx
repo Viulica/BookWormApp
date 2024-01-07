@@ -20,7 +20,7 @@ const AllBooks: React.FC = () => {
 
         if (promise.ok) {
           const data = await promise.json();
-          console.log(data);
+          // console.log(data);
           setAllBooks(data);
         } else {
           console.log(promise);

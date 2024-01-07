@@ -59,8 +59,8 @@ const MyCarousel = (props: CarouselProps) => {
     <div className='carousel-container'>
       <h3 className='carousel-title'>{props.title}</h3>
       <Slider  {...settings}>
-            {data.map(book => (
-              <a href={"/book/" + book.idknjiga}>
+            {data.map((book, index) => (
+              <a href={"/book/" + book.idknjiga} key={index}>
                 <div key={book.naslov}>
                     <Book naslov={book.naslov} autor={book.autor} src={getImageSource(book.src)} rating={book.rating} />
                 </div>

@@ -168,12 +168,16 @@ const AddBook: React.FC = () => {
 
       if (response.ok) {
         console.log(await response.json());
+        alert("Book added!");
       } else {
         console.error("Neuspješan poziv na /api/data/addBook");
       }
     } catch (error) {
       console.error("Greška prilikom dohvaćanja podataka profila", error);
     }
+
+    window.location.reload();
+
   };
 
   const handleInputChange = (inputType: "file" | "text") => {
