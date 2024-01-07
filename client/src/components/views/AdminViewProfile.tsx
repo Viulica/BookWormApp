@@ -3,18 +3,12 @@ import { baseUrl, storedToken } from "../../App";
 import { useNavigate } from "react-router-dom";
 import "../../styles/Profile.css";
 import { MessageIcon } from "../MessageIcon";
-import StarRating from "../StarRating";
-import MyBooks from "../MyBooks";
 import Slider from "../Slider";
 
-interface Role {
-  role: string;
-}
+const AdminViewProfile: React.FC = () => {
+  const [userRole, setUserRole] = useState<string>("");
 
-const AdminViewProfile: React.FC<Role> = (props) => {
-  const role = props.role;
   const [isMyProfile, setIsMyProfile] = useState<boolean>(false);
-
   const [loading, setLoading] = useState<boolean>(true);
   const [myUserId, setMyUserId] = useState<number>(0);
   const [profileData, setProfileData] = useState<any>({});
@@ -23,9 +17,6 @@ const AdminViewProfile: React.FC<Role> = (props) => {
       window.location.pathname.split("/").length - 1
     ]
   );
-  const [isAuthor, setIsAuthor] = useState<boolean>(false);
-  const [followStatus, setFollowStatus] = useState<string>("");
-  // const [showSavedBooks, setShowSavedBooks] = useState<boolean>(false);
   const [showAllBooks, setShowAllBooks] = useState<boolean>(false);
   const [showAllUsers, setShowAllUsers] = useState<boolean>(false);
   const [writtenBooks, setWrittenBooks] = useState<any>([]);
@@ -49,8 +40,6 @@ const AdminViewProfile: React.FC<Role> = (props) => {
           setIsMyProfile(profileId === data);
         } else if (response.status === 401) {
           navigate("/login");
-        } else {
-          console.log(await response.json());
         }
       } catch (error) {
         console.log("Greška prilikom dohvaćanja userId:", error);
@@ -68,44 +57,18 @@ const AdminViewProfile: React.FC<Role> = (props) => {
 
       if (response.ok) {
         const data = await response.json();
-        console.log(data);
+        setUserRole(data.tipkorisnika);
         setProfileData(data);
-        setIsAuthor(data.tipkorisnika === "autor");
+        setLoading(false);
       } else if (response.status === 401) {
         navigate("/login");
-      } else {
-        console.log(await response.json());
       }
     } catch (error) {
       console.log("Greška prilikom dohvaćanja userId:", error);
     }
   };
 
-  const fetchFollowing = async () => {
-    if (storedToken) {
-      try {
-        const response = await fetch(
-          `${baseUrl}/api/data/profile/following/${profileId}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `${storedToken}`,
-            },
-          }
-        );
-
-        const data = await response.text();
-        setFollowStatus(data);
-        setLoading(false);
-      } catch (error) {
-        console.error("Greška prilikom dohvaćanja praćenja", error);
-      }
-    }
-  };
-
   const fetchMyWrittenBooks = async () => {
-    console.log("fetchMyWrittenBooks", profileId);
     try {
       const response = await fetch(
         `${baseUrl}/api/data/profile/myWrittenBooks/${profileId}`,
@@ -118,19 +81,13 @@ const AdminViewProfile: React.FC<Role> = (props) => {
 
       if (response.ok) {
         const data = await response.json();
-        console.log(data);
         setWrittenBooks(data);
         setLoading(false);
       } else if (response.status === 401) {
         navigate("/login");
-      } else {
-        // Treba prikazati na zaslon da nema nikakvih knjiga!
-        console.log(await response.json());
       }
     } catch (error) {
       console.error("Greška prilikom dohvaćanja knjiga:", error);
-    } finally {
-      // setLoading(false);
     }
   };
 
@@ -146,7 +103,6 @@ const AdminViewProfile: React.FC<Role> = (props) => {
 
         if (response.ok) {
           const data = await response.json();
-          console.log(data);
           setAllUsers([...data]);
           setShowAllUsers(true);
         }
@@ -201,15 +157,6 @@ const AdminViewProfile: React.FC<Role> = (props) => {
     }
   };
 
-  /*
-  const openSavedBooks = () => {
-    setShowSavedBooks(true);
-  }
-  const closeSavedBooks = () => {
-    setShowSavedBooks(false);
-  }
-  */
-
   const openShowAllBooks = () => {
     fetchAllBooks();
   };
@@ -226,50 +173,16 @@ const AdminViewProfile: React.FC<Role> = (props) => {
 
   useEffect(() => {
     fetchMyUserId();
+    fetchProfileData();
   }, []);
 
   useEffect(() => {
-    if (role === "admin" && isMyProfile) {
-      console.log("Izvrši", isMyProfile);
-      fetchAllDataAdmin();
-    } else {
-      fetchFollowing();
-      fetchProfileData();
+    if (userRole === "autor") {
       fetchMyWrittenBooks();
+    } else if (userRole === "admin") {
+      fetchAllDataAdmin();
     }
-  }, [myUserId]);
-
-  const handleFollowUser = async () => {
-    if (storedToken) {
-      try {
-        const response = await fetch(
-          `${baseUrl}/api/data/profile/follow/${profileId}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `${storedToken}`,
-            },
-          }
-        );
-
-        if (response.status === 204) {
-          setProfileData({
-            ...profileData,
-            pratitelji: parseInt(profileData.pratitelji) - 1,
-          });
-        } else if (response.status === 200) {
-          setProfileData({
-            ...profileData,
-            pratitelji: parseInt(profileData.pratitelji) + 1,
-          });
-        }
-        fetchFollowing();
-      } catch (error) {
-        console.log("Greška prilikom praćenja korisnika:", error);
-      }
-    }
-  };
+  }, [userRole]);
 
   const deleteUser = async (button: any) => {
     const deleteUserId = button.id;
@@ -289,6 +202,31 @@ const AdminViewProfile: React.FC<Role> = (props) => {
         if (response.ok) {
           alert(await response.text());
           fetchAllUsers();
+        }
+      } catch (error) {
+        console.error("Greška prilikom brisanja korisnika:", error);
+      }
+    }
+  };
+
+  const deleteBook = async (button: any) => {
+    const deleteBookId = button.id;
+
+    if (storedToken) {
+      try {
+        const response = await fetch(
+          `${baseUrl}/api/data/deleteBook/${deleteBookId}`,
+          {
+            method: "DELETE",
+            headers: {
+              Authorization: `${storedToken}`,
+            },
+          }
+        );
+
+        if (response.ok) {
+          alert(await response.text());
+          fetchAllBooks();
         }
       } catch (error) {
         console.error("Greška prilikom brisanja korisnika:", error);
@@ -341,7 +279,7 @@ const AdminViewProfile: React.FC<Role> = (props) => {
                     <div>Saved Books</div>
                   </div>
 
-                  {isAuthor && (
+                  {userRole === "autor" && (
                     <>
                       <div className="vertical-line" />
 
@@ -376,17 +314,9 @@ const AdminViewProfile: React.FC<Role> = (props) => {
                 <a href="/changeProfile" className="btn btn-primary">
                   Change
                 </a>
-                {/* <a href={"/myBooks/" + profileId} className="btn btn-primary">
-                See reading list
-              </a> */}
-                  
-            {/* Hoće li admin moći dodati knjigu? */}
-                {isAuthor ||
+                {userRole === "autor" ||
                   (isMyProfile && (
-                    <a
-                      href={"/addBook?profileId=" + myUserId}
-                      className="btn btn-primary"
-                    >
+                    <a href={"/addBook"} className="btn btn-primary">
                       Upload book
                     </a>
                   ))}
@@ -402,7 +332,7 @@ const AdminViewProfile: React.FC<Role> = (props) => {
             </>
           )}
 
-          {!isMyProfile && storedToken  && (
+          {!isMyProfile && storedToken && (
             <div className="container-follow-message-and-see-reading-list">
               <a href={"/myBooks/" + profileId} className="btn btn-primary">
                 See reading list
@@ -444,7 +374,7 @@ const AdminViewProfile: React.FC<Role> = (props) => {
             </>
           )}
 
-          {isAuthor ? (
+          {userRole === "autor" ? (
             <div className="container-written-books">
               <div className="written-books-title">
                 <h1 className="display-6">Written books</h1>
@@ -526,21 +456,51 @@ const AdminViewProfile: React.FC<Role> = (props) => {
                 <span className="exit" onClick={closeShowAllBooks}>
                   &times;
                 </span>
-                <div className="container-all-books"></div>
-              </div>
-            </div>
-          )}
+                <div className="container-all-books">
+                  <div className="all-books-title">
+                    <p className="fs-4">All books</p>
+                  </div>
+                  <div className="all-books-rows">
+                    {allBooks.map((book: any, index: any) => (
+                      <div className="book-row" key={index}>
+                        <div className="delete-button">
+                          <a
+                            className="btn btn-danger"
+                            id={book.idknjiga}
+                            onClick={(e) => {
+                              deleteBook(e.target);
+                            }}
+                          >
+                            &times;
+                          </a>
+                        </div>
+                        <a href={"/book/" + book.idknjiga}>
+                          <div className="book-data-row">
+                            <div className="book-id-row">{book.idknjiga}</div>
+                            <div className="book-image-row">
+                              <img src={book.slika} alt="" />
+                            </div>
 
-          {/* {showSavedBooks && (
-              <div className="background">
-                <div className="window-user-reading-list">
-                  <span className="exit" onClick={closeSavedBooks}>&times;</span>
-                  <div>
-                    <MyBooks />
+                            <div className="book-genre-row">{book.zanr}</div>
+
+                            <div className="book-title-and-published-row">
+                              <div className="book-title-row">
+                                {book.naslov}
+                              </div>
+                              <div className="book-published-row">
+                                {book.godizd}
+                              </div>
+                            </div>
+                            <div className="book-isbn-row">{book.isbn}</div>
+                          </div>
+                        </a>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
-            )} */}
+            </div>
+          )}
         </>
       )}
     </div>

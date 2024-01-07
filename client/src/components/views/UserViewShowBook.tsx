@@ -7,7 +7,7 @@ import { EditIcon } from "../EditIcon";
 import { DeleteIcon } from "../DeleteIcon";
 import { InfoIcon } from "../InfoIcon";
 
-const AdminViewShowBook: React.FC = () => {
+const UserViewShowBook: React.FC = () => {
   const bookId = window.location.href
     .split("/")
     .at(window.location.href.split("/").length - 1);
@@ -517,4 +517,4 @@ const AdminViewShowBook: React.FC = () => {
   );
 };
 
-export default AdminViewShowBook;
+export default UserViewShowBook;

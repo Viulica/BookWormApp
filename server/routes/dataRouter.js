@@ -111,7 +111,7 @@ router.get('/allAuthors', async (req, res) => {
    }
 });
 
-// idknjiga, naslov, slika, godizd, idkorisnikAutor, imeAutor, prezAutor, brojRecenzija, brojOsvrta, prosjekOcjena, spremljenoPuta
+// idknjiga, naslov, slika, isbn, zanr, godizd, idkorisnikAutor, imeAutor, prezAutor, brojRecenzija, brojOsvrta, prosjekOcjena, spremljenoPuta
 router.get('/allBooks', async (req, res) => {
    try {
       const allBooks = await data.knjiga.findAll({
@@ -120,6 +120,8 @@ router.get('/allBooks', async (req, res) => {
             'naslov',
             'godizd',
             'slika',
+            'isbn',
+            'zanr',
             ['idkorisnik', 'idkorisnikAutor'],
             [Sequelize.col('idkorisnik_korisnik.ime'), 'imeAutor'],
             [Sequelize.col('idkorisnik_korisnik.prezime'), 'prezAutor']
@@ -250,7 +252,7 @@ router.delete('/deleteUser/:userId', verifyToken, async (req, res) => {
 router.delete('/deleteBook/:bookId', verifyToken, async (req, res) => {
    try {
       const bookId = req.params.bookId;
-      const book = await data.korisnik.findOne({
+      const book = await data.knjiga.findOne({
          where: {
             idknjiga: bookId
          }

@@ -76,7 +76,7 @@
 
 /* ----------------------------------------------------------------------- */
 
-.container-all-users{
+.container-all-users, .container-all-books{
    display: flex;
    flex-direction: column;
    gap: 20px;
@@ -84,37 +84,62 @@
    width: 90%;
 }
 
-.all-users{
+.all-users, .all-books-rows{
    display: flex;
    flex-direction: column;
    gap: 20px;
 }
 
-.user{
+.user, .book-row{
    display: flex;
    align-items: center;
 }
 
-.user-data{
+
+.book-row>a{
+   width: 90%;
+}
+
+.user-data, .book-data-row{
    display: flex;
+}
+
+.book-data-row{
+   align-items: center;
 }
 
 .user-data>div{
    width: 100px;
 }
 
+.book-data-row>div{
+   width: 150px;
+}
+
+.book-data-row>div:first-child, .book-data-row>div:nth-child(2){
+   width: 50px;
+}
+
+.book-data-row>div:nth-child(4){
+   width: 300px;
+}
+
 .user-data>div:last-child{
    width: 250px;
 }
 
-.user-profile-picture{
+.user-profile-picture, .book-image-row{
    display: flex;
    justify-content: center;
    align-items: center;
 }
 
-.user-profile-picture img {
+.user-profile-picture img{
    width: 72px;
+}
+
+.book-image-row img{
+   width: 50px;
 }
 
 .user-name-and-surname-and-dateOfBirth{
@@ -122,6 +147,17 @@
    flex-direction: column;
    align-items: start;
    gap: 10px;
+}
+
+.book-title-and-published-row{
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   gap: 10px;
+}
+
+.book-title-row{
+   text-align: start;
 }
 
 

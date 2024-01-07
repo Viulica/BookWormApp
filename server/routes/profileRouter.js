@@ -344,7 +344,7 @@ router.get('/myWrittenBooks/:profileId', async (req, res) => {
          }
       }
       else {
-         res.status(404).json({ message: "Role not approved!" });
+         res.status(404).json({ message: "Reader doesn't have any written books!" });
       }
    } catch (error) {
       console.error('Greška prilikom dohvaćanja knjiga:', error);
@@ -639,7 +639,7 @@ router.get('/following/:profileId', verifyToken, async (req, res) => {
       }
       else {
          // To znači da ne pratim korisnika
-         res.status(404).send("Follow"); // ovo će se prikazati u buttonu za praćenje
+         res.send("Follow"); // ovo će se prikazati u buttonu za praćenje
       }
    }
    catch (error) {

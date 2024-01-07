@@ -3,17 +3,11 @@ import { baseUrl, storedToken } from "../../App";
 import { useNavigate } from "react-router-dom";
 import "../../styles/Profile.css"
 import { MessageIcon } from "../MessageIcon";
-import StarRating from "../StarRating";
-import MyBooks from "../MyBooks";
 import Slider from "../Slider";
 
-interface Role{
-  role: string;
-}
+const AuthorViewProfile: React.FC = () => {
 
-const AuthorViewProfile: React.FC<Role> = (props) => {
-
-  const role = props.role;
+  const [userRole, setUserRole] = useState<string>("");
 
   const [loading, setLoading] = useState<boolean>(true);
   const [myUserId, setMyUserId] = useState<number>(0);
@@ -23,10 +17,8 @@ const AuthorViewProfile: React.FC<Role> = (props) => {
       window.location.pathname.split("/").length - 1
     ]
   );
-  const [isAuthor, setIsAuthor] = useState<boolean>(false);
-  const [isMyProfile, setIsMyProfile] = useState<boolean>(false);
+  const [isMyProfile, setIsMyProfile] = useState<boolean>();
   const [followStatus, setFollowStatus] = useState<string>("");
-  // const [showSavedBooks, setShowSavedBooks] = useState<boolean>(false);
   const [writtenBooks, setWrittenBooks] = useState<any>([]);
   const navigate = useNavigate();
 
@@ -64,13 +56,10 @@ const AuthorViewProfile: React.FC<Role> = (props) => {
 
       if (response.ok) {
         const data = await response.json();
-        console.log(data);
+        setUserRole(data.tipkorisnika)
         setProfileData(data);
-        setIsAuthor(data.tipkorisnika === "autor");
       } else if (response.status === 401) {
         navigate("/login");
-      } else {
-        console.log(await response.json());
       }
     } catch (error) {
       console.log("Greška prilikom dohvaćanja userId:", error);
@@ -101,7 +90,6 @@ const AuthorViewProfile: React.FC<Role> = (props) => {
   };
 
   const fetchMyWrittenBooks = async () => {
-    console.log("fetchMyWrittenBooks", profileId);
     try {
       const response = await fetch(
         `${baseUrl}/api/data/profile/myWrittenBooks/${profileId}`,
@@ -114,39 +102,27 @@ const AuthorViewProfile: React.FC<Role> = (props) => {
 
       if (response.ok) {
         const data = await response.json();
-        console.log(data);
         setWrittenBooks(data);
         setLoading(false);
       } else if (response.status === 401) {
         navigate("/login");
-      } else {
-        // Treba prikazati na zaslon da nema nikakvih knjiga!
-        console.log(await response.json());
       }
     } catch (error) {
       console.error("Greška prilikom dohvaćanja knjiga:", error);
-    } finally {
-      // setLoading(false);
     }
   };
 
-  /*
-  const openSavedBooks = () => {
-    setShowSavedBooks(true);
-  }
-  const closeSavedBooks = () => {
-    setShowSavedBooks(false);
-  }
-  */
-
   useEffect(() => {
-    console.log("Izvrši");
     fetchMyUserId();
     fetchFollowing();
     fetchProfileData();
-    fetchMyWrittenBooks();
   }, []);
 
+  useEffect(() => {
+    if (userRole === "autor") {
+      fetchMyWrittenBooks();
+    }
+  }, [userRole]);
 
   const handleFollowUser = async () => {
     if (storedToken) {
@@ -223,7 +199,7 @@ const AuthorViewProfile: React.FC<Role> = (props) => {
                 <div>Saved Books</div>
               </div>
 
-              {isAuthor && (
+              {userRole === "autor" && (
                 <>
                   <div className="vertical-line" />
 
@@ -244,7 +220,7 @@ const AuthorViewProfile: React.FC<Role> = (props) => {
               <a href={"/myBooks/" + profileId} className="btn btn-primary">
                 See reading list
               </a>
-              {isAuthor && (
+              {userRole === "autor" && (
                 <a
                   href={"/addBook?profileId=" + myUserId}
                   className="btn btn-primary"
@@ -305,7 +281,7 @@ const AuthorViewProfile: React.FC<Role> = (props) => {
             <div className="horizontal-line"></div>
           
 
-          {isAuthor ? (
+          {userRole === "autor" ? (
             <div className="container-written-books">
               <div className="written-books-title">
                 <h1 className="display-6">Written books</h1>
@@ -315,7 +291,7 @@ const AuthorViewProfile: React.FC<Role> = (props) => {
                   <Slider books={writtenBooks} id={0} />
                 ) : (
                   <>
-                    <p className="p-4">No written books!</p>
+                    <p className="p-4 text-center">No written books!</p>
                   </>
                 )}
               </div>
@@ -323,17 +299,6 @@ const AuthorViewProfile: React.FC<Role> = (props) => {
           ) : (
             <></>
           )}
-
-          {/* {showSavedBooks && (
-              <div className="background">
-                <div className="window-user-reading-list">
-                  <span className="exit" onClick={closeSavedBooks}>&times;</span>
-                  <div>
-                    <MyBooks />
-                  </div>
-                </div>
-              </div>
-            )} */}
         </>
       )}
     </div>
