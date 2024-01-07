@@ -33,7 +33,7 @@ CREATE TABLE PORUKA
 (
   idPoruka SERIAL NOT NULL,
   txtPoruka TEXT NOT NULL,
-  vremOzn DATE NOT NULL,
+  vremOzn timestamp without time zone NOT NULL,
   idPosiljatelj INT,
   idPrimatelj INT,
   PRIMARY KEY (idPoruka),

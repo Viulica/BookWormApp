@@ -178,8 +178,8 @@ router.post('/messages/send/:idReciever', verifyToken, async (req, res) => {
 });
 
 
-router.delete('/delete/:idMessage', verifyToken, async (req, res) => {
+// router.delete('/delete/:idMessage', verifyToken, async (req, res) => {
 
-});
+// });
 
 module.exports = router;
