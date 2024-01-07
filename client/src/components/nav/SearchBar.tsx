@@ -1,12 +1,13 @@
 import React from 'react'
 import { useState, useEffect } from 'react';
 import '../../styles/search.css'
+import { getImageSource } from '../Slider';
 
 interface BookType {
     naslov: string,
     imeAutor: string,
     prezAutor: string,
-    slika : string,
+    slika : { type: string; data: number[] },
     rating: number,
     idknjiga: number
   }
@@ -49,7 +50,7 @@ function SearchBar({books}: SearchProps) {
                 {filteredBooks.map(book => (
                     <a href={"/book/" + book.idknjiga}>
                         <div className="search-container" key={book.naslov}>
-                        <img className="search-img" src={book.slika}/>
+                        <img className="search-img" src={getImageSource(book.slika)}/>
                         <div className='search-body'>
                         <div className='search-naslov'>{book.naslov}</div>
                         <div className='search-autor'>{book.imeAutor + " " + book.prezAutor}</div>
