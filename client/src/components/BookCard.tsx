@@ -23,7 +23,7 @@ const BookCard = ({book, index}: BookCardProps) => {
   return (
     <div>
       <a href={"/book/" + book.idknjiga}
-                key={index}
+                // key={index}
                 className="book-link"
               >
                 <div className={`book`} id={`book-${index + 1}`}>
