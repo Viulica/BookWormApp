@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import StarRating from "./StarRating";
 import "../styles/Slider.css";
+import BookCard from "./BookCard";
 
 interface Book {
   idknjiga: number;
@@ -80,10 +81,13 @@ const Slider: React.FC<SliderProps> = ({ books, id }) => {
   return (
     <>
       <div className="slider-container">
-        <div>
+      <div>
           <button onClick={handlePrevClick}>&#60;</button>
           <div className={"books-" + id}>
             {books.slice(currentPage - 1, currentPage).map((book, index) => (
+<<<<<<< HEAD
+              <BookCard index={index} book={book} />
+=======
               <a
                 href={"/book/" + book.idknjiga}
                 key={index}
@@ -111,6 +115,7 @@ const Slider: React.FC<SliderProps> = ({ books, id }) => {
                   </div>
                 </div>
               </a>
+>>>>>>> 778c8e5a6b0993f7cb39b02ff8a594b6f4bdfc77
             ))}
           </div>
           <button onClick={handleNextClick}>&#62;</button>

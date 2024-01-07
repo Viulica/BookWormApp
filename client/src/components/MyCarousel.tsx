@@ -3,10 +3,6 @@ import Slider from 'react-slick';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Book from './Book';
-// import img1 from "../images/1984.jpeg"
-// import img2 from "../images/gatsby.jpeg"
-// import img3 from "../images/pride.jpeg"
-// import img4 from "../images/mockingbird.jpg"
 import "../styles/Carousel.css";
 import { baseUrl } from "@/App";
 import { useEffect, useState } from 'react';
@@ -15,8 +11,9 @@ import { getImageSource } from './Slider';
 interface BookType {
   naslov: string,
   autor: string,
+  rating: number, 
+  idknjiga: number
   src: { type: string; data: number[] },
-  rating: number
 }
 
 interface CarouselProps {
@@ -63,9 +60,12 @@ const MyCarousel = (props: CarouselProps) => {
       <h3 className='carousel-title'>{props.title}</h3>
       <Slider  {...settings}>
             {data.map(book => (
+              <a href={"/book/" + book.idknjiga}>
                 <div key={book.naslov}>
                     <Book naslov={book.naslov} autor={book.autor} src={getImageSource(book.src)} rating={book.rating} />
                 </div>
+              </a>
+
             ))}
       </Slider>
     </div>
@@ -73,3 +73,6 @@ const MyCarousel = (props: CarouselProps) => {
 }
 
 export default MyCarousel;
+
+
+

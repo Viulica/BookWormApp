@@ -14,6 +14,7 @@ interface BookType {
   prezAutor: string,
   slika : string,
   rating: number, 
+  idknjiga: number
 }
 
 const NavBar: React.FC = () => {
@@ -92,15 +93,14 @@ const NavBar: React.FC = () => {
 
   useEffect(() => {
     fetchMyUserId();
+    fetchGetRole();
+    fetchBooks();
   }, []);
   
   useEffect(() => {
     fetchGetRole();
   }, [role]);
 
-  useEffect(() => {
-    fetchBooks();
-  }, [])
 
   return (
       <nav className="my-container">

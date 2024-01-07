@@ -440,7 +440,8 @@ router.get('/recommendedBooks', async (req, res) => {
                   naslov: book.naslov,
                   autor: author.ime + " " + author.prezime,
                   src: book.slika,
-                  rating: allReviews.length === 0 ? '-' : ocjena / allReviews.length
+                  rating: allReviews.length === 0 ? '-' : ocjena / allReviews.length,
+                  idknjiga: book.idknjiga
                });
             }
          }
@@ -493,8 +494,8 @@ router.get('/bestRatedBooks', async (req, res) => {
                   autor: author.ime + " " + author.prezime,
                   count: allReviews.length,
                   src: book.slika,
-                  rating: allReviews.length === 0 ? '-' : ocjena / allReviews.length
-
+                  rating: allReviews.length === 0 ? '-' : ocjena / allReviews.length,
+                  idknjiga: book.idknjiga
                })
             }
          }
@@ -517,7 +518,8 @@ router.get('/bestRatedBooks', async (req, res) => {
             naslov: mostPopular[i].naslov,
             autor: mostPopular[i].autor,
             src: mostPopular[i].src,
-            rating: mostPopular[i].rating
+            rating: mostPopular[i].rating,
+            idknjiga: mostPopular[i].idknjiga
          })
       }
 
