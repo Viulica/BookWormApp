@@ -417,7 +417,7 @@ router.get('/recommendedBooks', async (req, res) => {
 
       const allBooks = await data.knjiga.findAll({
          raw: true,
-         attributes: ['idknjiga', 'naslov', 'idkorisnik', 'slika']
+         attributes: ['idknjiga', 'naslov', 'slika', 'idkorisnik']
       });
 
 

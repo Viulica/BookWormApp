@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { baseUrl } from "../App";
+import "../styles/login.css"
 
 interface LoginForm {
   username: string;
