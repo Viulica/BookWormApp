@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import StarRating from "./StarRating";
 import "../styles/Slider.css";
+import BookCard from "./BookCard";
 
 interface Book {
   idknjiga: number;
@@ -81,38 +82,11 @@ const Slider: React.FC<SliderProps> = ({ books, id }) => {
   return (
     <>
       <div className="slider-container">
-        <div>
+      <div>
           <button onClick={handlePrevClick}>&#60;</button>
           <div className={"books-" + id}>
             {books.slice(currentPage - 1, currentPage).map((book, index) => (
-              <a
-                href={"/book/" + book.idknjiga}
-                key={index}
-                className="book-link"
-              >
-                <div className={`book`} id={`book-${index + 1}`}>
-                  <div className="book-image">
-                    <img src={book.slika} alt="Book cover" />
-                    {/* <img src={getImageSource(book.slika)} alt="Book cover" /> */}
-                  </div>
-                  <div className="book-title-and-published">
-                    {book.naslov + " (" + book.godizd + ")"}
-                  </div>
-                  <div className="book-author">
-                    {"by " + book.imeAutor + " " + book.prezAutor}
-                  </div>
-                  <div className="book-number-of-ratings">
-                    {book.brojRecenzija + " ratings"}
-                  </div>
-                  <div className="book-number-of-reviews">
-                    {book.brojOsvrta + " reviews"}
-                  </div>
-                  <div className="book-avg-rating">
-                    <StarRating rating={book.prosjekOcjena} />
-                    <span>{book.prosjekOcjena}</span>
-                  </div>
-                </div>
-              </a>
+              <BookCard index={index} book={book} />
             ))}
           </div>
           <button onClick={handleNextClick}>&#62;</button>

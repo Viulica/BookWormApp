@@ -14,7 +14,7 @@ const Book = (props: BookProps) => {
 
   return (
         <div className='book-container'>
-            <div id="naslov">
+            <div id="naslov"> 
                 Naslov: {props.naslov}
             </div>
             <div id="autor">

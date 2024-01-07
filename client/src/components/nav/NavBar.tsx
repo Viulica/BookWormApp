@@ -14,6 +14,7 @@ interface BookType {
   prezAutor: string,
   slika : string,
   rating: number, 
+  idknjiga: number
 }
 
 const NavBar: React.FC = () => {
@@ -89,17 +90,17 @@ const NavBar: React.FC = () => {
     }
     else {
       setRole("user");
+      setLoading(false)
     }
   };
 
   useEffect(() => {
     fetchMyUserId();
     fetchGetRole();
+    fetchBooks();
+    console.log("Hello from navbar")
   }, []);
 
-  useEffect(() => {
-    fetchBooks();
-  }, [])
 
   return (
     !loading && (

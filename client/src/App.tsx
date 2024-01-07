@@ -8,7 +8,6 @@ import NavBar from "./components/nav/NavBar";
 // Komponente za rute
 import Home from "../src/components/Home";
 import Login from "../src/components/Login";
-import Profile from "./components/Profile";
 import ProfileRedirect from "./components/ProfileRedirect";
 import ChangeProfile from "../src/components/ChangeProfile";
 import MyBooks from "../src/components/MyBooks";

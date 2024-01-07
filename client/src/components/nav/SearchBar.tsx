@@ -7,7 +7,8 @@ interface BookType {
     imeAutor: string,
     prezAutor: string,
     slika : string,
-    rating: number, 
+    rating: number,
+    idknjiga: number
   }
 
   interface SearchProps {
@@ -46,13 +47,15 @@ function SearchBar({books}: SearchProps) {
                 <button className="my-button" type="submit">Search</button>
                 <div className="my-dropdown">
                 {filteredBooks.map(book => (
-                    <div className="search-container" key={book.naslov}>
+                    <a href={"/book/" + book.idknjiga}>
+                        <div className="search-container" key={book.naslov}>
                         <img className="search-img" src={book.slika}/>
                         <div className='search-body'>
                         <div className='search-naslov'>{book.naslov}</div>
                         <div className='search-autor'>{book.imeAutor + " " + book.prezAutor}</div>
                         </div>
-                    </div>
+                        </div>
+                    </a>
                 ))}
             </div>
         </form>
