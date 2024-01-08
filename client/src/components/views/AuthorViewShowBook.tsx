@@ -26,6 +26,7 @@ const AuthorViewShowBook: React.FC = () => {
   const [userRatingText, setUserRatingText] = useState<string>("");
   const [showBookDetails, setShowBookDetails] = useState<boolean>(false);
   const [bookStatus, setBookStatus] = useState<number>(0);
+  const [bookStatistics, setBookStatistics] = useState<any>({});
   const navigate = useNavigate();
 
   const openRateWindow = () => {
@@ -78,7 +79,6 @@ const AuthorViewShowBook: React.FC = () => {
 
       if (response.ok) {
         const data = await response.json();
-        console.log(data);
         setBookData(data);
         setIsMyBook(myUserId === data.idkorisnikAutor);
       } else if (response.status === 401) {
@@ -104,13 +104,30 @@ const AuthorViewShowBook: React.FC = () => {
         });
 
         const data = await response.json();
-        console.log(data);
         setBookStatus(data.statusNumber);
       } catch (error) {
         console.error("Greška prilikom dohvaćanja knjige:", error);
       }
     }
   };
+
+  const fetchBookStatistics = async () => {
+    try {
+      const response = await fetch(`${baseUrl}/api/data/getBookStatistics/${bookId}`, {
+        method: 'GET',
+        headers: {
+          'Content-type': 'application/json',
+          Authorization: `${storedToken}`
+        }
+      });
+
+      if (response.ok) {
+        setBookStatistics(await response.json());
+      }
+    } catch (error) {
+      console.error("Greška prilikom dohvaćanja statistike za knjigu.");
+    }
+  }
 
   const fetchRatings = async () => {
     try {
@@ -123,7 +140,6 @@ const AuthorViewShowBook: React.FC = () => {
 
       if (response.ok) {
         const data = await response.json();
-        console.log(data);
         setRatings(data);
       } else if (response.status === 401) {
         navigate("/logout");
@@ -146,7 +162,6 @@ const AuthorViewShowBook: React.FC = () => {
 
         if (response.ok) {
           const data = await response.json();
-          console.log(data);
           setMyRating(data);
         } else if (response.status === 401) {
           navigate("/logout");
@@ -222,12 +237,14 @@ const AuthorViewShowBook: React.FC = () => {
 
   useEffect(() => {
     if (myUserId !== 0) {
-      console.log(myUserId);
       fetchBookStatus();
       fetchBookData();
 
       if (!isMyBook) {
         fetchMyRating();
+      }
+      else {
+        fetchBookStatistics();
       }
 
       fetchRatings();
@@ -316,7 +333,7 @@ const AuthorViewShowBook: React.FC = () => {
                     <InfoIcon />
                   </a>
                 </div>
-                {!isMyBook && (
+                {!isMyBook ? (
                   <>
                     <div className="book-details-reading-status">
                       <button
@@ -356,7 +373,20 @@ const AuthorViewShowBook: React.FC = () => {
                       </button>
                     </div>
                   </>
-                )}
+                ) : 
+                  <>
+                    <div className="book-details-statistics">
+                      <p className="p-1">Book statistics</p>
+                      <div>Read: { bookStatistics.procitano}</div>
+                      <div>Currently reading: { bookStatistics.trenutnoCitam}</div>
+                      <div>Want to read: { bookStatistics.zelimProcitati}</div>
+                    </div>
+
+                    <div className="book-details-edit-book">
+                      <a href={"/changeBookInfo/" + bookId} className="btn btn-primary">Edit</a>
+                    </div>
+                  </>
+                }
               </div>
             </div>
           </div>

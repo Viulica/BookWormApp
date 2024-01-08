@@ -14,7 +14,7 @@ const upload = multer({ storage: storage });
 
 // Šablona
 // try {
-      
+
 // } catch (error) {
 //    console.error('Error fetching books:', error);
 //    res.status(500).json({ error: 'Internal Server Error', details: error.message });
@@ -33,7 +33,7 @@ router.get('/allUsers', verifyToken, async (req, res) => {
       const allUsers = await data.korisnik.findAll({
          where: {
             idkorisnik: {
-               [Op.ne] : userId
+               [Op.ne]: userId
             }
          }
       });
@@ -243,7 +243,7 @@ router.delete('/deleteUser/:userId', verifyToken, async (req, res) => {
       else {
          res.status(404).send("No such user!");
       }
-      
+
    } catch (error) {
       console.error('Greška prilikom pretraživanja korisnika:', error);
       res.status(500).json({ error: 'Internal Server Error', details: error.message });
@@ -299,20 +299,20 @@ router.post('/checkISBN/:ISBN', verifyToken, async (req, res) => {
       res.status(500).json({ error: 'Interna server greška', details: error.message });
    }
 });
- 
+
 const getImageBufferFromUrl = async (url) => {
    try {
-     const response = await axios.get(url, { responseType: 'arraybuffer' });
-     const buffer = Buffer.from(response.data, 'binary');
+      const response = await axios.get(url, { responseType: 'arraybuffer' });
+      const buffer = Buffer.from(response.data, 'binary');
       return buffer;
-      
-   } catch (error) {
-     console.error('Greška prilikom dohvaćanja slike s URL-a:', error.message);
-     throw error;
-   }
- };
 
- router.post('/addBook', upload.single('coverImage'), async (req, res) => {
+   } catch (error) {
+      console.error('Greška prilikom dohvaćanja slike s URL-a:', error.message);
+      throw error;
+   }
+};
+
+router.post('/addBook', upload.single('coverImage'), async (req, res) => {
    try {
       const { title, genre, published, about, isbn, userId, imageUrl } = req.body;
       let slika;
@@ -338,8 +338,68 @@ const getImageBufferFromUrl = async (url) => {
       console.error('Greška prilikom dodavanja knjige:', error);
       res.status(500).json({ error: 'Interna server greška', details: error.message });
    }
-}); 
- 
+});
+
+router.post('/changeBookData/:bookId', upload.single('fileImage'), async (req, res) => {
+   try {
+      const { title, genre, published, about, isbn, imageUrl } = req.body;
+      let slika;
+
+      if (req.file) {
+         slika = req.file.buffer;
+      }
+      else {
+         console.log(req.body);
+         if (imageUrl !== "") {
+            slika = await getImageBufferFromUrl(imageUrl);
+         }
+         else {
+            slika = null;
+         }
+      }
+
+      const bookId = req.params.bookId;
+
+      if (slika) {
+         const updatedBook = await data.knjiga.update(
+            {
+               naslov: title,
+               zanr: genre,
+               godizd: published,
+               opis: about,
+               isbn: isbn,
+               slika: slika,
+            },
+            {
+               where: {
+                  idknjiga: bookId
+               }
+            }
+         );
+         res.status(200).json(updatedBook);
+      }
+      else {
+         const updatedBook = await data.knjiga.update(
+            {
+               naslov: title,
+               zanr: genre,
+               godizd: published,
+               opis: about,
+               isbn: isbn,
+            },
+            {
+               where: {
+                  idknjiga: bookId
+               }
+            }
+         );
+         res.status(200).json(updatedBook);
+      }
+   } catch (error) {
+      console.error('Greška prilikom dodavanja knjige:', error);
+      res.status(500).json({ error: 'Interna server greška', details: error.message });
+   }
+});
 
 router.post('/findAuthors', async (req, res) => {
    const { searchTerm } = req.body;
@@ -581,6 +641,35 @@ router.get('/getUserData/:id', verifyToken, async (req, res) => {
    }
 });
 
+router.get('/getBookData/:bookId', verifyToken, async (req, res) => {
+   try {
+      const bookId = req.params.bookId;
+      const book = await data.knjiga.findOne({
+         attributes: [
+            'naslov',
+            'zanr',
+            'godizd',
+            'opis',
+            'isbn',
+            'slika'
+         ],
+         where: {
+            idknjiga: bookId
+         }
+      });
+
+      if (book) {
+         res.status(200).json(book);
+      }
+      else {
+         res.status(404).json({ message: "Nemoguće pronaći knjigu" });
+      }
+   } catch (error) {
+      console.error('Error fetching books:', error);
+      res.status(500).json({ error: 'Internal Server Error', details: error.message });
+   }
+})
+
 router.get('/book/:id', async (req, res) => {
    const bookId = req.params.id;
 
@@ -640,20 +729,20 @@ router.get('/getRatings/:bookId', async (req, res) => {
             idknjiga: bookId,
             [Op.and]: [
                {
-                 [Op.or]: [
-                   {
-                     ocjena: {
-                       [Op.between]: [1, 5],
+                  [Op.or]: [
+                     {
+                        ocjena: {
+                           [Op.between]: [1, 5],
+                        },
                      },
-                   },
-                   {
-                     txtrecenzija: {
-                       [Op.not]: "",
+                     {
+                        txtrecenzija: {
+                           [Op.not]: "",
+                        },
                      },
-                   },
-                 ],
+                  ],
                },
-             ],
+            ],
 
          },
          include: [
@@ -892,5 +981,42 @@ router.get('/saved/:bookId', verifyToken, async (req, res) => {
    }
 });
 
+router.get('/getBookStatistics/:bookId', verifyToken, async (req, res) => {
+   try {
+      const bookId = req.params.bookId;
+      const r = await data.cita.count({
+         where: {
+            idknjiga: bookId,
+            status: "Pročitano"
+         }
+      });
+
+      const ctr = await data.cita.count({
+         where: {
+            idknjiga: bookId,
+            status: "Trenutno čitam"
+         }
+      });
+
+      const wtr = await data.cita.count({
+         where: {
+            idknjiga: bookId,
+            status: "Želim pročitati"
+         }
+      });
+
+
+      const bookStatistics = {
+         procitano: r,
+         trenutnoCitam: ctr,
+         zelimProcitati: wtr
+      }
+
+      res.status(200).json(bookStatistics);
+   } catch (error) {
+      console.error('Error fetching books:', error);
+      res.status(500).json({ error: 'Internal Server Error', details: error.message });
+   }
+})
 
 module.exports = router;

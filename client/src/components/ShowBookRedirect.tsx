@@ -7,7 +7,6 @@ import AuthorViewShowBook from "./views/AuthorViewShowBook";
 
 const ShowBookRedirect: React.FC = () => {
   const [role, setRole] = useState<string>("");
-  console.log(role);
   const fetchGetRole = async () => {
     if (storedToken) {
       try {
