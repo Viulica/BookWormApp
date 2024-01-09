@@ -104,6 +104,10 @@ const AddBook: React.FC = () => {
 
         if (response.status === 400) {
           setValidationMessage(".container-validation", await response.text());
+          return true;
+        }
+        else {
+          return false;
         }
       } catch (error) {
         console.error("Greška prilikom dohvaćanja ISBN:", error);
@@ -113,8 +117,12 @@ const AddBook: React.FC = () => {
 
   const validateISBN = (e: React.ChangeEvent<HTMLInputElement>) => {
     const ISBN = e.target.value;
-    if (ISBN.length >= 0 && ISBN.length <= 13) {
+    if (ISBN.length >= 0 && ISBN.length < 13) {
       setIsbn(e.target.value);
+    }
+    else if (ISBN.length === 13) {
+      setIsbn(e.target.value);
+      checkISBN();
     }
   };
 
@@ -133,6 +141,7 @@ const AddBook: React.FC = () => {
         ".container-validation",
         "ISBN must have 13 numbers"
       );
+      return;
     } else if (
       parseInt(published) < 0 ||
       parseInt(published) > new Date().getFullYear()
@@ -141,8 +150,12 @@ const AddBook: React.FC = () => {
         ".container-validation",
         `Year must be between 1500 and ${new Date().getFullYear()}`
       );
-    } else if (isbn.length == 13) {
-      checkISBN();
+      return;
+    }
+    else if (isbn.length === 13) {
+      if (await checkISBN()) {
+        return;
+      }
     }
 
     const formData = new FormData();

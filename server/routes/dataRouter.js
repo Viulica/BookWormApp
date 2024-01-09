@@ -300,6 +300,32 @@ router.post('/checkISBN/:ISBN', verifyToken, async (req, res) => {
    }
 });
 
+router.post('/checkISBN/:ISBN/:bookId', verifyToken, async (req, res) => {
+   try {
+      const ISBN = req.params.ISBN;
+      const bookId = req.params.bookId;
+      const existingBook = await data.knjiga.findOne({
+         where: {
+            isbn: ISBN,
+            idknjiga: {
+               [Sequelize.Op.ne]: bookId
+            }
+         }
+      });
+
+      if (existingBook) {
+         return res.status(400).send('This book already exists.');
+      }
+      else {
+         res.status(200).send("");
+      }
+   }
+   catch (error) {
+      console.error('Greška prilikom dodavanja knjige:', error);
+      res.status(500).json({ error: 'Interna server greška', details: error.message });
+   }
+});
+
 const getImageBufferFromUrl = async (url) => {
    try {
       const response = await axios.get(url, { responseType: 'arraybuffer' });
@@ -342,43 +368,23 @@ router.post('/addBook', upload.single('coverImage'), async (req, res) => {
 
 router.post('/changeBookData/:bookId', upload.single('fileImage'), async (req, res) => {
    try {
-      const { title, genre, published, about, isbn, imageUrl } = req.body;
+      const { title, genre, published, about, isbn, imageUrl, deleteImage } = req.body;
+      const bookId = req.params.bookId;
       let slika;
+
+      console.log(req.body);
+      console.log(req.file);
 
       if (req.file) {
          slika = req.file.buffer;
       }
-      else {
-         console.log(req.body);
-         if (imageUrl !== "") {
-            slika = await getImageBufferFromUrl(imageUrl);
-         }
-         else {
-            slika = null;
-         }
+      else if (imageUrl !== "") {
+         slika = await getImageBufferFromUrl(imageUrl);
       }
-
-      const bookId = req.params.bookId;
-
-      if (slika) {
-         const updatedBook = await data.knjiga.update(
-            {
-               naslov: title,
-               zanr: genre,
-               godizd: published,
-               opis: about,
-               isbn: isbn,
-               slika: slika,
-            },
-            {
-               where: {
-                  idknjiga: bookId
-               }
-            }
-         );
-         res.status(200).json(updatedBook);
+      else if (deleteImage === "1") {
+         slika = null;
       }
-      else {
+      else if (deleteImage === "0") {
          const updatedBook = await data.knjiga.update(
             {
                naslov: title,
@@ -394,7 +400,26 @@ router.post('/changeBookData/:bookId', upload.single('fileImage'), async (req, r
             }
          );
          res.status(200).json(updatedBook);
+         return;
       }
+      
+      const updatedBook = await data.knjiga.update(
+         {
+            naslov: title,
+            zanr: genre,
+            godizd: published,
+            opis: about,
+            isbn: isbn,
+            slika: slika,
+         },
+         {
+            where: {
+               idknjiga: bookId
+            }
+         }
+      );
+      res.status(200).json(updatedBook);
+
    } catch (error) {
       console.error('Greška prilikom dodavanja knjige:', error);
       res.status(500).json({ error: 'Interna server greška', details: error.message });
