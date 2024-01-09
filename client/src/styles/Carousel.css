@@ -1,20 +1,34 @@
-.slick-list {
-    margin-top: 15px;
-}
+    .slick-list {
+        margin-top: 15px;
+    }
 
-.slick-slide > div {
-    margin: 0 5px;
-    background-color: white;
-    font-family: "playfair";
+    .slick-slider {
+        margin: 0 auto;
+        padding: 40px;
+        width: 80%;
+    }    
+    
+    .slick-slide > div {
+        margin: 0 5px;
+        background-color: white;
+        font-family: "playfair";
+    
+    }
 
-}
+    .slick-track {
+        display: flex;
+        align-items: center; /* Centers slides vertically */
+    }
+    
+    
+    .carousel-container {
 
-.carousel-container {
-    margin-top: 50px;
-}
+        margin-top: 50px;
+    }
+    
+    .carousel-title {
+        margin: 0 5px;
+        font-family: "playfair";
+        font-size: 18px;
+    }
 
-.carousel-title {
-    margin: 0 5px;
-    font-family: "playfair";
-    font-size: 18px;
-}

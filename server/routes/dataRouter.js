@@ -56,7 +56,6 @@ router.get('/allAuthors', async (req, res) => {
          raw: true,
       })
 
-      console.log(allAuthors);
 
       if (allAuthors) {
          for (const a of allAuthors) {
@@ -918,81 +917,13 @@ router.get('/getBookStatistics/:bookId', verifyToken, async (req, res) => {
 
 router.get('/najpopularnije', async (req, res) => {
    try {
-      const allBooks = await data.knjiga.findAll({
-         attributes: [
-            'idknjiga',
-            'naslov',
-            'godizd',
-            'slika',
-            'isbn',
-            'zanr',
-            ['idkorisnik', 'idkorisnikAutor'],
-            [Sequelize.col('idkorisnik_korisnik.ime'), 'imeAutor'],
-            [Sequelize.col('idkorisnik_korisnik.prezime'), 'prezAutor']
-         ],
-         include: [
-            {
-               model: data.korisnik,
-               as: 'idkorisnik_korisnik',
-               attributes: []
-            }
-         ],
-         raw: true
-      })
+         const knjige = await getAllBooks();
 
-      if (allBooks.length > 0) {
-         for (const book of allBooks) {
-
-            const brojSpremanja = await data.cita.count({
-               where: {
-                  idknjiga: book.idknjiga
-               }
-            })
-
-            book.brojSpremanja = brojSpremanja;
-
-            const brojRecenzija = await data.recenzija.count({
-               where:
-               {
-                  idknjiga: book.idknjiga
-               }
-            })
-
-            book.brojRecenzija = brojRecenzija;
-
-            const brojOsvrta = await data.recenzija.count({
-               where:
-               {
-                  idknjiga: book.idknjiga,
-                  txtrecenzija: {
-                     [Op.not]: null
-                  }
-               }
-            })
-
-            book.brojOsvrta = brojOsvrta;
-
-            if (brojRecenzija) {
-               const prosjekOcjena = await data.recenzija.findAll({
-                  attributes: [
-                     [Sequelize.fn('AVG', Sequelize.col('ocjena')), 'prosjekOcjena']
-                  ],
-                  where: {
-                     idknjiga: book.idknjiga,
-                     ocjena: {
-                        [Sequelize.Op.between]: [1, 5]
-                     }
-                  },
-                  raw: true
-               });
-               book.prosjekOcjena = parseFloat(prosjekOcjena[0].prosjekOcjena).toFixed(2);
-            }
-            else {
-               book.prosjekOcjena = 0;
-            }
+         if (knjige === "nema knjiga") {
+            return res.status(400).send("No books in db.")
          }
-         
-         allBooks.sort((a, b) => {
+
+         knjige.sort((a, b) => {
             if (a.prosjekOcjena < b.prosjekOcjena) {
                return 1;
             }
@@ -1001,13 +932,11 @@ router.get('/najpopularnije', async (req, res) => {
             }
             return 0;
          });
-         const popularBooks = allBooks.slice(0, 4);
+         const popularBooks = knjige.slice(0, 4);
          res.status(200).json(popularBooks);
       }
-      else {
-         res.status(404).json("Nema knjiga!");
-      }
-   }
+
+   
    catch (error) {
       console.error('Error fetching authors:', error);
       res.status(500).json({ error: 'Internal Server Error', details: error.message });
@@ -1015,8 +944,89 @@ router.get('/najpopularnije', async (req, res) => {
 });
 
 
+async function getAllBooks() {
 
-router.get('/toplePreporuke', async (req, res) => {
+   const allBooks = await data.knjiga.findAll({
+      attributes: [
+         'idknjiga',
+         'naslov',
+         'godizd',
+         'slika',
+         'isbn',
+         'zanr',
+         ['idkorisnik', 'idkorisnikAutor'],
+         [Sequelize.col('idkorisnik_korisnik.ime'), 'imeAutor'],
+         [Sequelize.col('idkorisnik_korisnik.prezime'), 'prezAutor']
+      ],
+      include: [
+         {
+            model: data.korisnik,
+            as: 'idkorisnik_korisnik',
+            attributes: []
+         }
+      ],
+      raw: true
+   })
+
+   if (allBooks.length > 0) {
+      for (const book of allBooks) {
+
+         const brojSpremanja = await data.cita.count({
+            where: {
+               idknjiga: book.idknjiga
+            }
+         })
+
+         book.brojSpremanja = brojSpremanja;
+
+         const brojRecenzija = await data.recenzija.count({
+            where:
+            {
+               idknjiga: book.idknjiga
+            }
+         })
+
+         book.brojRecenzija = brojRecenzija;
+
+         const brojOsvrta = await data.recenzija.count({
+            where:
+            {
+               idknjiga: book.idknjiga,
+               txtrecenzija: {
+                  [Op.not]: null
+               }
+            }
+         })
+
+         book.brojOsvrta = brojOsvrta;
+
+         if (brojRecenzija) {
+            const prosjekOcjena = await data.recenzija.findAll({
+               attributes: [
+                  [Sequelize.fn('AVG', Sequelize.col('ocjena')), 'prosjekOcjena']
+               ],
+               where: {
+                  idknjiga: book.idknjiga,
+                  ocjena: {
+                     [Sequelize.Op.between]: [1, 5]
+                  }
+               },
+               raw: true
+            });
+            book.prosjekOcjena = parseFloat(prosjekOcjena[0].prosjekOcjena).toFixed(2);
+         }
+         else {
+            book.prosjekOcjena = 0;
+         }
+      }
+      return allBooks;
+   }
+   else {
+      return "nema knjiga."
+   }
+}
+
+router.get('/toplepreporuke', async (req, res) => {
    try {
 
       const allAuthors = await data.korisnik.findAll({
@@ -1027,104 +1037,31 @@ router.get('/toplePreporuke', async (req, res) => {
             tipkorisnika: "autor",
          },
          raw: true,
-      });
-
-
-      const allBooks = await data.knjiga.findAll({
-         attributes: [
-            'idknjiga',
-            'naslov',
-            'godizd',
-            'slika',
-            'isbn',
-            'zanr',
-            ['idkorisnik', 'idkorisnikAutor'],
-            [Sequelize.col('idkorisnik_korisnik.ime'), 'imeAutor'],
-            [Sequelize.col('idkorisnik_korisnik.prezime'), 'prezAutor']
-         ],
-         include: [
-            {
-               model: data.korisnik,
-               as: 'idkorisnik_korisnik',
-               attributes: []
-            }
-         ],
-         raw: true
       })
 
-      if (allBooks.length > 0) {
-         for (const book of allBooks) {
+      const knjige = await getAllBooks();
+      if (knjige === "nema knjiga.") {
+         return res.status(400).send("No books in DB.");
+      }
 
-            const brojSpremanja = await data.cita.count({
-               where: {
-                  idknjiga: book.idknjiga
-               }
-            })
-
-            book.brojSpremanja = brojSpremanja;
-
-            const brojRecenzija = await data.recenzija.count({
-               where:
-               {
-                  idknjiga: book.idknjiga
-               }
-            })
-
-            book.brojRecenzija = brojRecenzija;
-
-            const brojOsvrta = await data.recenzija.count({
-               where:
-               {
-                  idknjiga: book.idknjiga,
-                  txtrecenzija: {
-                     [Op.not]: null
-                  }
-               }
-            })
-
-            book.brojOsvrta = brojOsvrta;
-
-            if (brojRecenzija) {
-               const prosjekOcjena = await data.recenzija.findAll({
-                  attributes: [
-                     [Sequelize.fn('AVG', Sequelize.col('ocjena')), 'prosjekOcjena']
-                  ],
-                  where: {
-                     idknjiga: book.idknjiga,
-                     ocjena: {
-                        [Sequelize.Op.between]: [1, 5]
-                     }
-                  },
-                  raw: true
-               });
-               book.prosjekOcjena = parseFloat(prosjekOcjena[0].prosjekOcjena).toFixed(2);
-            }
-            else {
-               book.prosjekOcjena = 0;
-            }
-         }
-         
-         const preporuke = [];
-         console.log(allBooks)
-         console.log(allAuthors)
-         for (book of allBooks) {
+      const preporuke = [];
+         for (book of knjige) {
             for (autor of allAuthors) {
                if ((book.idkorisnikAutor === autor.idkorisnik) && autor.idkorisnik > 13) {
                   preporuke.push(book)
                }
             }
          }
-         res.status(200).json(preporuke);
-      }
-      else {
-         res.status(404).json("Nema knjiga!");
-      }
-   }
-   catch (error) {
+
+      res.status(200).json(preporuke);
+   } catch (error) {
       console.error('Error fetching authors:', error);
       res.status(500).json({ error: 'Internal Server Error', details: error.message });
    }
 });
+
+
+
 
 
 module.exports = router;

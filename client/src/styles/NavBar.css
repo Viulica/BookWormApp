@@ -41,3 +41,51 @@
   color: #F6A192;
   /* Change link color on hover */
 }
+
+
+
+@media only screen and (max-width: 768px) {
+
+
+  .navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.hamburger-menu {
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    height: 25px; /* Adjust as needed */
+    width: 35px; /* Adjust as needed */
+}
+
+.line {
+    height: 3px;
+    width: 100%;
+    background-color: #333; /* Adjust color as needed */
+}
+
+.nav-list {
+    list-style-type: none;
+    display: none;
+}
+
+/* Styles for larger screens */
+@media screen and (min-width: 600px) {
+    .nav-list {
+        display: flex;
+    }
+
+    .hamburger-menu {
+        display: none;
+    }
+}
+
+
+}
+
+
+

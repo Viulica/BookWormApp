@@ -34,7 +34,7 @@ const MyCarousel = (props: CarouselProps) => {
     dots: true,
     infinite: true,
     speed: 500,
-    slidesToShow: 3,
+    slidesToShow: window.innerWidth > 600 && window.innerWidth < 800 ? 1 : window.innerWidth > 800 && window.innerWidth < 1024 ? 2 : 3,
     slidesToScroll: 1,
     autoplay: true,
     pauseOnHover: true,

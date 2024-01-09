@@ -22,13 +22,14 @@ import "./App.css"
 import Register from "./components/Register";
 import AllAuthors from "./components/AllAuthors";
 import ChangeBookInfo from "./components/ChangeBookInfo";
+import HamburgerMenu from "./components/HamburgerMenu";
 
 // Glavna aplikacija sa rutama i NavBar-om
 const App: React.FC = () => {
   return (
     <Router>
       <div className="app">
-        <NavBar />
+        {window.innerWidth > 768 ? <NavBar /> : <HamburgerMenu />}
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/home" element={<Home />} />

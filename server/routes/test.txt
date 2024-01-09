@@ -1,0 +1,11 @@
+         allBooks.sort((a, b) => {
+            if (a.prosjekOcjena < b.prosjekOcjena) {
+               return 1;
+            }
+            if (a.prosjekOcjena > b.prosjekOcjena) {
+               return -1;
+            }
+            return 0;
+         });
+         const popularBooks = allBooks.slice(0, 4);
+         res.status(200).json(popularBooks);

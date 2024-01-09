@@ -79,7 +79,7 @@ const Slider: React.FC<SliderProps> = ({ books, id }) => {
   }, [currentPage]);
 
   return (
-    <>
+    <div className="body">
       <div className="slider-container">
       <div>
           <button onClick={handlePrevClick}>&#60;</button>
@@ -92,7 +92,7 @@ const Slider: React.FC<SliderProps> = ({ books, id }) => {
         </div>
         <div className="page-indicator">{currentPage + "/" + totalBooks}</div>
       </div>
-    </>
+    </div>
   );
 };
 
