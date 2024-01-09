@@ -12,7 +12,7 @@ interface BookType {
   naslov: string,
   imeAutor: string,
   prezAutor: string,
-  slika : string,
+  slika : { type: string; data: number[] },
   rating: number, 
   idknjiga: number
 }

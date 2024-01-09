@@ -1,0 +1,101 @@
+.container-change-book {
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+}
+
+.container-title,
+.container-change-bookData,
+.container-validation {
+   width: 50%;
+}
+
+.container-bookData-image-title-published-and-genre {
+   display: flex;
+   gap: 20px;
+}
+
+.div-for-edit-icon {
+   position: relative;
+   display: inline-block;
+}
+
+.overlay {
+   position: absolute;
+   top: 100%;
+   left: 100%;
+   transform: translate(-10px, -10px);
+   width: 20px;
+   height: 20px;
+   background: url('../images/plus.png') center/cover;
+   transition: opacity 0.3s ease;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+}
+
+.overlay:hover{
+   cursor: pointer;
+}
+
+.container-bookData-image {
+   width: 25%;
+   display: flex;
+   justify-content: center;
+   align-items: center;
+}
+
+.container-bookData-title-published-and-genre {
+   width: 60%;
+}
+
+.container-validation {
+   color: red;
+}
+
+#save-and-back-buttons {
+   display: flex;
+   gap: 20px;
+}
+
+#about {
+   resize: none;
+}
+
+.background {
+   position: fixed;
+   top: 0;
+   left: 0;
+   width: 100%;
+   height: 100%;
+   background: rgba(0, 0, 0, 0.5);
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   z-index: 1;
+}
+
+.window-image-input {
+   background-color: white;
+   padding: 30px;
+   width: 280px;
+   height: fit-content;
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   border-radius: 10px;
+   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+   position: relative;
+   text-align: center;
+   justify-content: center;
+   align-content: center;
+   font-family: Helvetica, sans-serif;
+}
+
+.exit {
+   position: absolute;
+   top: 10px;
+   right: 10px;
+   font-size: 20px;
+   cursor: pointer;
+}

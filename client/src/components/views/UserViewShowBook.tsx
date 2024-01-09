@@ -1,10 +1,8 @@
-import { baseUrl, storedToken } from "@/App";
+import { baseUrl } from "@/App";
 import React, { useEffect, useState } from "react";
 import StarRating from "../StarRating";
 import "../../styles/ShowBook.css";
 import { useNavigate } from "react-router-dom";
-import { EditIcon } from "../EditIcon";
-import { DeleteIcon } from "../DeleteIcon";
 import { InfoIcon } from "../InfoIcon";
 import { getImageSource } from "../Slider";
 
@@ -31,7 +29,6 @@ const UserViewShowBook: React.FC = () => {
 
       if (response.ok) {
         const data = await response.json();
-        console.log(data);
         setBookData(data);
       } else if (response.status === 401) {
         navigate("/login");
@@ -55,7 +52,6 @@ const UserViewShowBook: React.FC = () => {
 
          if (response.ok) {
          const data = await response.json();
-         console.log(data);
          setRatings(data);
          } else if (response.status === 401) {
          navigate("/login");

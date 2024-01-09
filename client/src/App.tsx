@@ -21,6 +21,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css"
 import Register from "./components/Register";
 import AllAuthors from "./components/AllAuthors";
+import ChangeBookInfo from "./components/ChangeBookInfo";
 
 // Glavna aplikacija sa rutama i NavBar-om
 const App: React.FC = () => {
@@ -33,17 +34,15 @@ const App: React.FC = () => {
             <Route path="/home" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-          {/* <Route path="/profile/:id" element={<Profile />} /> */}
-          <Route path="/profile/:id" element={<ProfileRedirect />} />
+            <Route path="/profile/:id" element={<ProfileRedirect />} />
             <Route path="/changeProfile" element={<ChangeProfile />} />
             <Route path="/myBooks/:id" element={<MyBooks />} />
             <Route path="/logout" element={<Logout />} />
             <Route path="/allBooks" element={<AllBooks />} />
             <Route path="/allAuthors" element={<AllAuthors />} />
             <Route path="/addBook" element={<AddBook />} />
-            {/* <Route path="/book/:id" element={<ShowBook />} /> */}
             <Route path="/book/:id" element={<ShowBookRedirect />} />
-            {/* <Route path="/book/:id?idReader=:id" element={<ShowBook />} /> */}
+            <Route path="/changeBookInfo/:id" element={<ChangeBookInfo/>} />
             <Route path="/inbox" element={<Inbox />} />
             <Route path="/inbox?idReciever=:id" element={<Messages/>} />
           </Routes>

@@ -14,6 +14,7 @@ const AdminViewShowBook: React.FC = () => {
     .at(window.location.href.split("/").length - 1);
   const [bookData, setBookData] = useState<any>(null);
   const [ratings, setRatings] = useState<any>([]);
+  const [bookStatistics, setBookStatistics] = useState<any>({});
 
   const [showBookDetails, setShowBookDetails] = useState<boolean>(false);
   const navigate = useNavigate();
@@ -32,7 +33,6 @@ const AdminViewShowBook: React.FC = () => {
 
       if (response.ok) {
         const data = await response.json();
-        console.log(data);
         setBookData(data);
       } else if (response.status === 401) {
         navigate("/login");
@@ -56,7 +56,6 @@ const AdminViewShowBook: React.FC = () => {
 
       if (response.ok) {
         const data = await response.json();
-        console.log(data);
         setRatings(data);
       } else if (response.status === 401) {
         navigate("/login");
@@ -92,9 +91,28 @@ const AdminViewShowBook: React.FC = () => {
     }
   };
 
+  const fetchBookStatistics = async () => {
+    try {
+      const response = await fetch(`${baseUrl}/api/data/getBookStatistics/${bookId}`, {
+        method: 'GET',
+        headers: {
+          'Content-type': 'application/json',
+          Authorization: `${storedToken}`
+        }
+      });
+
+      if (response.ok) {
+        setBookStatistics(await response.json());
+      }
+    } catch (error) {
+      console.error("Greška prilikom dohvaćanja statistike za knjigu.");
+    }
+  }
+
   useEffect(() => {
     fetchBookData();
     fetchRatings();
+    fetchBookStatistics();
   }, []);
 
   return (
@@ -146,6 +164,17 @@ const AdminViewShowBook: React.FC = () => {
                     <InfoIcon />
                   </a>
                 </div>
+
+                <div className="book-details-statistics">
+                  <div>Read: { bookStatistics.procitano}</div>
+                  <div>Currently reading: { bookStatistics.trenutnoCitam}</div>
+                  <div>Want to read: { bookStatistics.zelimProcitati}</div>
+                </div>
+
+                <div className="book-details-edit-book">
+                  <a href={"/changeBookInfo/" + bookId} className="btn btn-primary">Edit</a>
+                </div>
+
               </div>
             </div>
           </div>
