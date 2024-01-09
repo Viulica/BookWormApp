@@ -4,8 +4,9 @@
 
 .slick-slide > div {
     margin: 0 5px;
-    border: 1px solid black;
-    background-color: var(--bg-main);
+    background-color: white;
+    font-family: "playfair";
+
 }
 
 .carousel-container {
@@ -15,4 +16,5 @@
 .carousel-title {
     margin: 0 5px;
     font-family: "playfair";
+    font-size: 18px;
 }

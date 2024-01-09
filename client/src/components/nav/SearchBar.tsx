@@ -1,6 +1,7 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import "../../styles/search.css";
+import "../../styles/SearchBar.css"
 import { getImageSource } from "../Slider";
 
 interface BookType {
@@ -48,9 +49,6 @@ function SearchBar({ books }: SearchProps) {
         value={query}
         onChange={(e) => setQuery(e.target.value)}
       />
-      <button className="my-button" type="submit">
-        Search
-      </button>
       <div className="my-dropdown">
         {filteredBooks.map((book) => (
           <a href={"/book/" + book.idknjiga} key={book.naslov}>

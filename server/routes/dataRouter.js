@@ -488,134 +488,6 @@ router.post('/searchAuthor', async (req, res) => {
    }
 })
 
-
-router.get('/recommendedBooks', async (req, res) => {
-   try {
-
-      const allAuthors = await data.korisnik.findAll({
-         where: {
-            tipkorisnika: "autor"
-         },
-         raw: true,
-         attributes: ['idkorisnik', 'ime', 'prezime']
-      });
-
-      const allBooks = await data.knjiga.findAll({
-         raw: true,
-         attributes: ['idknjiga', 'naslov', 'slika', 'idkorisnik']
-      });
-
-
-      let books = [];
-      for (let book of allBooks) {
-         for (let author of allAuthors) {
-            if (book.idkorisnik === author.idkorisnik && author.idkorisnik > 13) {
-               const allReviews = await data.recenzija.findAll({
-                  where: {
-                     idknjiga: book.idknjiga
-                  },
-                  raw: true,
-                  attributes: ['ocjena']
-               });
-               let ocjena = 0;
-               for (let i = 0; i < allReviews.length; i++) {
-                  ocjena += allReviews[i].ocjena;
-               }
-               books.push({
-                  naslov: book.naslov,
-                  autor: author.ime + " " + author.prezime,
-                  src: book.slika,
-                  rating: allReviews.length === 0 ? '-' : ocjena / allReviews.length,
-                  idknjiga: book.idknjiga
-               });
-            }
-         }
-      }
-
-      res.status(200).json(books);
-   }
-   catch (error) {
-      console.error('Error fetching books:', error);
-      res.status(500).json({ error: 'Internal Server Error', details: error.message });
-   }
-});
-
-router.get('/bestRatedBooks', async (req, res) => {
-   try {
-
-      const allAuthors = await data.korisnik.findAll({
-         where: {
-            tipkorisnika: "autor"
-         },
-         raw: true,
-         attributes: ['idkorisnik', 'ime', 'prezime']
-      });
-
-      const allBooks = await data.knjiga.findAll({
-         raw: true,
-         attributes: ['idknjiga', 'naslov', 'idkorisnik', 'slika']
-      });
-
-      console.log(allBooks)
-
-      let books = [];
-      let mostPopular = [];
-      for (let book of allBooks) {
-         for (let author of allAuthors) {
-            if (book.idkorisnik === author.idkorisnik) {
-               const allReviews = await data.recenzija.findAll({
-                  where: {
-                     idknjiga: book.idknjiga
-                  },
-                  raw: true,
-                  attributes: ['ocjena']
-               })
-               let ocjena = 0;
-               for (let i = 0; i < allReviews.length; i++) {
-                  ocjena += allReviews[i].ocjena;
-               }
-               mostPopular.push({
-                  naslov: book.naslov,
-                  autor: author.ime + " " + author.prezime,
-                  count: allReviews.length,
-                  src: book.slika,
-                  rating: allReviews.length === 0 ? '-' : ocjena / allReviews.length,
-                  idknjiga: book.idknjiga
-               })
-            }
-         }
-      }
-
-
-      mostPopular.sort((a, b) => {
-         if (a.count < b.count) {
-            return 1;
-         }
-         if (a.count > b.count) {
-            return -1;
-         }
-         return 0;
-      });
-
-      console.log("slika:", mostPopular[0].src)
-      for (i = 0; i < 4; i++) {
-         books.push({
-            naslov: mostPopular[i].naslov,
-            autor: mostPopular[i].autor,
-            src: mostPopular[i].src,
-            rating: mostPopular[i].rating,
-            idknjiga: mostPopular[i].idknjiga
-         })
-      }
-
-      res.status(200).json(books);
-   }
-   catch (error) {
-      console.error('Error fetching books:', error);
-      res.status(500).json({ error: 'Internal Server Error', details: error.message });
-   }
-});
-
 router.get('/getUserId', verifyToken, async (req, res) => {
    try {
       const userId = req.user.userId;
@@ -1043,5 +915,216 @@ router.get('/getBookStatistics/:bookId', verifyToken, async (req, res) => {
       res.status(500).json({ error: 'Internal Server Error', details: error.message });
    }
 })
+
+router.get('/najpopularnije', async (req, res) => {
+   try {
+      const allBooks = await data.knjiga.findAll({
+         attributes: [
+            'idknjiga',
+            'naslov',
+            'godizd',
+            'slika',
+            'isbn',
+            'zanr',
+            ['idkorisnik', 'idkorisnikAutor'],
+            [Sequelize.col('idkorisnik_korisnik.ime'), 'imeAutor'],
+            [Sequelize.col('idkorisnik_korisnik.prezime'), 'prezAutor']
+         ],
+         include: [
+            {
+               model: data.korisnik,
+               as: 'idkorisnik_korisnik',
+               attributes: []
+            }
+         ],
+         raw: true
+      })
+
+      if (allBooks.length > 0) {
+         for (const book of allBooks) {
+
+            const brojSpremanja = await data.cita.count({
+               where: {
+                  idknjiga: book.idknjiga
+               }
+            })
+
+            book.brojSpremanja = brojSpremanja;
+
+            const brojRecenzija = await data.recenzija.count({
+               where:
+               {
+                  idknjiga: book.idknjiga
+               }
+            })
+
+            book.brojRecenzija = brojRecenzija;
+
+            const brojOsvrta = await data.recenzija.count({
+               where:
+               {
+                  idknjiga: book.idknjiga,
+                  txtrecenzija: {
+                     [Op.not]: null
+                  }
+               }
+            })
+
+            book.brojOsvrta = brojOsvrta;
+
+            if (brojRecenzija) {
+               const prosjekOcjena = await data.recenzija.findAll({
+                  attributes: [
+                     [Sequelize.fn('AVG', Sequelize.col('ocjena')), 'prosjekOcjena']
+                  ],
+                  where: {
+                     idknjiga: book.idknjiga,
+                     ocjena: {
+                        [Sequelize.Op.between]: [1, 5]
+                     }
+                  },
+                  raw: true
+               });
+               book.prosjekOcjena = parseFloat(prosjekOcjena[0].prosjekOcjena).toFixed(2);
+            }
+            else {
+               book.prosjekOcjena = 0;
+            }
+         }
+         
+         allBooks.sort((a, b) => {
+            if (a.prosjekOcjena < b.prosjekOcjena) {
+               return 1;
+            }
+            if (a.prosjekOcjena > b.prosjekOcjena) {
+               return -1;
+            }
+            return 0;
+         });
+         const popularBooks = allBooks.slice(0, 4);
+         res.status(200).json(popularBooks);
+      }
+      else {
+         res.status(404).json("Nema knjiga!");
+      }
+   }
+   catch (error) {
+      console.error('Error fetching authors:', error);
+      res.status(500).json({ error: 'Internal Server Error', details: error.message });
+   }
+});
+
+
+
+router.get('/toplePreporuke', async (req, res) => {
+   try {
+
+      const allAuthors = await data.korisnik.findAll({
+         attributes: [
+            'idkorisnik',
+         ],
+         where: {
+            tipkorisnika: "autor",
+         },
+         raw: true,
+      });
+
+
+      const allBooks = await data.knjiga.findAll({
+         attributes: [
+            'idknjiga',
+            'naslov',
+            'godizd',
+            'slika',
+            'isbn',
+            'zanr',
+            ['idkorisnik', 'idkorisnikAutor'],
+            [Sequelize.col('idkorisnik_korisnik.ime'), 'imeAutor'],
+            [Sequelize.col('idkorisnik_korisnik.prezime'), 'prezAutor']
+         ],
+         include: [
+            {
+               model: data.korisnik,
+               as: 'idkorisnik_korisnik',
+               attributes: []
+            }
+         ],
+         raw: true
+      })
+
+      if (allBooks.length > 0) {
+         for (const book of allBooks) {
+
+            const brojSpremanja = await data.cita.count({
+               where: {
+                  idknjiga: book.idknjiga
+               }
+            })
+
+            book.brojSpremanja = brojSpremanja;
+
+            const brojRecenzija = await data.recenzija.count({
+               where:
+               {
+                  idknjiga: book.idknjiga
+               }
+            })
+
+            book.brojRecenzija = brojRecenzija;
+
+            const brojOsvrta = await data.recenzija.count({
+               where:
+               {
+                  idknjiga: book.idknjiga,
+                  txtrecenzija: {
+                     [Op.not]: null
+                  }
+               }
+            })
+
+            book.brojOsvrta = brojOsvrta;
+
+            if (brojRecenzija) {
+               const prosjekOcjena = await data.recenzija.findAll({
+                  attributes: [
+                     [Sequelize.fn('AVG', Sequelize.col('ocjena')), 'prosjekOcjena']
+                  ],
+                  where: {
+                     idknjiga: book.idknjiga,
+                     ocjena: {
+                        [Sequelize.Op.between]: [1, 5]
+                     }
+                  },
+                  raw: true
+               });
+               book.prosjekOcjena = parseFloat(prosjekOcjena[0].prosjekOcjena).toFixed(2);
+            }
+            else {
+               book.prosjekOcjena = 0;
+            }
+         }
+         
+         const preporuke = [];
+         console.log(allBooks)
+         console.log(allAuthors)
+         for (book of allBooks) {
+            for (autor of allAuthors) {
+               if ((book.idkorisnikAutor === autor.idkorisnik) && autor.idkorisnik > 13) {
+                  preporuke.push(book)
+               }
+            }
+         }
+         res.status(200).json(preporuke);
+      }
+      else {
+         res.status(404).json("Nema knjiga!");
+      }
+   }
+   catch (error) {
+      console.error('Error fetching authors:', error);
+      res.status(500).json({ error: 'Internal Server Error', details: error.message });
+   }
+});
+
 
 module.exports = router;

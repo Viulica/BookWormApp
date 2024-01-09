@@ -1,0 +1,55 @@
+.register-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.register-form {
+    width: 400px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+    padding: 30px;
+    font-family: "playfair";
+    margin-bottom: 80px;
+}
+
+.register-form label {
+    font-family: "playfair";
+}
+
+.title {
+    font-family: "playfair";
+    font-size: 20px;
+    text-align: center;
+    padding-bottom: 30px;
+}
+
+.radio {
+    display: flex;
+    align-items: center;
+}
+
+.button {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    color: rgb(67, 63, 63);
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 10px;
+    display: block;
+    text-align: center;
+    font-family: "playfair";
+    background-color: #F6A192;
+    transition: background-color 0.5s;
+}
+
+.button:hover {
+    background-color: #f38775;
+}
+
+.register-container input[type="radio"] {
+    margin-right: 230px;
+}

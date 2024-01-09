@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import StarRating from "./StarRating";
 import { getImageSource } from "./Slider";
+import "../styles/Slider.css";
+
 
 interface Book {
   idknjiga: number;

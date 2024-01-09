@@ -1,6 +1,7 @@
 import { baseUrl } from "@/App";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import "../styles/Register.css"
 
 const Register: React.FC = () => {
 
@@ -46,46 +47,37 @@ const Register: React.FC = () => {
    };
 
    return (
-      <div className="content register">
-         <form>
-            <div className="form-group">
-               <label htmlFor="username">
-                  username
-                  <input type="text" name="" id="username" className="form-control" placeholder="username" value={korime} onChange={(e) => setKorime(e.target.value)} />
-               </label>   
-            </div>
-
-            <div className="form-group">
+      <div className="register-container">
+         <form className="register-form">
+           <h1 className="title">Registration</h1>
+           <div className="form-input">
+               <label htmlFor="username">username</label>   
+               <input type="text" name="" id="username" className="form-control" placeholder="username" value={korime} onChange={(e) => setKorime(e.target.value)} />
+           </div>
+            <div className="form-input">
                <label htmlFor="password">
                   password
                   <input type="password" name="" id="password" className="form-control" placeholder="password" value={lozinka} onChange={(e) => setLozinka(e.target.value)} />
                </label>
             </div>
 
-            <div className="form-group">
-               <label htmlFor="name">
-                  name
-                  <input type="text" name="" id="name" className="form-control" placeholder="name" value={ime} onChange={(e) => setIme(e.target.value)}/>
-               </label>
+            <div className="form-input">
+               <label htmlFor="name"> name </label>
+               <input type="text" name="" id="name" className="form-control" placeholder="name" value={ime} onChange={(e) => setIme(e.target.value)}/>
             </div>
 
-            <div className="form-group">
-               <label htmlFor="surname">
-                  surname
-                  <input type="text" name="" id="surname" className="form-control" placeholder="surname" value={prezime} onChange={(e) => setPrezime(e.target.value)} />
-               </label>
+            <div className="form-input">
+               <label htmlFor="surname">surname</label>
+               <input type="text" name="" id="surname" className="form-control" placeholder="surname" value={prezime} onChange={(e) => setPrezime(e.target.value)} />
             </div>
 
-            <div className="form-group">
-               <label htmlFor="info">
-                  info
-                  <input type="text" name="" id="info" className="form-control" placeholder="info" value={info} onChange={(e) => setInfo(e.target.value)}/>
-               </label>
+            <div className="form-input">
+               <label htmlFor="info">info</label>
+               <input type="text" name="" id="info" className="form-control" placeholder="info" value={info} onChange={(e) => setInfo(e.target.value)}/>
             </div>
 
-            <div className="form-group">
-               <label>
-                  author
+            <div className="form-input radio">
+               <label>author</label>
                   <input
                      type="radio"
                      name="userType"
@@ -93,12 +85,10 @@ const Register: React.FC = () => {
                      checked={tipkorisnika === 'autor'}
                      onChange={(e) => {setTipkorisnika(e.target.value)}}
                   />
-               </label>
             </div>
 
-            <div className="form-group">
-               <label>
-                  reader
+            <div className="form-input radio">
+               <label>reader</label>
                   <input
                      type="radio"
                      name="userType"
@@ -106,20 +96,17 @@ const Register: React.FC = () => {
                      checked={tipkorisnika === 'autor'}
                      onChange={(e) => {setTipkorisnika(e.target.value)}}
                   />
-               </label>
             </div>
 
-            <div className="form-group">
-               <label>
+            <div className="form-input">
+               <label>Date of birth: </label>
                   <input
                      type="date"
                      value={datrod}
                      onChange={(e) => setDatrod(e.target.value)}
                      />
-                     Date of birth:
-               </label>
             </div>
-            <a className="btn btn-primary" onClick={handleRegister}>Register</a>
+               <button className="button" onClick={handleRegister}>Register</button>
          </form>
       </div>
    );

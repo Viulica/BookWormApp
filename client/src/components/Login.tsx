@@ -44,41 +44,41 @@ const Login: React.FC = () => {
     }
   };
 
+ function handleClick(){
+    window.location.href = "/register"
+ }
+
   return (
-    <div>
-      <form onSubmit={handleSubmit} method="post">
-        <div className="mb-3">
-          <label htmlFor="username" className="form-label">
-            Username:
-          </label>
-          <input
-            type="text"
-            className="form-control"
-            value={formData.username}
-            onChange={(e) =>
-              setFormData({ ...formData, username: e.target.value })
-            }
-          />
-        </div>
+      <div className="login-container">
+        <form onSubmit={handleSubmit} method="post" className="login-form">
+          <h1 className="login-title">Login</h1>
+          <div className="form-input">
+            <label htmlFor="username" className="form-label">Username:</label>
+            <input
+              type="text"
+              id="username"
+              value={formData.username}
+              onChange={(e) =>
+                setFormData({ ...formData, username: e.target.value })
+              }
+            />
+          </div>
 
-        <div className="mb-3">
-          <label htmlFor="password" className="form-label">
-            Password:
-          </label>
-          <input
-            type="password"
-            className="form-control"
-            value={formData.password}
-            onChange={(e) =>
-              setFormData({ ...formData, password: e.target.value })
-            }
-          />
-        </div>
-        <button className="bg-orange-200">Login</button>
-      </form>
-
-      <a href="/register" className="btn btn-primary">Register</a>
-    </div>
+          <div className="form-input">
+            <label htmlFor="password" className="form-label">Password:</label>
+            <input
+              type="password"
+              id="password"
+              value={formData.password}
+              onChange={(e) =>
+                setFormData({ ...formData, password: e.target.value })
+              }
+            />
+          </div>
+            <button className="buton login-buton">Login</button>
+            <button className="buton register-buton"onClick={handleClick}>Register</button>
+        </form>
+      </div>   
   );
 };
 

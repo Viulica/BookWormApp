@@ -1,0 +1,75 @@
+.login-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.login-form {
+    margin-top: -150px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+    width: 350px;
+    border-radius: 5px;
+    padding: 20px;
+}
+
+.login-title {
+    font-family: "playfair";
+    text-align: center;
+    padding-bottom: 30px;
+    font-size: 20px;
+}
+
+.form-input {
+    margin-bottom: 15px;
+    font-family: "playfair";
+}
+
+.form-input label {
+    display: block;
+    margin-bottom: 5px;
+    font-family: "playfair";
+}
+
+.form-input input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid darkgrey;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-family: "playfair";
+}
+
+.buton {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    color: rgb(67, 63, 63);
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 10px;
+    display: block;
+    text-align: center;
+    font-family: "playfair";
+    
+}
+
+.login-buton {
+    background-color: #f6d192;
+    transition: background-color 0.5s;
+}
+
+.login-buton:hover {
+    background-color: #f2c16d;
+}
+.register-buton {
+    background-color: #F6A192;
+    transition: background-color 0.5s;
+
+}
+
+.register-buton:hover {
+    background-color: #f38775;
+
+}
