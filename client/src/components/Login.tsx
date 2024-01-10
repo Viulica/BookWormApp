@@ -15,9 +15,37 @@ const Login: React.FC = () => {
     password: "",
   });
   const navigate = useNavigate();
+  const [isValidPass, setIsValidPass] = useState<boolean>(false);
+  const [isValidUsr, setIsValidUsr] = useState<boolean>(false);
+  const [passMessage, setPassMessage] = useState('');
+  const [usrMessage, setUsrMessage] = useState("");
+
+
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    const password = formData.password;
+    const username = formData.username;
+
+    if (password.length === 0) {
+      setIsValidPass(false)
+      setPassMessage("Polje za lozinku ne smije biti prazno");
+    } else if (password.length < 8) {
+      setIsValidPass(false)
+      setPassMessage('Duljina lozinke mora biti barem 8 znakova');
+    } else {
+      setIsValidPass(true);
+      setPassMessage("")
+    }
+
+    if (username.length === 0) {
+        setUsrMessage("Korisnicko ime mora sadrzavati barem 1 znak");
+        setIsValidUsr(false);
+    } else {
+      setIsValidUsr(true);
+      setUsrMessage("")
+    }
 
     try {
       // Šaljemo podatke na backend
@@ -48,6 +76,7 @@ const Login: React.FC = () => {
     window.location.href = "/register"
  }
 
+
   return (
       <div className="login-container">
         <form onSubmit={handleSubmit} method="post" className="login-form">
@@ -62,8 +91,9 @@ const Login: React.FC = () => {
                 setFormData({ ...formData, username: e.target.value })
               }
             />
+            {!isValidUsr && <p className="poruka">{usrMessage}</p>}
           </div>
-
+          
           <div className="form-input">
             <label htmlFor="password" className="form-label">Password:</label>
             <input
@@ -74,6 +104,7 @@ const Login: React.FC = () => {
                 setFormData({ ...formData, password: e.target.value })
               }
             />
+            {!isValidPass && <p className="poruka">{passMessage}</p>}
           </div>
             <button className="buton login-buton">Login</button>
             <button className="buton register-buton"onClick={handleClick}>Register</button>
