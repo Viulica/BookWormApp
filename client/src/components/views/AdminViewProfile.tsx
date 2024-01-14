@@ -311,9 +311,9 @@ const AdminViewProfile: React.FC = () => {
           {storedToken && isMyProfile && (
             <>
               <div className="container-change-and-see-reading-list">
-                <a href="/changeProfile" className="btn btn-primary">
+                {/* <a href="/changeProfile" className="btn btn-primary">
                   Change
-                </a>
+                </a> */}
                 {userRole === "autor" ||
                   (isMyProfile && (
                     <a href={"/addBook"} className="btn btn-primary">
@@ -337,12 +337,12 @@ const AdminViewProfile: React.FC = () => {
               <a href={"/myBooks/" + profileId} className="btn btn-primary">
                 See reading list
               </a>
-              <a
+              {/* <a
                 href={"/inbox?idReciever=" + profileId}
                 className="message-icon"
               >
                 <MessageIcon />
-              </a>
+              </a> */}
             </div>
           )}
 

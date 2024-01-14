@@ -127,7 +127,7 @@ const HamburgerMenu = () => {
             <a href="/addBook">Add Book</a>
           </li>
         )}
-        {storedToken && (
+        {storedToken && role !== "admin" && (
           <li>
             <a href="/inbox">Inbox</a>
           </li>

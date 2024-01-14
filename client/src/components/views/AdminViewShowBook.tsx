@@ -147,14 +147,14 @@ const AdminViewShowBook: React.FC = () => {
                       {bookData.imeAutor + " " + bookData.prezAutor}
                     </a>
                   </span>
-                  <span>
+                  {/* <span>
                     <a
                       href={"/inbox?idReciever=" + bookData.idkorisnikAutor}
                       className="btn btn-warning"
                     >
                       Send message
                     </a>
-                  </span>
+                  </span> */}
                 </div>
                 <div className="book-details-description">
                   Description: {bookData.opis}
