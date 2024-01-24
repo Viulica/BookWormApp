@@ -111,7 +111,7 @@ const NavBar: React.FC = () => {
         {storedToken && <NavItem path={currentPath}  href={"/profile/" + myUserId}>Profile</NavItem>}
         {(storedToken && role !== "admin") && <NavItem path={currentPath} href={"/myBooks/" + myUserId}>My Books</NavItem>}
         {(storedToken && role === "admin") && <NavItem path={currentPath} href="/addBook">Add Book</NavItem>}
-        {storedToken && <NavItem path={currentPath} href="/inbox">Inbox</NavItem>}
+        {storedToken && role !== "admin" && <NavItem path={currentPath} href="/inbox">Inbox</NavItem>}
         {!storedToken && <NavItem path={currentPath}  href="/login">Login</NavItem>}
         {!storedToken && <NavItem path={currentPath}  href="/register">Register</NavItem>}
         {storedToken && <NavItem path={currentPath}  href="/logout">Logout</NavItem>}
