@@ -1,5 +1,5 @@
 import { baseUrl } from "@/App";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/Register.css";
 
@@ -90,27 +90,43 @@ const Register: React.FC = () => {
       setIsValidDate(false);
       setDateMessage("Morate unijeti datum rodenja");
     }
-
-    if (isValidUsr && isValidPass && isValidName && isValidSrname) {
-      try {
-        const response = await fetch(`${baseUrl}/api/register`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
-        });
-
-        if (!response.ok) {
-          console.log("Korisnik već postoji, prijavi se!");
-        } else {
-          console.log(await response.json());
-          alert("Login now!");
-          navigate("/login");
-        }
-      } catch (error) {}
-    }
   };
+
+  useEffect(() => {
+    async function submit() {
+      const data = {
+        datrod,
+        korime,
+        lozinka,
+        ime,
+        prezime,
+        info,
+        tipkorisnika,
+      };
+
+      if (isValidUsr && isValidPass && isValidName && isValidSrname) {
+        try {
+          const response = await fetch(`${baseUrl}/api/register`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+          });
+
+          if (!response.ok) {
+            console.log("Korisnik već postoji, prijavi se!");
+          } else {
+            console.log(await response.json());
+            alert("Login now!");
+            navigate("/login");
+          }
+        } catch (error) {}
+      }
+    }
+
+    submit();
+  }, [isValidUsr, isValidPass, isValidName, isValidSrname]);
 
   return (
     <div className="register-container">

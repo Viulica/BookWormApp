@@ -29,9 +29,9 @@ const Login: React.FC = () => {
     if (password.length === 0) {
       setIsValidPass(false);
       setPassMessage("Polje za lozinku ne smije biti prazno");
-    } else if (password.length < 8) {
-      // setIsValidPass(false)
-      // setPassMessage('Duljina lozinke mora biti barem 8 znakova');
+    } else if (password.length < 2) {
+      setIsValidPass(false)
+      setPassMessage('Duljina lozinke mora biti barem 8 znakova');
     } else {
       setIsValidPass(true);
       setPassMessage("");
