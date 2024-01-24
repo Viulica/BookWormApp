@@ -1,19 +1,12 @@
 .my-navbar {
   display: flex;
-  /* Use Flexbox */
   justify-content: space-evenly;
-  /* Equal spacing between items */
   align-items: center;
-  /* Align items vertically */
   list-style: none;
-  /* Remove default list styling */
   padding: 10px;
-  /* Remove default padding */
   margin: 5px;
   background-color: var(--bg-main);
-  /* Add background color */
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  /* Add subtle shadow */
   position: relative;
 }
 
@@ -24,22 +17,17 @@
 
 .my-navbar li {
   padding: 10px 20px;
-  /* Add padding to each item */
   transition: background-color 0.3s;
-  /* Smooth transition for hover effect */
 }
 
 .my-navbar a {
   text-decoration: none;
-  /* Remove underline from links */
   font-family: "playfair";
   transition: color 0.2s;
-  /* Smooth transition for color change */
 }
 
 .my-navbar a:hover {
   color: #F6A192;
-  /* Change link color on hover */
 }
 
 
@@ -58,14 +46,14 @@
     display: flex;
     flex-direction: column;
     justify-content: space-around;
-    height: 25px; /* Adjust as needed */
-    width: 35px; /* Adjust as needed */
+    height: 25px; 
+    width: 35px; 
 }
 
 .line {
     height: 3px;
     width: 100%;
-    background-color: #333; /* Adjust color as needed */
+    background-color: #333; 
 }
 
 .nav-list {
@@ -73,7 +61,6 @@
     display: none;
 }
 
-/* Styles for larger screens */
 @media screen and (min-width: 600px) {
     .nav-list {
         display: flex;
