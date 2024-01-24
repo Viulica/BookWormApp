@@ -30,16 +30,6 @@ const Register: React.FC = () => {
   const handleRegister = async (e: SubmitEvent) => {
     e.preventDefault();
 
-    const data = {
-      datrod,
-      korime,
-      lozinka,
-      ime,
-      prezime,
-      info,
-      tipkorisnika,
-    };
-
     if (lozinka.length === 0) {
       setIsValidPass(false);
       setPassMessage("Polje za lozinku ne smije biti prazno");
