@@ -8,8 +8,7 @@ router.post('/', async (req, res) => {
    try {
       const { datrod, korime, lozinka, ime, prezime, info, tipkorisnika } = req.body;
 
-      console.log(req.body)
-
+      let tip = tipkorisnika === "author" ? "autor" : "čitatelj";
       // možda dodati da tipkorisnika bude predan kao 0 ili 1 pa onda ja stavljam string "čitatelj" ili "autor"
 
       const existingUser = await data.korisnik.findOne({
@@ -28,7 +27,7 @@ router.post('/', async (req, res) => {
             throw new Error("Hashing error");
          } else {
             const newUser = await data.korisnik.create({
-               datrod, korime, lozinka, ime, prezime, info: info || null, tipkorisnika
+               datrod, korime, lozinka, ime, prezime, info: info || null, tip
             });
             res.status(201).json({ message: "Korisnik uspješno stvoren", user: newUser });
          }
