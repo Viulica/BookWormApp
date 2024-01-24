@@ -140,7 +140,6 @@ router.get('/messages/:idReciever', verifyToken, async (req, res) => {
          raw: true,
       });
 
-      console.log(messagesSender);
 
       res.status(200).json(messagesSender);
 
@@ -159,7 +158,7 @@ router.post('/messages/send/:idReciever', verifyToken, async (req, res) => {
       const { txtporuka } = req.body;
 
       const trenutnoVrijeme = new Date();
-      trenutnoVrijeme.setUTCHours(trenutnoVrijeme.getUTCHours() + 1);
+      trenutnoVrijeme.setUTCHours(trenutnoVrijeme.getUTCHours());
       console.log(trenutnoVrijeme);
 
       const sendMessage = await data.poruka.create({

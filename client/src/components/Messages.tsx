@@ -102,9 +102,13 @@ const Messages: React.FC = () => {
             }
           );
 
+          console.log("IM ", response.status)
+
           if (response.ok) {
             const data = await response.json();
             setMessagesData(data);
+          } else if (response.status === 304) {
+            console.log("304")
           }
           else if (response.status === 401) {
             navigate('/login');
@@ -122,9 +126,16 @@ const Messages: React.FC = () => {
 
     setLastRefreshed(formatDate(new Date()));
 
+
+
     fetchUserId();
     fetchUserData();
     fetchInbox();
+    const messageInterval = setInterval(() => {
+      fetchInbox();
+    }, 2000);
+
+    return () => clearInterval(messageInterval);
   }, []);
 
 
@@ -234,17 +245,6 @@ const Messages: React.FC = () => {
                 </div>
               </div>
             ))}
-          </div>
-          <div className="refreshed">
-            <span>Last refreshed: {lastRefreshed}</span>
-            <a
-              className="btn btn-primary"
-              onClick={() => {
-                window.location.reload();
-              }}
-            >
-              Refresh
-            </a>
           </div>
           <div className="form">
             <div className="form-group">
