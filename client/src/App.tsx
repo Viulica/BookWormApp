@@ -18,7 +18,7 @@ import ShowBookRedirect from "../src/components/ShowBookRedirect";
 import Inbox from "../src/components/Inbox";
 import Messages from "../src/components/Messages";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "./App.css"
+import "./App.css";
 import Register from "./components/Register";
 import AllAuthors from "./components/AllAuthors";
 import ChangeBookInfo from "./components/ChangeBookInfo";
@@ -30,28 +30,28 @@ const App: React.FC = () => {
     <Router>
       <div className="app">
         {window.innerWidth > 768 ? <NavBar /> : <HamburgerMenu />}
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/home" element={<Home />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/profile/:id" element={<ProfileRedirect />} />
-            <Route path="/changeProfile" element={<ChangeProfile />} />
-            <Route path="/myBooks/:id" element={<MyBooks />} />
-            <Route path="/logout" element={<Logout />} />
-            <Route path="/allBooks" element={<AllBooks />} />
-            <Route path="/allAuthors" element={<AllAuthors />} />
-            <Route path="/addBook" element={<AddBook />} />
-            <Route path="/book/:id" element={<ShowBookRedirect />} />
-            <Route path="/changeBookInfo/:id" element={<ChangeBookInfo/>} />
-            <Route path="/inbox" element={<Inbox />} />
-            <Route path="/inbox?idReciever=:id" element={<Messages/>} />
-          </Routes>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/home" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/profile/:id" element={<ProfileRedirect />} />
+          <Route path="/changeProfile" element={<ChangeProfile />} />
+          <Route path="/myBooks/:id" element={<MyBooks />} />
+          <Route path="/logout" element={<Logout />} />
+          <Route path="/allBooks" element={<AllBooks />} />
+          <Route path="/allAuthors" element={<AllAuthors />} />
+          <Route path="/addBook" element={<AddBook />} />
+          <Route path="/book/:id" element={<ShowBookRedirect />} />
+          <Route path="/changeBookInfo/:id" element={<ChangeBookInfo />} />
+          <Route path="/inbox" element={<Inbox />} />
+          <Route path="/inbox?idReciever=:id" element={<Messages />} />
+        </Routes>
       </div>
     </Router>
   );
 };
 
 export default App;
-export const baseUrl = "http://localhost:3000";
-export const storedToken = sessionStorage.getItem('token');
+export const baseUrl = "https://bookwormapp.onrender.com";
+export const storedToken = sessionStorage.getItem("token");
