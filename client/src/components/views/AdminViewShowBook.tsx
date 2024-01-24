@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 import StarRating from "../StarRating";
 import "../../styles/ShowBook.css";
 import { useNavigate } from "react-router-dom";
-import { EditIcon } from "../EditIcon";
 import { DeleteIcon } from "../DeleteIcon";
 import { InfoIcon } from "../InfoIcon";
 import { getImageSource } from "../Slider";
@@ -93,13 +92,16 @@ const AdminViewShowBook: React.FC = () => {
 
   const fetchBookStatistics = async () => {
     try {
-      const response = await fetch(`${baseUrl}/api/data/getBookStatistics/${bookId}`, {
-        method: 'GET',
-        headers: {
-          'Content-type': 'application/json',
-          Authorization: `${storedToken}`
+      const response = await fetch(
+        `${baseUrl}/api/data/getBookStatistics/${bookId}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-type": "application/json",
+            Authorization: `${storedToken}`,
+          },
         }
-      });
+      );
 
       if (response.ok) {
         setBookStatistics(await response.json());
@@ -107,7 +109,7 @@ const AdminViewShowBook: React.FC = () => {
     } catch (error) {
       console.error("Greška prilikom dohvaćanja statistike za knjigu.");
     }
-  }
+  };
 
   useEffect(() => {
     fetchBookData();
@@ -166,15 +168,19 @@ const AdminViewShowBook: React.FC = () => {
                 </div>
 
                 <div className="book-details-statistics">
-                  <div>Read: { bookStatistics.procitano}</div>
-                  <div>Currently reading: { bookStatistics.trenutnoCitam}</div>
-                  <div>Want to read: { bookStatistics.zelimProcitati}</div>
+                  <div>Read: {bookStatistics.procitano}</div>
+                  <div>Currently reading: {bookStatistics.trenutnoCitam}</div>
+                  <div>Want to read: {bookStatistics.zelimProcitati}</div>
                 </div>
 
                 <div className="book-details-edit-book">
-                  <a href={"/changeBookInfo/" + bookId} className="btn btn-primary">Edit</a>
+                  <a
+                    href={"/changeBookInfo/" + bookId}
+                    className="btn btn-primary"
+                  >
+                    Edit
+                  </a>
                 </div>
-
               </div>
             </div>
           </div>

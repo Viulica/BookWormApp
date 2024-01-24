@@ -1,6 +1,6 @@
 import { baseUrl, storedToken } from "@/App";
 import React, { useEffect, useState } from "react";
-import { useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import "../styles/Inbox.css";
 import "../styles/Messages.css";
 import Messages from "./Messages";
@@ -11,13 +11,11 @@ const Inbox: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [userId, setUserId] = useState<number>(0);
-  const [idReciever, setIdReciever] = useState<string>("");
   const [showMessages, setShowMessages] = useState<boolean>(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     if (window.location.search.split("=")[1]) {
-      setIdReciever(window.location.search.split("=")[1]);
       setShowMessages(true);
     }
 
@@ -34,11 +32,9 @@ const Inbox: React.FC = () => {
             const data = await response.json();
             setInboxData(data);
             setLoading(false);
-          }
-          else if (response.status === 401) {
-            navigate('/login');
-          }
-          else {
+          } else if (response.status === 401) {
+            navigate("/login");
+          } else {
             console.log(await response.json());
           }
         } catch (error) {
@@ -64,11 +60,9 @@ const Inbox: React.FC = () => {
           if (response.ok) {
             const data = await response.json();
             setUserId(data);
-          }
-          else if (response.status === 401) {
-            navigate('/login');
-          }
-          else {
+          } else if (response.status === 401) {
+            navigate("/login");
+          } else {
             console.log(await response.json());
           }
         } catch (error) {
@@ -97,11 +91,9 @@ const Inbox: React.FC = () => {
       if (response.ok) {
         const data = await response.json();
         setFilteredData(data);
-      }
-      else if (response.status === 401) {
-        navigate('/login');
-      }
-      else {
+      } else if (response.status === 401) {
+        navigate("/login");
+      } else {
         console.log(await response.json());
       }
     } catch (error) {
@@ -139,12 +131,12 @@ const Inbox: React.FC = () => {
                       href={"/inbox?idReciever=" + message.idkorisnik}
                       className="text-primary"
                     >
-                        {message.korime +
-                          " (" +
-                          message.ime +
-                          " " +
-                          message.prezime +
-                          ")"}
+                      {message.korime +
+                        " (" +
+                        message.ime +
+                        " " +
+                        message.prezime +
+                        ")"}
                     </a>
                   </div>
                 ))}
@@ -158,7 +150,8 @@ const Inbox: React.FC = () => {
               {inboxData.length > 0 ? (
                 inboxData.map((message, index) => (
                   <div className="conversation" key={index}>
-                    <a href={
+                    <a
+                      href={
                         message.idprimatelj === userId
                           ? "/inbox?idReciever=" + message.idposiljatelj
                           : "/inbox?idReciever=" + message.idprimatelj
@@ -175,11 +168,9 @@ const Inbox: React.FC = () => {
                 ))
               ) : (
                 <>Ništa</>
-                )}
-              </div>
-              {showMessages && 
-                <Messages />
-                }
+              )}
+            </div>
+            {showMessages && <Messages />}
           </div>
         </>
       )}

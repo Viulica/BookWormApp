@@ -1,10 +1,8 @@
-import { baseUrl, storedToken } from "@/App";
+import { baseUrl } from "@/App";
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import Slider from "./Slider";
 
 const AllBooks: React.FC = () => {
-  const navigate = useNavigate();
   const [allBooks, setAllBooks] = useState<any>([]);
   const [loading, setLoading] = useState<boolean>(true);
 

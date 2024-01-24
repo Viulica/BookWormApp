@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { baseUrl, storedToken } from "../../App";
 import { useNavigate } from "react-router-dom";
 import "../../styles/Profile.css";
-import { MessageIcon } from "../MessageIcon";
 import Slider, { getImageSource } from "../Slider";
 
 const AdminViewProfile: React.FC = () => {
@@ -10,7 +9,6 @@ const AdminViewProfile: React.FC = () => {
 
   const [isMyProfile, setIsMyProfile] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
-  const [myUserId, setMyUserId] = useState<number>(0);
   const [profileData, setProfileData] = useState<any>({});
   const profileId = parseInt(
     window.location.pathname.split("/")[
@@ -36,7 +34,6 @@ const AdminViewProfile: React.FC = () => {
 
         if (response.ok) {
           const data = await response.json();
-          setMyUserId(data);
           setIsMyProfile(profileId === data);
         } else if (response.status === 401) {
           navigate("/login");

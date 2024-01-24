@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { baseUrl, storedToken } from "../../App";
+import { baseUrl } from "../../App";
 import { useNavigate } from "react-router-dom";
 import "../../styles/Profile.css";
 import Slider from "../Slider";

@@ -1,64 +1,17 @@
 import { baseUrl, storedToken } from "@/App";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/MyBooks.css";
 import Slider from "./Slider";
 
 const MyBooks: React.FC = () => {
   const [savedBooks, setSavedBooks] = useState<any>({});
-  const [myUserId, setMyUserId] = useState<number>(0);
   const profileId = window.location.href
     .split("/")
     .at(window.location.href.split("/").length - 1);
   console.log(profileId);
   const [loading, setLoading] = useState<boolean>(true);
-  const [isAuthor, setIsAuthor] = useState<boolean>(false);
   const navigate = useNavigate();
-
-  const fetchMyUserId = async () => {
-    if (storedToken) {
-      try {
-        const response = await fetch(`${baseUrl}/api/data/getUserId`, {
-          headers: {
-            Authorization: `${storedToken}`,
-          },
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          setMyUserId(data);
-        } else if (response.status === 401) {
-          navigate("/login");
-        } else {
-          console.log(await response.json());
-        }
-      } catch (error) {
-        console.log("Greška prilikom dohvaćanja userId:", error);
-      }
-    }
-  };
-
-  const fetchProfileData = async () => {
-    try {
-      const response = await fetch(`${baseUrl}/api/data/profile/${profileId}`, {
-        headers: {
-          Authorization: `${storedToken}`,
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        console.log(data);
-        setIsAuthor(data.tipkorisnika === "autor");
-      } else if (response.status === 401) {
-        navigate("/login");
-      } else {
-        console.log(await response.json());
-      }
-    } catch (error) {
-      console.log("Greška prilikom dohvaćanja userId:", error);
-    }
-  };
 
   const fetchSavedBooksData = async () => {
     console.log("fetchSavedBooksData", profileId);
@@ -76,7 +29,7 @@ const MyBooks: React.FC = () => {
         if (response.ok) {
           const data = await response.json();
           console.log(data);
-          setSavedBooks({...data});
+          setSavedBooks({ ...data });
         } else if (response.status === 401) {
           navigate("/login");
         } else {
@@ -97,8 +50,6 @@ const MyBooks: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchMyUserId();
-    fetchProfileData();
     fetchSavedBooksData();
   }, []);
 
@@ -108,9 +59,10 @@ const MyBooks: React.FC = () => {
         <p className="p-4">Loading...</p>
       ) : (
         <>
-            <div className="container">
-
-            {(savedBooks["Read"].length > 0 || savedBooks['Currently reading'].length > 0 || savedBooks['Want to read'].length > 0) ? (
+          <div className="container">
+            {savedBooks["Read"].length > 0 ||
+            savedBooks["Currently reading"].length > 0 ||
+            savedBooks["Want to read"].length > 0 ? (
               <>
                 {savedBooks["Read"].length > 0 ? (
                   <>

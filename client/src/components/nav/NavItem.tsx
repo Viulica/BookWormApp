@@ -1,11 +1,10 @@
-import PropTypes from 'prop-types';
-import "../../styles/NavItem.css"
+import "../../styles/NavItem.css";
 
 function NavItem({ href, children, path }: NavItemProps) {
   let isActive = false;
-  let className = '';
-  href === path ? isActive = true: isActive;
-  isActive ? className = 'active' : className;
+  let className = "";
+  href === path ? (isActive = true) : isActive;
+  isActive ? (className = "active") : className;
 
   return (
     <li className={`nav-item-custom ${className}`}>
@@ -18,8 +17,8 @@ function NavItem({ href, children, path }: NavItemProps) {
 
 interface NavItemProps {
   href: string;
-  children: React.ReactNode,
-  path: string
+  children: React.ReactNode;
+  path: string;
 }
 
 export default NavItem;

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import "../styles/HamburgerMenu.css";
 import { baseUrl, storedToken } from "@/App";
 import { useNavigate } from "react-router-dom";
