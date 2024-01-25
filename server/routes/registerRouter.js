@@ -27,7 +27,7 @@ router.post('/', async (req, res) => {
             throw new Error("Hashing error");
          } else {
             const newUser = await data.korisnik.create({
-               datrod, korime, lozinka, ime, prezime, info: info || null, tip
+               datrod, korime, lozinka, ime, prezime, info: info || null, tipkorisnika: tip
             });
             res.status(201).json({ message: "Korisnik uspješno stvoren", user: newUser });
          }

@@ -1043,15 +1043,12 @@ router.get('/toplepreporuke', async (req, res) => {
       if (knjige === "nema knjiga.") {
          return res.status(400).send("No books in DB.");
       }
-
-      const preporuke = [];
-         for (book of knjige) {
-            for (autor of allAuthors) {
-               if ((book.idkorisnikAutor === autor.idkorisnik) && autor.idkorisnik > 13) {
-                  preporuke.push(book)
-               }
-            }
-         }
+      let preporuke;
+      if (knjige.length < 4) {
+         preporuke = knjige
+      } else {
+         preporuke = knjige.slice(-4)
+      }
 
       res.status(200).json(preporuke);
    } catch (error) {
